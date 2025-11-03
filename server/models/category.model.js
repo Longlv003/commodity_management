@@ -4,7 +4,7 @@ const catSchema = new db.mongoose.Schema(
     {
         name: {type: String, required: true}
     }, 
-    {collection: 'catgories'},
+    {collection: 'categories'},
 );
 
 let catModel = db.mongoose.model('catModel', catSchema);
