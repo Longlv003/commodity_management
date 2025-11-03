@@ -1,5 +1,5 @@
 # commodity_management
-Dự án 1 (PRO1122)
+
 **Dự án 1 (PRO1122)** — Quản lý hàng hóa  
 
 ---
