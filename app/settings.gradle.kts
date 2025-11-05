@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "commodity_management"
+rootProject.name = "closet_hub"
 include(":app")

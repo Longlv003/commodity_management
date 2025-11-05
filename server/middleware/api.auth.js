@@ -3,6 +3,8 @@ var {userModel} = require('../models/account.model')
 require('dotenv').config();
 const chuoi_bi_mat = process.env.TOKEN_SEC_KEY;
 // hàm kiểm tra đăng nhập
+
+
 const api_auth = async (req, res , next)=>{
    // lấy token trong header
    let header_token = req.header ('Authorization');
@@ -13,6 +15,7 @@ const api_auth = async (req, res , next)=>{
    let token = header_token.replace('Bearer ','');
    // chú ý: có 1 dấu cách ở sau chữ Bearer
    // kiểm tra token hợp lệ hay không
+   
    try {
        let data = jwt.verify(token, chuoi_bi_mat);
        console.log(data);
@@ -26,12 +29,29 @@ const api_auth = async (req, res , next)=>{
        req.user = user;
        req.token = token;
 
-
        next();// xác thực ok, cho phép làm tiếp các công việc tiếp theo
       
    } catch (error) {
        console.error(error);
        res.status(401).send({error: error.message})
    }
-}
-module.exports = {api_auth}
+};
+
+// const checkRole = async (req, res, next) => {
+//     if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+//         return res.status(403).json({ error: 'Chỉ admin mới được phép thực hiện thao tác này.' });
+//     }
+//     next();
+// };
+
+const checkRole = (roles = []) => {
+    // roles: mảng quyền được phép, ví dụ ['admin'] hoặc ['admin', 'super_admin']
+    return (req, res, next) => {
+        if (!req.user || !roles.includes(req.user.role)) {
+            return res.status(403).json({ error: 'Không có quyền truy cập' });
+        }
+        next();
+    };
+};
+
+module.exports = {api_auth, checkRole};

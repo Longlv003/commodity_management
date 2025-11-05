@@ -60,11 +60,11 @@ Dự án gồm **2 phần chính**:
 ## ⚙️ Hướng dẫn cài đặt (tùy chọn)
 
 ### 🔹 1. Clone dự án
-```bash
-npm install -g nodemon
-git clone https://github.com/yourusername/closethub.git
-cd closethub/server
-```
+   ```bash
+   npm install -g nodemon
+   git clone https://github.com/yourusername/closethub.git
+   cd closethub/server
+   ```
 
 ### 🔸 2. Server
 1. Cài Node.js và MongoDB  

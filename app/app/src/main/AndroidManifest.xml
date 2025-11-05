@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -15,13 +16,25 @@
         android:theme="@style/Theme.Commodity_management"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".ItemCategoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LayoutBannerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".NavHeaderActivity"
+            android:exported="false" />
+        <activity
+            android:name=".HeaderMainActivity"
+            android:exported="false" />
+        <activity
             android:name=".RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".MainActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

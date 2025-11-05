@@ -5,6 +5,7 @@ var accountCtrl = require('../controllers/account.controller');
 var multer = require('multer');
 var path = require('path');
 var upload = multer({dest: path.join(__dirname, '../public/upload')});
+var bannerCtrl = require('../controllers/banner_sale.controller');
 var catCtrl = require('../controllers/category.controller');
 var pModel = require('../controllers/product.controller');
 
@@ -13,10 +14,16 @@ router.post('/account/register', upload.single('image'), accountCtrl.doReg);
 router.post('/account/login', accountCtrl.doLogin);
 router.post('/account/upload-avatar',upload.single("image"), accountCtrl.UploadAvatar);
 
+// Banner
+router.post('/banner/sale/add',mdw.api_auth, mdw.checkRole(['admin']), upload.single('image'), bannerCtrl.AddBanner);
+router.delete('/banner/sale/delete',mdw.api_auth, mdw.checkRole(['admin']), bannerCtrl.DeleteBanner);
+router.get('/banner/sale/list', bannerCtrl.GetAllBanner);
+
+
 // Category
-router.post('/category/add', catCtrl.addCat);
-router.put('/category/edit/:_id', catCtrl.updateCat);
-router.delete('/category/delete/:_id', catCtrl.deleteCat);
+router.post('/category/add', mdw.api_auth, mdw.checkRole(['admin']), catCtrl.addCat);
+router.put('/category/edit/:_id', mdw.api_auth, mdw.checkRole(['admin']), catCtrl.updateCat);
+router.delete('/category/delete/:_id', mdw.api_auth, mdw.checkRole(['admin']), catCtrl.deleteCat);
 router.get('/category/list', catCtrl.getListCat);
 
 // Product

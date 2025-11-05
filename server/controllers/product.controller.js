@@ -116,7 +116,7 @@ exports.UploadImage = async (req, res, next) => {
 };
 
 exports.GetListProduct = async (req, res, next) => {
-    dataRes = {msg: 'OK'};
+    let dataRes = {msg: 'OK'};
     try {
         let list = await pModel.find();
         dataRes.data = list;
@@ -129,7 +129,7 @@ exports.GetListProduct = async (req, res, next) => {
 
 exports.GetProductByCat = async (req, res, next) => {
     let dk = null;
-    dataRes = {msg: 'OK'};
+    let dataRes = {msg: 'OK'};
     try {
         if (typeof(req.query.catID) != 'undefined') {
             dk = {catID: new mongoose.Types.ObjectId(req.query.catID)};

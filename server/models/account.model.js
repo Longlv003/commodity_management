@@ -8,10 +8,17 @@ const accSchema = new db.mongoose.Schema(
     {
         email: {type: String, required: true},
         pass: {type: String, required: true},
+        role: { 
+            type: String, 
+            enum: ['user', 'admin'], 
+            default: 'user' 
+        },
+        is_active: {type: Boolean, default: true},
+        //is_delete: {type: Boolean, default: false},
         phone: {type: String},
         image: {type: String},
         token: {type: String}
-    }, 
+    },
     {
         collection: 'accounts'
     }
