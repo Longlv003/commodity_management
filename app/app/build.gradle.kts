@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.commodity_management"
+    namespace = "com.example.closethub"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.commodity_management"
+        applicationId = "com.example.closethub"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

@@ -1,4 +1,4 @@
-package com.example.commodity_management;
+package com.example.closethub;
 
 import android.os.Bundle;
 
