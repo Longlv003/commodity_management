@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    tools:context=".ItemProductActivity"
+    android:layout_width="180dp"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:gravity="center_horizontal">
+
+        <!-- Icon yêu thích -->
+        <ImageView
+            android:id="@+id/imgFavorite"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="end"
+            android:src="@drawable/ic_favorite"
+            android:contentDescription="favorite" />
+
+        <!-- Ảnh sản phẩm -->
+        <ImageView
+            android:id="@+id/imgProduct"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_launcher_foreground"
+            android:layout_marginTop="4dp" />
+
+        <!-- Tên và khối lượng -->
+        <TextView
+            android:id="@+id/txtName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Fresh Orange"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="8dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:gravity="center_horizontal" />
+
+        <!--        <TextView-->
+        <!--            android:id="@+id/txtWeight"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:text="130 gm"-->
+        <!--            android:textColor="#888888"-->
+        <!--            android:textSize="13sp"/>-->
+
+        <!-- Giá -->
+        <TextView
+            android:id="@+id/txtPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="14.29"
+            android:textColor="#2E7D32"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_marginTop="4dp"/>
+
+        <!-- Số lượng -->
+        <TextView
+            android:id="@+id/txtQty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="14.29"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:layout_marginTop="4dp"/>
+
+        <!-- Add to cart -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:background="@drawable/custom_edt">
+
+<!--            <ImageView-->
+<!--                android:id="@+id/btnAddCart"-->
+<!--                android:layout_width="30dp"-->
+<!--                android:layout_height="30dp"-->
+<!--                android:src="@drawable/add"-->
+<!--                android:textSize="30sp"-->
+<!--                android:textColor="@color/black"-->
+<!--                android:layout_marginEnd="10dp" />-->
+
+            <TextView
+                android:id="@+id/txtAddCart"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Add to cart"
+                android:gravity="center_horizontal"
+
+                android:clickable="true"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

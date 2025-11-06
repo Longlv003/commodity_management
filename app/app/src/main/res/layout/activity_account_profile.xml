@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AccountProfileActivity"
+    android:padding="24dp"
+    android:background="@android:color/white">
+
+    <LinearLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Thanh tiêu đề -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
+
+            <ImageView
+                android:id="@+id/imgBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/outline_arrow_back_24"
+                android:contentDescription="Back"
+                android:padding="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Complete your profile"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_marginStart="12dp"/>
+        </LinearLayout>
+
+        <!-- Ảnh đại diện và nút chỉnh sửa -->
+        <RelativeLayout
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="24dp"
+            android:padding="10dp">
+
+            <ImageView
+                android:id="@+id/imgAvatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_camera"
+                android:scaleType="centerCrop"
+                android:background="@drawable/avatar_bg"
+                android:contentDescription="Avatar"/>
+
+            <ImageButton
+                android:id="@+id/btnEditAvatar"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/ic_edit"
+                android:contentDescription="Edit avatar"
+                android:layout_margin="6dp"
+                android:background="@drawable/edit_avatar_bg"/>
+        </RelativeLayout>
+
+<!--        <com.google.android.material.textfield.TextInputLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:hint="Fullname"-->
+<!--            android:layout_marginBottom="10dp">-->
+
+<!--            <com.google.android.material.textfield.TextInputEditText-->
+<!--                android:id="@+id/edtFullname"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:background="@drawable/custom_edt"/>-->
+<!--        </com.google.android.material.textfield.TextInputLayout>-->
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:layout_marginBottom="10dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/custom_edt"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+<!--        <com.google.android.material.textfield.TextInputLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:hint="YYYY/MM/DD"-->
+<!--            android:layout_marginBottom="10dp">-->
+
+<!--            <com.google.android.material.textfield.TextInputEditText-->
+<!--                android:id="@+id/edtDateBirthDay"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:background="@drawable/custom_edt"/>-->
+<!--        </com.google.android.material.textfield.TextInputLayout>-->
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Phone number"
+            android:layout_marginBottom="10dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtPhoneNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/custom_edt"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!--        <LinearLayout-->
+        <!--            android:id="@+id/layPhone"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="50dp"-->
+        <!--            android:orientation="horizontal"-->
+        <!--            android:gravity="center_vertical"-->
+        <!--            android:background="@drawable/custom_edt"-->
+        <!--            android:padding="8dp"-->
+        <!--            android:layout_marginBottom="24dp">-->
+
+        <!--            <ImageView-->
+        <!--                android:id="@+id/imgFlag"-->
+        <!--                android:layout_width="28dp"-->
+        <!--                android:layout_height="20dp"-->
+        <!--                android:src="@drawable/ic_favorite" />-->
+
+        <!--            <Spinner-->
+        <!--                android:id="@+id/spinnerCountry"-->
+        <!--                android:layout_width="wrap_content"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:entries="@array/countries_codes"-->
+        <!--                android:layout_marginStart="8dp"/>-->
+
+        <!--            <EditText-->
+        <!--                android:id="@+id/edtPhone"-->
+        <!--                android:layout_width="0dp"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:layout_weight="1"-->
+        <!--                android:layout_marginStart="8dp"-->
+        <!--                android:hint="Phone number"-->
+        <!--                android:inputType="phone"-->
+        <!--                android:background="@android:color/transparent"/>-->
+        <!--        </LinearLayout>-->
+
+        <Button
+            android:id="@+id/btnEdit"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Edit my profile"
+            android:textAllCaps="false"
+            android:backgroundTint="@android:color/holo_green_dark"
+            android:textColor="@android:color/white"/>
+
+        <Button
+            android:id="@+id/btnComplete"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Complete your profile"
+            android:textAllCaps="false"
+            android:backgroundTint="@android:color/holo_green_dark"
+            android:textColor="@android:color/white"/>
+    </LinearLayout>
+</ScrollView>

@@ -3,6 +3,7 @@ package com.example.closethub.networks;
 import com.example.closethub.models.ApiResponse;
 import com.example.closethub.models.Banner;
 import com.example.closethub.models.Category;
+import com.example.closethub.models.Product;
 import com.example.closethub.models.User;
 
 import java.util.List;
@@ -30,4 +31,9 @@ public interface ApiService {
     @GET("/api/category/list")
     Call<ApiResponse<List<Category>>> getListCategory();
 
+    @GET("/api/product/list")
+    Call<ApiResponse<List<Product>>> getListProduct();
+
+    @GET("/api/product/list-by-cat")
+    Call<ApiResponse<List<Product>>> getListProductByCat(@Query("catID") String catID);
 }

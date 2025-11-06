@@ -104,3 +104,15 @@ exports.updateUserStatus = async (req, res) => {
         return res.status(400).send(error);
     }
 };
+
+exports.GetAllAccount = async (req, res, next) => {
+    let dataRes = {msg: 'OK'};
+    try {
+        let list = await userModel.find();
+        dataRes.data = list;
+    } catch (error) {
+        dataRes.data = null;
+        dataRes.msg = error.message;
+    }
+    res.json(dataRes);
+};

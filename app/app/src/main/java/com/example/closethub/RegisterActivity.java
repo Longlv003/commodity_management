@@ -32,9 +32,9 @@ public class RegisterActivity extends AppCompatActivity {
     private TextView txtLogin;
     private void initUI() {
         imgBack = findViewById(R.id.imgBack);
-        imgGoogle = findViewById(R.id.imgGoogle);
-        imgFacebook = findViewById(R.id.imgFacebook);
-        imgApple = findViewById(R.id.imgApple);
+//        imgGoogle = findViewById(R.id.imgGoogle);
+//        imgFacebook = findViewById(R.id.imgFacebook);
+//        imgApple = findViewById(R.id.imgApple);
         edtEmail = findViewById(R.id.edtEmail);
         edtPass = findViewById(R.id.edtPass);
         btnCreate = findViewById(R.id.btnCreate);

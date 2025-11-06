@@ -128,11 +128,57 @@ public class HomeFragment extends Fragment {
 
         GetListCategory();
 
+        productArrayList = new ArrayList<>();
+        rcvProduct.setLayoutManager(
+                new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false)
+        );
+        productAdapter = new ProductAdapter(getContext(), productArrayList);
+        rcvProduct.setAdapter(productAdapter);
+
+        if (categoryId.equals("")) {
+            GetListProduct();
+        } else {
+            GetListProductByCat(categoryId);
+        }
+
         return view;
     }
 
-    private void GetListProductByCat(String categoryId) {
+    private void GetListProduct() {
+        apiService.getListProduct().enqueue(new Callback<ApiResponse<List<Product>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<Product>>> call, Response<ApiResponse<List<Product>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    productArrayList.clear();
+                    productArrayList.addAll(response.body().getData());
+                    productAdapter.notifyDataSetChanged();
+                }
+            }
 
+            @Override
+            public void onFailure(Call<ApiResponse<List<Product>>> call, Throwable throwable) {
+                Toast.makeText(getContext(), "Error: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("Error", "ProductList Error", throwable);
+            }
+        });
+    }
+
+    private void GetListProductByCat(String categoryId) {
+        apiService.getListProductByCat(categoryId).enqueue(new Callback<ApiResponse<List<Product>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<Product>>> call, Response<ApiResponse<List<Product>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    productArrayList.clear();
+                    productArrayList.addAll(response.body().getData());
+                    productAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<List<Product>>> call, Throwable throwable) {
+                Log.e("Error", "ProductList Error", throwable);
+            }
+        });
     }
 
     private void GetListCategory() {

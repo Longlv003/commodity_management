@@ -4,17 +4,21 @@ require('dotenv').config();
 const chuoi_bi_mat = process.env.TOKEN_SEC_KEY;
 // hàm kiểm tra đăng nhập
 
-
 const api_auth = async (req, res , next)=>{
-   // lấy token trong header
-   let header_token = req.header ('Authorization');
-   if(typeof(header_token) =='undefined' || header_token == null){
+   // lấy token trong header hoặc cookie
+   let header_token = req.header('Authorization');
+   let token = null;
+   if (typeof(header_token) != 'undefined' && header_token != null) {
+       token = header_token.replace('Bearer ', '');
+   } else if (req.cookies && req.cookies.token) {
+       token = req.cookies.token;
+   } else {
+       // Nếu là request HTML -> redirect về trang login; còn lại trả JSON
+       if (req.accepts('html')) {
+           return res.redirect('/auth/login');
+       }
        return res.status(403).json({error: 'Không xác định token'});
    }
-   // nếu có token thì bóc tách lấy chuỗi mã hóa trong token
-   let token = header_token.replace('Bearer ','');
-   // chú ý: có 1 dấu cách ở sau chữ Bearer
-   // kiểm tra token hợp lệ hay không
    
    try {
        let data = jwt.verify(token, chuoi_bi_mat);

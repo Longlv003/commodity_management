@@ -36,9 +36,9 @@ public class LoginActivity extends AppCompatActivity {
     private void initUI() {
         txtRegister = findViewById(R.id.txtRegister);
         txtForgot = findViewById(R.id.txtForgot);
-        imgGoogle = findViewById(R.id.imgGoogle);
-        imgFacebook = findViewById(R.id.imgFacebook);
-        imgApple = findViewById(R.id.imgApple);
+//        imgGoogle = findViewById(R.id.imgGoogle);
+//        imgFacebook = findViewById(R.id.imgFacebook);
+//        imgApple = findViewById(R.id.imgApple);
         edtEmail = findViewById(R.id.edtEmail);
         edtPass = findViewById(R.id.edtPass);
         btnLogin = findViewById(R.id.btnLogin);

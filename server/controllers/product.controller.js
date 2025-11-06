@@ -6,10 +6,10 @@ exports.addProduct = async (req, res, next) => {
     let dataRes = { msg: 'OK' };
 
     try {
-        const { name, price, catID, description, createdAt } = req.body;
+        const { name, price, qty, catID, description, createdAt } = req.body;
 
         // Kiểm tra thông tin bắt buộc
-        if (name == null || price == null || catID == null) {
+        if (name == null || price == null || catID == null || qty == null) {
             throw new Error("Missing required information");
         }
 
@@ -17,6 +17,7 @@ exports.addProduct = async (req, res, next) => {
         const product = new pModel({
             name,
             price,
+            qty,
             catID,
             description: description || "",
             createdAt: createdAt || new Date()
@@ -45,12 +46,13 @@ exports.EditProduct = async (req, res, next) => {
         if (typeof(req.params._id) != 'undefined') {
             _id = req.params._id;
         }
-        const { name, price, description} = req.body;
+        const { name, price, qty, description} = req.body;
         
         // Tạo object update chỉ chứa những trường có giá trị
         let updateData = {};
         if (name) updateData.name = name;
         if (price) updateData.price = price;
+        if (qty) updateData.qty = qty;
         if (description) updateData.description = description;
 
         // Nếu có file upload, thêm image
@@ -128,42 +130,40 @@ exports.GetListProduct = async (req, res, next) => {
 }
 
 exports.GetProductByCat = async (req, res, next) => {
-    let dk = null;
-    let dataRes = {msg: 'OK'};
+    let dataRes = { msg: 'OK' };
+    
     try {
-        if (typeof(req.query.catID) != 'undefined') {
-            dk = {catID: new mongoose.Types.ObjectId(req.query.catID)};
+        // Kiểm tra nếu không có catID thì trả về lỗi
+        if (!req.query.catID || req.query.catID.trim() === '') {
+            return res.status(400).json({
+                msg: 'Thiếu tham số catID',
+                data: null
+            });
         }
         
+        // Validate ObjectId
+        if (!mongoose.Types.ObjectId.isValid(req.query.catID)) {
+            return res.status(400).json({
+                msg: 'ID danh mục không hợp lệ',
+                data: null
+            });
+        }
+        
+        // Tạo điều kiện tìm kiếm theo catID
+        const dk = { catID: new mongoose.Types.ObjectId(req.query.catID) };
+        
+        // Lấy danh sách sản phẩm theo catID
         let list = await pModel.find(dk);
+        
         dataRes.data = list;
+        dataRes.total = list.length;
+        
     } catch (error) {
+        console.error('Lỗi khi lấy sản phẩm theo danh mục:', error);
         dataRes.data = null;
-        dataRes.msg = error.message;
+        dataRes.msg = 'Lỗi server: ' + error.message;
+        return res.status(500).json(dataRes);
     }
+    
     res.json(dataRes);
 }
-
-exports.GetListProductAndByCat = async (req, res, next) => {
-    const dataRes = { msg: 'OK' };
-    try {
-        const filter = {};
-
-        // Nếu query catID có giá trị → lọc theo category
-        if (req.query.catID) {
-            if (!mongoose.Types.ObjectId.isValid(req.query.catID)) {
-                throw new Error("Invalid category ID");
-            }
-            filter.catID = new mongoose.Types.ObjectId(req.query.catID);
-        }
-
-        const list = await pModel.find(filter); // nếu filter rỗng → lấy tất cả
-        dataRes.data = list;
-
-    } catch (error) {
-        dataRes.data = null;
-        dataRes.msg = error.message;
-    }
-
-    res.json(dataRes);
-};

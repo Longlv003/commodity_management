@@ -2,7 +2,7 @@ const db = require('./db');
 
 const catSchema = new db.mongoose.Schema(
     {
-        name: {type: String, required: true}
+        name: {type: String, required: true, unique: true}
     }, 
     {collection: 'categories'},
 );

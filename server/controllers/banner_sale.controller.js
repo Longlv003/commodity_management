@@ -24,7 +24,7 @@ exports.AddBanner = async (req, res, next) => {
         }
 
         // Upload file
-        const fileName = await uploadSingleFile(req.file, 'banner');
+        const fileName = await uploadSingleFile(req.file, 'banners');
 
         // Tạo banner mới
         const banner = new bannerModel({

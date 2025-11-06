@@ -1,5 +1,6 @@
 package com.example.closethub;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -63,11 +64,11 @@ public class MainActivity extends AppCompatActivity {
                 if (id == R.id.nav_home) {
                     selectBottomBar(0);
                 } else if (id == R.id.nav_profile) {
-                    selectBottomBar(1);
+                    startActivity(new Intent(MainActivity.this, AccountProfileActivity.class));
                 } else if (id == R.id.nav_settings) {
                     //selectBottomBar(0);
                 } else if (id == R.id.nav_logout) {
-                    // Xử lý code logout
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 }
 
                 // Đóng menu sau khi chọn
