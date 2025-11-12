@@ -13,7 +13,7 @@
 
 ## ✨ Tính năng chính
 
-- 🧥 **Hiển thị danh sách sản phẩm** (tên, giá, mô tả, hình ảnh)
+- 🧥 **Hiển thị danh sách sản phẩm** (tên, giá, mô tả, size, màu sắc, hình ảnh)
 - 🔍 **Tìm kiếm và lọc quần áo** theo loại, giá hoặc tên
 - ➕ **Thêm, sửa, xoá sản phẩm** (dành cho người quản lý)
 - 🛒 **Giỏ hàng và thanh toán đơn giản**
