@@ -100,6 +100,7 @@ router.put(
   pCtrl.UpdateFavorite
 );
 router.get("/product/list/favorite", mdw.api_auth, pCtrl.GetFavoriteProducts);
+router.get("/product/:_id", pCtrl.GetProductDetail);
 
 // Cart
 router.post("/cart/add", mdw.api_auth, cartCtrl.addToCart);

@@ -39,9 +39,9 @@ public class ProductBillAdapter extends RecyclerView.Adapter<ProductBillAdapter.
         holder.txtName.setText(p.getName());
 
         NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-        holder.txtPrice.setText(formatter.format(p.getPrice()));
+        holder.txtPrice.setText(formatter.format(p.getMin_price()));
         holder.txtQuantity.setText(String.valueOf(p.getQuantity()));
-        holder.txtAmount.setText(formatter.format(p.getPrice() * p.getQuantity()));
+        holder.txtAmount.setText(formatter.format(p.getMin_price() * p.getQuantity()));
     }
 
     @Override

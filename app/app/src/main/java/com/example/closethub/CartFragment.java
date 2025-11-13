@@ -230,7 +230,7 @@ public class CartFragment extends Fragment {
 
         for (CartLookUpProduct item : productArrayList) {
             totalQuantity += item.getQuantity();
-            totalAmount += item.getQuantity() * item.getId_product().getPrice();
+            totalAmount += item.getQuantity() * item.getId_product().getMin_price();
         }
 
         txtQuantity.setText(String.valueOf(totalQuantity));

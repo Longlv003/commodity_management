@@ -51,19 +51,34 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
         Product product = productArrayList.get(position);
-        String imageUrl = "http://10.0.2.2:3000/images/products/" + product.getImage();
+
+        // Lấy ảnh đầu tiên trong danh sách ảnh sản phẩm
+        String imageUrl = "";
+        if (product.getImage() != null && !product.getImage().isEmpty()) {
+            imageUrl = "http://10.0.2.2:3000/images/products/" + product.getImage().get(0);
+        }
+
         Glide.with(holder.itemView.getContext())
                 .load(imageUrl)
-                .placeholder(R.drawable.ic_placeholder) // ảnh tạm khi đang load
-                .error(R.drawable.ic_error)             // ảnh lỗi nếu load thất bại
+                .placeholder(R.drawable.ic_placeholder) // Ảnh tạm khi đang load
+                .error(R.drawable.ic_error)             // Ảnh lỗi nếu load thất bại
                 .into(holder.imgProduct);
 
         holder.txtName.setText(product.getName());
-        //holder.txtPrice.setText(String.valueOf(product.getPrice()));
+
+        // Hiển thị giá min - max
         NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-        String formattedPrice = formatter.format(product.getPrice()) + " ₫";
-        holder.txtPrice.setText("Price: " + formattedPrice);
-        //holder.txtQty.setText("Quantity: " + String.valueOf(product.getQuantity()));
+        String formattedMinPrice = formatter.format(product.getMin_price()) + " ₫";
+        String formattedMaxPrice = formatter.format(product.getMax_price()) + " ₫";
+
+        // Nếu min và max bằng nhau thì chỉ hiển thị 1 giá
+        if (product.getMin_price() == product.getMax_price()) {
+            holder.txtMinPrice.setText(formattedMinPrice);
+            holder.txtMaxPrice.setText(""); // ẩn giá max
+        } else {
+            holder.txtMinPrice.setText(formattedMinPrice);
+            holder.txtMaxPrice.setText(formattedMaxPrice);
+        }
 
         if (product.getQuantity() <= 0) {
             holder.txtQty.setText("Hết hàng");
@@ -181,7 +196,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     public class ProductViewHolder extends RecyclerView.ViewHolder {
         ImageView imgFavorite, imgProduct, btnAddCart;
-        TextView txtName, txtPrice, txtAddCart, txtQty;
+        TextView txtName, txtMinPrice, txtMaxPrice, txtAddCart, txtQty;
 
         public ProductViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -189,7 +204,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             imgFavorite = itemView.findViewById(R.id.imgFavorite);
             imgProduct = itemView.findViewById(R.id.imgProduct);
             txtName = itemView.findViewById(R.id.txtName);
-            txtPrice = itemView.findViewById(R.id.txtPrice);
+            txtMinPrice = itemView.findViewById(R.id.txtMinPrice);
+            txtMaxPrice = itemView.findViewById(R.id.txtMaxPrice);
             txtQty = itemView.findViewById(R.id.txtQty);
             txtAddCart = itemView.findViewById(R.id.txtAddCart);
             //btnAddCart = itemView.findViewById(R.id.btnAddCart);

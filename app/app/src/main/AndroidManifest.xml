@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -14,7 +14,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Commodity_management"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true" >
+        <activity
+            android:name=".ProductDetailActivity"
+            android:exported="false" />
         <activity
             android:name=".ItemProductBillActivity"
             android:exported="false" />
@@ -59,7 +62,7 @@
             android:exported="false" />
         <activity
             android:name=".LoginActivity"
-            android:exported="true">
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

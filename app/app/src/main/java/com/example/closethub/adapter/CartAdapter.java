@@ -69,7 +69,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         holder.txtName.setText(product.getId_product().getName());
 
         NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-        String formattedPrice = formatter.format(product.getId_product().getPrice()) + " ₫";
+        String formattedPrice = formatter.format(product.getId_product().getMin_price()) + " ₫";
         holder.txtPrice.setText(formattedPrice);
 
         holder.edtQuantity.setText(String.valueOf(product.getQuantity()));
