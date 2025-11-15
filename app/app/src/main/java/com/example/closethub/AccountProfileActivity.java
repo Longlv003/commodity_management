@@ -92,7 +92,7 @@ public class AccountProfileActivity extends AppCompatActivity {
         edtPhoneNumber.setText(user.getPhone());
 
         imgBack.setOnClickListener(v -> {
-            startActivity(new Intent(AccountProfileActivity.this, MainActivity.class));
+            finish();
         });
 
         btnEdit.setOnClickListener(v -> {

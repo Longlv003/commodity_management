@@ -4,8 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AccountProfileActivity"
-    android:padding="24dp"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    android:layout_marginHorizontal="10dp">
 
     <LinearLayout
         android:id="@+id/main"

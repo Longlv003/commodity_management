@@ -2,6 +2,7 @@ const db = require("./db");
 
 let pSchema = new db.mongoose.Schema(
   {
+    productCode: { type: String, required: true, unique: true },
     catID: { type: db.mongoose.Schema.Types.ObjectId, required: true },
     name: { type: String, required: true },
     description: { type: String },

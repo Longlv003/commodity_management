@@ -118,4 +118,8 @@ public interface ApiService {
             @Path("id") String userId,
             @Part MultipartBody.Part image
     );
+
+    @GET("/api/product/{id}")
+    Call<ApiResponse<Product>> getProductDetail(@Path("id") String id);
+
 }

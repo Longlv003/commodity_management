@@ -38,7 +38,7 @@ public class WalletLoginActivity extends AppCompatActivity {
         initUI();
 
         imgBack.setOnClickListener(v -> {
-            startActivity(new Intent(WalletLoginActivity.this, MainActivity.class));
+            finish();
         });
     }
 }

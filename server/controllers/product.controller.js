@@ -3,40 +3,157 @@ const { uploadSingleFile } = require("../helpers/upload.helper");
 const mongoose = require("mongoose");
 const { pVariantModel } = require("../models/product.variants.model");
 
-exports.addProduct = async (req, res, next) => {
+exports.CheckProductAndSKU = async (req, res, next) => {
   let dataRes = { msg: "OK" };
-  try {
-    const { name, catID, description, variants } = req.body;
 
+  try {
+    const { productCode, sku } = req.body;
+
+    if (!productCode || !sku) {
+      throw new Error("Missing parameter: productCode or sku");
+    }
+
+    const product = await pModel.findOne({ productCode, is_deleted: false });
+    const variant = await pVariantModel.findOne({ sku, is_deleted: false });
+
+    if (!product && !variant) {
+      dataRes.status = "CREATE_PRODUCT_AND_VARIANT";
+    } else if (product && !variant) {
+      dataRes.status = "ADD_VARIANT";
+      dataRes.product = product;
+    } else if (product && variant) {
+      throw new Error("ProductCode and SKU already exist");
+    } else {
+      dataRes.status = "UNKNOWN_CASE";
+    }
+  } catch (error) {
+    console.error("CheckProductAndSKU Error:", error);
+    dataRes.msg = error.message;
+  }
+
+  res.json(dataRes);
+};
+
+exports.AddOnlyProduct = async (req, res, next) => {
+  let dataRes = { msg: "OK" };
+
+  try {
+    const { name, productCode, catID, description, image } = req.body;
+
+    if (!name || !productCode || !catID) {
+      throw new Error("Missing required fields");
+    }
+
+    // Check trùng productCode
+    const existed = await pModel.findOne({ productCode, is_deleted: false });
+    if (existed) {
+      throw new Error("ProductCode already exists");
+    }
+
+    const product = new pModel({
+      name,
+      productCode,
+      catID,
+      description: description || "",
+      image: Array.isArray(image) ? image : [],
+    });
+
+    // Nếu upload file (single) thì override mảng ảnh
+    if (req.file) {
+      const fileName = await uploadSingleFile(req.file, "products");
+      product.image = [fileName];
+    }
+
+    const saved = await product.save();
+
+    dataRes.msg = "Product created successfully";
+    dataRes.data = saved;
+  } catch (error) {
+    console.error("AddProduct Error:", error);
+    dataRes.msg = error.message;
+  }
+
+  res.json(dataRes);
+};
+
+exports.AddProduct = async (req, res, next) => {
+  let dataRes = { msg: "OK" };
+
+  // Bắt đầu transaction
+  const session = await pModel.startSession();
+  session.startTransaction();
+
+  try {
+    const { name, catID, description, productCode, variants } = req.body;
+
+    // ----------- CHECK INPUT -----------
     if (!name || !catID) {
       throw new Error("Missing required fields");
     }
 
-    // Tạo sản phẩm
+    // ----------- CHECK PRODUCT CODE -----------
+    // Kiểm tra xem productCode đã tồn tại hay chưa
+    if (productCode) {
+      const existed = await pModel.findOne({ productCode });
+      if (existed) throw new Error("productCode already exists");
+    }
+
+    // ----------- TẠO PRODUCT -----------
     const product = new pModel({
       name,
       catID,
       description: description || "",
+      productCode: productCode || "",
     });
 
-    // Upload ảnh nếu có
+    // Nếu upload ảnh
     if (req.file) {
       const fileName = await uploadSingleFile(req.file, "products");
       product.image = fileName;
     }
 
-    const savedProduct = await product.save();
+    const savedProduct = await product.save({ session });
 
-    // Nếu có variants gửi kèm (dạng mảng JSON)
-    if (variants && Array.isArray(JSON.parse(variants))) {
-      const variantList = JSON.parse(variants).map((v) => ({
-        ...v,
-        product_id: savedProduct._id,
-      }));
-      await pVariantModel.insertMany(variantList);
+    // ----------- XỬ LÝ VARIANTS -----------
+    let variantList = [];
+
+    if (variants) {
+      let parsed;
+
+      try {
+        parsed = JSON.parse(variants);
+      } catch (err) {
+        throw new Error("Invalid variant JSON format");
+      }
+
+      if (Array.isArray(parsed)) {
+        variantList = parsed.map((v) => ({
+          ...v,
+          product_id: savedProduct._id,
+        }));
+      }
     }
 
-    // Populate để trả về product có variants
+    // ----------- CHECK TRÙNG SKU -----------
+    for (const v of variantList) {
+      if (v.sku) {
+        const existedSku = await pVariantModel.findOne({ sku: v.sku });
+        if (existedSku) {
+          throw new Error(`SKU already exists: ${v.sku}`);
+        }
+      }
+    }
+
+    // ----------- INSERT VARIANT -----------
+    if (variantList.length > 0) {
+      await pVariantModel.insertMany(variantList, { session });
+    }
+
+    // Commit transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    // Populate trả về product + variants
     const fullProduct = await pModel
       .findById(savedProduct._id)
       .populate("variants");
@@ -44,8 +161,12 @@ exports.addProduct = async (req, res, next) => {
     dataRes.data = fullProduct;
     dataRes.msg = "Product added successfully";
   } catch (error) {
+    // Rollback nếu có lỗi
+    await session.abortTransaction();
+    session.endSession();
+
     console.error(error);
-    dataRes.msg = error.message;
+    dataRes.msg = error.message || "Unknown error";
   }
 
   res.json(dataRes);

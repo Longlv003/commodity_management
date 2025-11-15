@@ -2,6 +2,7 @@ const db = require("./db");
 
 const pVariantSchema = new db.mongoose.Schema(
   {
+    sku: { type: String, required: true, unique: true },
     product_id: {
       type: db.mongoose.Types.ObjectId,
       ref: "pModel",

@@ -62,7 +62,7 @@ public class ViewAllProductActivity extends AppCompatActivity {
         apiService = RetrofitClient.getApiService();
 
         imgBack.setOnClickListener(v -> {
-            startActivity(new Intent(ViewAllProductActivity.this, MainActivity.class));
+            finish();
         });
 
         categoryArrayList = new ArrayList<>();

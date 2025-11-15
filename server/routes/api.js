@@ -82,7 +82,7 @@ router.post(
   "/product/add",
   mdw.api_auth,
   upload.single("image"),
-  pCtrl.addProduct
+  pCtrl.AddProduct
 );
 router.put(
   "/product/edit/:_id",

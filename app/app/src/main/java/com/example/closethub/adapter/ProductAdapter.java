@@ -1,6 +1,7 @@
 package com.example.closethub.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.closethub.ProductDetailActivity;
 import com.example.closethub.R;
 import com.example.closethub.models.ApiResponse;
 import com.example.closethub.models.Cart;
@@ -110,6 +112,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
         holder.txtAddCart.setOnClickListener(v -> {
             AddToCart(product);
+        });
+
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ProductDetailActivity.class);
+            intent.putExtra("product_id", product.get_id());   // Gửi ID sang
+            context.startActivity(intent);
         });
     }
 

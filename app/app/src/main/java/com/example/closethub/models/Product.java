@@ -9,6 +9,7 @@ public class Product {
     private String name;
     private String description;
     private List<String> image;
+    private List<Variant> variants;
     private boolean is_favorite;
     private int quantity;
     private double min_price;
@@ -102,5 +103,13 @@ public class Product {
 
     public void setUpdated_at(Date updated_at) {
         this.updated_at = updated_at;
+    }
+
+    public List<Variant> getVariants() {
+        return variants;
+    }
+
+    public void setVariants(List<Variant> variants) {
+        this.variants = variants;
     }
 }
