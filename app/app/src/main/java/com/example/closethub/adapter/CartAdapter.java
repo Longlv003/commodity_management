@@ -3,6 +3,8 @@ package com.example.closethub.adapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -21,8 +24,10 @@ import com.example.closethub.R;
 import com.example.closethub.models.ApiResponse;
 import com.example.closethub.models.Cart;
 import com.example.closethub.models.CartLookUpProduct;
+import com.example.closethub.models.User;
 import com.example.closethub.networks.ApiService;
 import com.example.closethub.networks.RetrofitClient;
+import com.google.gson.Gson;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -53,18 +58,18 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
-        SharedPreferences sharedPref = context.getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
-        String idUser = sharedPref.getString("id_user", null);
-        String token_user = sharedPref.getString("token", null);
+        SharedPreferences prefs = context.getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+        String userJson = prefs.getString("user_data", null);
+
+        if (userJson == null) {
+            Toast.makeText(context, "account found", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Gson gson = new Gson();
+        User user = gson.fromJson(userJson, User.class);
 
         CartLookUpProduct product = productArrayList.get(position);
-//        String imageUrl = "http://10.0.2.2:3000/images/products/" + product.getId_product().getImage();
-
-//        Glide.with(context)
-//                .load(imageUrl)
-//                .placeholder(R.drawable.ic_placeholder)
-//                .error(R.drawable.ic_error)
-//                .into(holder.imgProduct);
 
         String imageUrl = "";
         if (product.getId_product().getImage() != null && !product.getId_product().getImage().isEmpty()) {
@@ -80,25 +85,32 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         holder.txtName.setText(product.getId_product().getName());
 
         NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-        String formattedPrice = formatter.format(product.getId_product().getMin_price()) + " ₫";
+        String formattedPrice = formatter.format(product.getId_variant().getPrice()) + " ₫";
         holder.txtPrice.setText(formattedPrice);
+
+        holder.txtSize.setText(product.getId_variant().getSize());
+
+        String hexColor = mapColor(product.getId_variant().getColor());
+
+        GradientDrawable bg = (GradientDrawable) holder.viewColor.getBackground();
+        bg.setColor(Color.parseColor(hexColor));
 
         holder.edtQuantity.setText(String.valueOf(product.getQuantity()));
 
         holder.btnAddCart.setOnClickListener(v -> {
             int newQty = product.getQuantity() + 1;
-            apiService.UpdateQuantity(token_user, product.get_id(), newQty).enqueue(new Callback<ApiResponse<List<CartLookUpProduct>>>() {
+            apiService.updateCartQuantity(user.getToken(), product.get_id(), newQty).enqueue(new Callback<ApiResponse<CartLookUpProduct>>() {
                 @Override
-                public void onResponse(Call<ApiResponse<List<CartLookUpProduct>>> call, Response<ApiResponse<List<CartLookUpProduct>>> response) {
+                public void onResponse(Call<ApiResponse<CartLookUpProduct>> call, Response<ApiResponse<CartLookUpProduct>> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         product.setQuantity(newQty);
                         holder.edtQuantity.setText(String.valueOf(newQty));
+                        notifyItemChanged(position);
                         if (listener != null) listener.OnQuantityChanged();
                     }
                 }
-
                 @Override
-                public void onFailure(Call<ApiResponse<List<CartLookUpProduct>>> call, Throwable throwable) {
+                public void onFailure(Call<ApiResponse<CartLookUpProduct>> call, Throwable throwable) {
                     Log.e("Error", "Updating Quantity Error", throwable);
                 }
             });
@@ -115,31 +127,34 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if(currentPosition != RecyclerView.NO_POSITION){
-                            DeleteCart(token_user, product.get_id(), currentPosition);
+                            DeleteCart(user.getToken(), product.get_id(), currentPosition);
                         }
                     }
                 }).setNegativeButton("No", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
+                        holder.edtQuantity.setText(String.valueOf(product.getQuantity()));
                     }
                 });
                 AlertDialog alertDialog = builder.create();
                 alertDialog.setCancelable(false);
                 alertDialog.show();
+                return;
             }
-            apiService.UpdateQuantity(token_user, product.get_id(), newQty).enqueue(new Callback<ApiResponse<List<CartLookUpProduct>>>() {
+
+            apiService.updateCartQuantity(user.getToken(), product.get_id(), newQty).enqueue(new Callback<ApiResponse<CartLookUpProduct>>() {
                 @Override
-                public void onResponse(Call<ApiResponse<List<CartLookUpProduct>>> call, Response<ApiResponse<List<CartLookUpProduct>>> response) {
+                public void onResponse(Call<ApiResponse<CartLookUpProduct>> call, Response<ApiResponse<CartLookUpProduct>> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         product.setQuantity(newQty);
                         holder.edtQuantity.setText(String.valueOf(newQty));
+                        notifyItemChanged(position);
                         if (listener != null) listener.OnQuantityChanged();
                     }
                 }
-
                 @Override
-                public void onFailure(Call<ApiResponse<List<CartLookUpProduct>>> call, Throwable throwable) {
+                public void onFailure(Call<ApiResponse<CartLookUpProduct>> call, Throwable throwable) {
                     Log.e("Error", "Updating Quantity Error", throwable);
                 }
             });
@@ -154,7 +169,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if(currentPosition != RecyclerView.NO_POSITION){
-                        DeleteCart(token_user, product.get_id(), currentPosition);
+                        DeleteCart(user.getToken(), product.get_id(), currentPosition);
                     }
                 }
             }).setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -170,7 +185,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     }
 
     private void DeleteCart(String token, String id, int position) {
-        apiService.DeleteProduct(token, id).enqueue(new Callback<ApiResponse<Cart>>() {
+        apiService.deleteCartItem(token, id).enqueue(new Callback<ApiResponse<Cart>>() {
             @Override
             public void onResponse(Call<ApiResponse<Cart>> call, Response<ApiResponse<Cart>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -202,10 +217,23 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         this.listener = listener;
     }
 
+    private String mapColor(String colorName) {
+        switch (colorName.toLowerCase()) {
+            case "đỏ": return "#FF0000";
+            case "đen": return "#000000";
+            case "xanh": return "#007BFF";
+            case "vàng": return "#FFD600";
+            case "hồng": return "#FF69B4";
+            case "trắng": return "#FFFFFF";
+        }
+        return "#CCCCCC"; // fallback
+    }
+
     public class CartViewHolder extends RecyclerView.ViewHolder {
         ImageView imgFavorite, imgProduct, btnAddCart, btnRemoveCart, imgDelete;
-        TextView txtName, txtPrice;
+        TextView txtName, txtPrice, txtSize;
         EditText edtQuantity;
+        View viewColor;
         public CartViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -214,9 +242,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             imgDelete = itemView.findViewById(R.id.imgDelete);
             txtName = itemView.findViewById(R.id.txtName);
             txtPrice = itemView.findViewById(R.id.txtPrice);
+            txtSize = itemView.findViewById(R.id.txtSize);
             edtQuantity = itemView.findViewById(R.id.edtQuantity);
             btnAddCart = itemView.findViewById(R.id.btnAddCart);
             btnRemoveCart = itemView.findViewById(R.id.btnRemoveCart);
+
+            viewColor = itemView.findViewById(R.id.viewColor);
         }
     }
 }

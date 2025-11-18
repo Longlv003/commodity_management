@@ -16,6 +16,9 @@
         android:theme="@style/Theme.Commodity_management"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".PayActivity"
+            android:exported="false" />
+        <activity
             android:name=".ItemSizeProductActivity"
             android:exported="false" />
         <activity

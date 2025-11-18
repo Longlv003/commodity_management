@@ -104,6 +104,9 @@ router.get("/product/:_id", pCtrl.GetProductDetail);
 
 // Cart
 router.post("/cart/add", mdw.api_auth, cartCtrl.addToCart);
+router.get("/cart/list/:id_user", cartCtrl.getCartList);
+router.put("/cart/update/:_id", mdw.api_auth, cartCtrl.updateCartQuantity);
+router.delete("/cart/delete/:_id", mdw.api_auth, cartCtrl.deleteCartItem);
 
 //router.post('/order/:id_user/place/:address', mdw.api_auth, orderCtrl.PlaceOrder);
 router.post("/order", mdw.api_auth, orderCtrl.PlaceOrder);

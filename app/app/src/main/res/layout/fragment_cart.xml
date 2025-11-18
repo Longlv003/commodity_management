@@ -15,7 +15,7 @@
             android:id="@+id/txtTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="List Product"
+            android:text="Danh sách sản phẩm"
             android:textSize="30sp"
             android:textStyle="bold"
             android:gravity="center" />
@@ -38,7 +38,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Tong ket don hang"
+                    android:text="Tóm tắt đơn hàng"
                     android:textStyle="bold"
                     android:textSize="30sp"
                     android:gravity="center"
@@ -54,7 +54,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Quantity: "
+                        android:text="Số lượng: "
                         android:textStyle="bold"
                         android:gravity="center"/>
 
@@ -78,7 +78,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Tam tinh: "
+                        android:text="Tạm tính: "
                         android:textStyle="bold"
                         android:gravity="center"/>
 
@@ -98,21 +98,21 @@
                     android:orientation="horizontal"
                     android:layout_marginBottom="5dp">
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Phi van chuyen: "
-                        android:textStyle="bold"
-                        android:gravity="center"/>
+<!--                    <TextView-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:text="Phi van chuyen: "-->
+<!--                        android:textStyle="bold"-->
+<!--                        android:gravity="center"/>-->
 
-                    <TextView
-                        android:id="@+id/txtShip"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="01"
-                        android:gravity="center"/>
+<!--                    <TextView-->
+<!--                        android:id="@+id/txtShip"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:text="01"-->
+<!--                        android:gravity="center"/>-->
 
                 </LinearLayout>
 
@@ -132,7 +132,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Tong cong: "
+                        android:text="Tổng: "
                         android:textStyle="bold"
                         android:textSize="30sp"
                         android:gravity="center"/>
@@ -152,7 +152,8 @@
                     android:id="@+id/btnPay"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Thanh toan"
+                    android:text="Thanh toán"
+                    android:textSize="28sp"
                     android:background="@drawable/custom_btn"
                     app:backgroundTint="@null"/>
             </LinearLayout>

@@ -139,7 +139,7 @@ exports.UpdateUser = async (req, res, next) => {
 
   try {
     const { _id } = req.params;
-    const { email, phone } = req.body; // đọc text fields từ multipart
+    const { email, phone, name, address } = req.body; // đọc text fields từ multipart
 
     const user = await userModel.findById(_id);
     if (!user) throw new Error("Người dùng không tồn tại");
@@ -153,6 +153,10 @@ exports.UpdateUser = async (req, res, next) => {
     }
 
     if (phone) updateData.phone = phone;
+
+    // ✅ Thêm name và address
+    if (name) updateData.name = name;
+    if (address) updateData.address = address;
 
     // ✅ Nếu có file upload
     if (req.file) {

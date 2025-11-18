@@ -8,7 +8,6 @@ import com.example.closethub.models.CartLookUpProduct;
 import com.example.closethub.models.CartRequest;
 import com.example.closethub.models.Category;
 import com.example.closethub.models.LoginResponse;
-import com.example.closethub.models.OrderRequest;
 import com.example.closethub.models.Product;
 import com.example.closethub.models.User;
 
@@ -66,44 +65,35 @@ public interface ApiService {
             @Header("Authorization") String token
     );
 
-//    @POST("/api/cart/add")
-//    Call<ApiResponse<Cart>> addToCart(
-//            @Header("Authorization") String token,
-//            @Body CartRequest cartRequest
-//    );
-
     @POST("/api/cart/add")
     Call<ApiResponse<Cart>> addToCart(
             @Header("Authorization") String token,
             @Body CartRequest cartRequest
     );
 
+    @GET("/api/cart/list/{id_user}")
+    Call<ApiResponse<List<CartLookUpProduct>>> getCartList(
+            @Path("id_user") String userId
+    );
 
-    @PUT("/api/cart/{id}/update/{newQuantity}")
-    Call<ApiResponse<List<CartLookUpProduct>>> UpdateQuantity(
+    @PUT("/api/cart/update/{id}")
+    Call<ApiResponse<CartLookUpProduct>> updateCartQuantity(
             @Header("Authorization") String token,
             @Path("id") String id,
-            @Path("newQuantity") int newQuantity);
+            @Query("quantity") int quantity
+    );
 
     @DELETE("/api/cart/delete/{id}")
-    Call<ApiResponse<Cart>> DeleteProduct(
+    Call<ApiResponse<Cart>> deleteCartItem(
             @Header("Authorization") String token,
-            @Path("id") String id);
+            @Path("id") String id
+    );
 
-    @GET("/api/getListMyCart/{id_user}")
-    Call<ApiResponse<List<CartLookUpProduct>>> getListProductMyCart(@Path("id_user") String idUser);
-
-//    @POST("/api/order/{id}/place/{address}")
+//    @POST("/api/order")
 //    Call<ApiResponse<Objects>> PayCart(
 //            @Header("Authorization") String token,
-//            @Path("id") String id,
-//            @Path("address") String address);
-
-    @POST("/api/order")
-    Call<ApiResponse<Objects>> PayCart(
-            @Header("Authorization") String token,
-            @Body OrderRequest orderRequest
-    );
+//            @Body OrderRequest orderRequest
+//    );
 
     @GET("/api/order/history/{id_user}")
     Call<ApiResponse<List<Bill>>> getBills(@Path("id_user") String userId);

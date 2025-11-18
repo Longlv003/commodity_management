@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 
 const accSchema = new db.mongoose.Schema(
   {
+    name: { type: String },
     email: { type: String, required: true, unique: true },
     pass: { type: String, required: true, unique: true },
     role: {
@@ -17,6 +18,7 @@ const accSchema = new db.mongoose.Schema(
     has_wallet: { type: Boolean, default: false },
     //is_delete: {type: Boolean, default: false},
     phone: { type: String },
+    address: { type: String },
     image: { type: String },
     token: { type: String },
   },
