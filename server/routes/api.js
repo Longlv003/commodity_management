@@ -14,7 +14,7 @@ var walletCtrl = require("../controllers/wallet.controller");
 
 // User
 router.post("/account/register", upload.single("image"), accountCtrl.doReg);
-router.post("/account/login", accountCtrl.doLogin);
+router.post("/account/login", upload.none(), accountCtrl.doLogin);
 router.post(
   "/account/upload-avatar",
   upload.single("image"),
