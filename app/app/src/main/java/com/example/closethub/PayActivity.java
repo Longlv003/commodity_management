@@ -1,6 +1,7 @@
 package com.example.closethub;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
@@ -78,12 +79,30 @@ public class PayActivity extends AppCompatActivity {
         Gson gson = new Gson();
         user = gson.fromJson(userJson, User.class);
 
+        setupAddress();
         setupEvent();
 
     }
 
+    private void setupAddress() {
+        if (user.getName().equals("") || user.getName() == null) {
+            txtNameAccount.setText("Chưa nhập địa chỉ giao hàng");
+            txtPhoneAccount.setText("");
+            txtAddressAccount.setText("");
+            return;
+        }
+        txtNameAccount.setText(user.getName());
+        txtPhoneAccount.setText("("+user.getPhone()+")");
+        txtAddressAccount.setText(user.getAddress());
+    }
+
     private void setupEvent() {
         imgBack.setOnClickListener(v -> {finish();});
+        btnChangeAddress.setOnClickListener(v -> {
+            startActivity(new Intent(PayActivity.this, AccountProfileActivity.class));
+        });
+
+
     }
 
 

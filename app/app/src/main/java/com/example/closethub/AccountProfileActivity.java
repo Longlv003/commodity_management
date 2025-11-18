@@ -43,7 +43,7 @@ import retrofit2.Response;
 public class AccountProfileActivity extends AppCompatActivity {
     private ImageView imgAvatar, imgBack;
     private ImageButton btnEditAvatar;
-    private TextInputEditText edtEmail, edtPhoneNumber;
+    private TextInputEditText edtEmail, edtPhoneNumber, edtNameAccount, edtAddressAccount;
     private Button btnComplete, btnEdit;
     private void initUI() {
         imgBack = findViewById(R.id.imgBack);
@@ -51,6 +51,8 @@ public class AccountProfileActivity extends AppCompatActivity {
         btnEditAvatar = findViewById(R.id.btnEditAvatar);
         edtEmail = findViewById(R.id.edtEmail);
         edtPhoneNumber = findViewById(R.id.edtPhoneNumber);
+        edtNameAccount = findViewById(R.id.edtNameAccount);
+        edtAddressAccount = findViewById(R.id.edtAddressAccount);
         btnComplete = findViewById(R.id.btnComplete);
         btnEdit = findViewById(R.id.btnEdit);
     }
@@ -90,6 +92,8 @@ public class AccountProfileActivity extends AppCompatActivity {
                 .into(imgAvatar);
         edtEmail.setText(user.getEmail());
         edtPhoneNumber.setText(user.getPhone());
+        edtNameAccount.setText(user.getName());
+        edtAddressAccount.setText(user.getAddress());
 
         imgBack.setOnClickListener(v -> {
             finish();
@@ -121,32 +125,17 @@ public class AccountProfileActivity extends AppCompatActivity {
             imagePickerLauncher.launch(intent);
         });
 
-
-//        ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
-//                new ActivityResultContracts.StartActivityForResult(),
-//                result -> {
-//                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-//                        selectedImageUri = result.getData().getData();
-//                        imgAvatar.setImageURI(selectedImageUri);
-//                    }
-//                }
-//        );
-//
-//        btnEditAvatar.setOnClickListener(v -> {
-//            Intent intent = new Intent(Intent.ACTION_PICK);
-//            intent.setType("image/*");
-//            imagePickerLauncher.launch(intent);
-//        });
-
         btnComplete.setOnClickListener(v -> {
             String email = edtEmail.getText().toString().trim();
             String phoneNumber = edtPhoneNumber.getText().toString().trim();
+            String name = edtNameAccount.getText().toString().trim();
+            String address = edtAddressAccount.getText().toString().trim();
 
             UnEnable(false);
             btnEdit.setVisibility(View.VISIBLE);
             btnComplete.setVisibility(View.GONE);
 
-            updateUserInfo(user.getToken(), user.get_id(), email, phoneNumber, selectedImageUri);
+            updateUserInfo(user.getToken(), user.get_id(), selectedImageUri, email, phoneNumber, name, address);
         });
     }
 
@@ -199,8 +188,7 @@ public class AccountProfileActivity extends AppCompatActivity {
         }
     }
 
-
-    private void updateUserInfo(String token, String userId, String email, String phone, Uri imageUri) {
+    private void updateUserInfo(String token, String userId, Uri imageUri, String email, String phone, String name, String address) {
         try {
             MultipartBody.Part imagePart = null;
 
@@ -216,8 +204,9 @@ public class AccountProfileActivity extends AppCompatActivity {
 
             RequestBody emailBody = RequestBody.create(MediaType.parse("text/plain"), email);
             RequestBody phoneBody = RequestBody.create(MediaType.parse("text/plain"), phone);
-
-            apiService.UpdateProfileUserMultipart(token, userId, imagePart, emailBody, phoneBody)
+            RequestBody nameBody = RequestBody.create(MediaType.parse("text/plain"), name);
+            RequestBody addressBody = RequestBody.create(MediaType.parse("text/plain"), address);
+            apiService.UpdateProfileUserMultipart(token, userId, imagePart, emailBody, phoneBody, nameBody, addressBody)
                     .enqueue(new Callback<ApiResponse<User>>() {
                         @Override
                         public void onResponse(Call<ApiResponse<User>> call, Response<ApiResponse<User>> response) {
@@ -236,12 +225,11 @@ public class AccountProfileActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onFailure(Call<ApiResponse<User>> call, Throwable t) {
-                            Log.e("Update", "Lỗi khi cập nhật", t);
+                        public void onFailure(Call<ApiResponse<User>> call, Throwable throwable) {
+                            Log.e("Update", "Lỗi khi cập nhật", throwable);
                             Toast.makeText(AccountProfileActivity.this, "Lỗi kết nối server", Toast.LENGTH_SHORT).show();
                         }
                     });
-
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(this, "Không thể xử lý ảnh!", Toast.LENGTH_SHORT).show();

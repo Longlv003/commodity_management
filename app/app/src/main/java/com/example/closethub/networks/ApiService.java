@@ -35,6 +35,18 @@ public interface ApiService {
     @POST("/api/account/login")
     Call<ApiResponse<LoginResponse>> getLogin(@Body User user);
 
+    @Multipart
+    @PUT("/api/account/update/{id}")
+    Call<ApiResponse<User>> UpdateProfileUserMultipart(
+            @Header("Authorization") String token,
+            @Path("id") String userId,
+            @Part MultipartBody.Part image,
+            @Part("email") RequestBody email,
+            @Part("phone") RequestBody phone,
+            @Part("name") RequestBody name,
+            @Part("address") RequestBody address
+    );
+
     @GET("/api/banner/sale/list")
     Call<ApiResponse<List<Banner>>> getBanner();
 
@@ -97,16 +109,6 @@ public interface ApiService {
 
     @GET("/api/order/history/{id_user}")
     Call<ApiResponse<List<Bill>>> getBills(@Path("id_user") String userId);
-
-    @Multipart
-    @PUT("/api/account/update/{id}")
-    Call<ApiResponse<User>> UpdateProfileUserMultipart(
-            @Header("Authorization") String token,
-            @Path("id") String userId,
-            @Part MultipartBody.Part image,
-            @Part("email") RequestBody email,
-            @Part("phone") RequestBody phone
-    );
 
     @Multipart
     @PUT("/api/account/{id}/upload/avatar")
