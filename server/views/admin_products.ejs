@@ -1,4 +1,3 @@
-@ -0,0 +1,638 @@
 <!DOCTYPE html>
 <html class="dark" lang="vi">
   <head>
@@ -28,10 +27,26 @@
 
   <body class="bg-slate-950 text-slate-100">
     <div class="flex min-h-screen">
+      <!-- Mobile menu button -->
+      <button
+        id="mobileMenuBtn"
+        class="md:hidden fixed top-4 left-4 z-30 p-2 rounded-lg bg-slate-800 text-slate-100 hover:bg-slate-700"
+      >
+        <span class="material-symbols-outlined text-xl">menu</span>
+      </button>
+
       <!-- Sidebar -->
       <aside
-        class="hidden md:flex w-64 flex-col border-r border-slate-800 bg-slate-950/80 backdrop-blur"
+        id="sidebar"
+        class="hidden md:flex w-64 flex-col border-r border-slate-800 bg-slate-950/80 backdrop-blur fixed left-0 top-0 h-screen z-20 overflow-y-auto"
       >
+        <!-- Close button for mobile -->
+        <button
+          id="closeSidebarBtn"
+          class="md:hidden absolute top-4 right-4 p-2 rounded-lg bg-slate-800 text-slate-100 hover:bg-slate-700"
+        >
+          <span class="material-symbols-outlined text-xl">close</span>
+        </button>
         <div class="flex items-center gap-3 px-6 pt-6 pb-4">
           <div
             class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-lg font-black"
@@ -97,8 +112,14 @@
         </div>
       </aside>
 
+      <!-- Sidebar overlay for mobile -->
+      <div
+        id="sidebarOverlay"
+        class="hidden fixed inset-0 bg-black/50 z-10 md:hidden"
+      ></div>
+
       <!-- Main content -->
-      <main class="flex-1 bg-slate-950">
+      <main class="flex-1 bg-slate-950 md:ml-64">
         <!-- Top bar -->
         <header
           class="flex items-center justify-between border-b border-slate-800 px-4 md:px-8 py-4 bg-slate-950/80 backdrop-blur sticky top-0 z-20"
@@ -126,7 +147,7 @@
           </div>
         </header>
 
-        <div class="px-4 md:px-8 py-6 flex flex-col gap-6">
+        <div class="px-4 md:px-8 py-6 flex flex-col gap-6 h-[calc(100vh-120px)]">
           <!-- Filters & search -->
           <section
             class="flex flex-col md:flex-row md:items-center gap-3 md:gap-4"
@@ -163,10 +184,10 @@
           </section>
 
           <!-- Main grid -->
-          <section class="grid grid-cols-1 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-6">
+          <section class="grid grid-cols-1 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-6 flex-1 min-h-0">
             <!-- Products table -->
             <div
-              class="rounded-xl border border-slate-800 bg-slate-900/60 shadow-xl overflow-hidden"
+              class="rounded-xl border border-slate-800 bg-slate-900/60 shadow-xl overflow-hidden flex flex-col"
             >
               <div
                 class="flex items-center justify-between px-4 md:px-6 py-3 border-b border-slate-800"
@@ -181,14 +202,18 @@
                 </p>
               </div>
 
-              <div class="overflow-auto scrollbar-thin max-h-[520px]">
+              <div class="overflow-auto scrollbar-thin flex-1">
                 <table class="min-w-full text-sm">
                   <thead class="bg-slate-900/80 sticky top-0 z-10">
                     <tr class="text-left text-xs text-slate-400 uppercase">
-                      <th class="px-4 md:px-6 py-3 font-medium">Sản phẩm</th>
-                      <th class="px-4 md:px-6 py-3 font-medium">Giá</th>
-                      <th class="px-4 md:px-6 py-3 font-medium">Danh mục</th>
-                      <th class="px-4 md:px-6 py-3 font-medium text-right">
+                      <th class="px-2 py-2 font-medium">Hình ảnh</th>
+                      <th class="px-2 py-2 font-medium">Tên sản phẩm</th>
+                      <th class="px-2 py-2 font-medium">SKU</th>
+                      <th class="px-2 py-2 font-medium">Giá</th>
+                      <th class="px-2 py-2 font-medium">Danh mục</th>
+                      <th class="px-2 py-2 font-medium">Tồn kho</th>
+                      <th class="px-2 py-2 font-medium">Trạng thái</th>
+                      <th class="px-2 py-2 font-medium text-right">
                         Hành động
                       </th>
                     </tr>
@@ -217,61 +242,44 @@
                   class="px-4 md:px-6 py-4 flex flex-col gap-3"
                   enctype="multipart/form-data"
                 >
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label class="text-xs text-slate-400">Tên sản phẩm</label>
-                      <input
-                        name="name"
-                        id="productName"
-                        required
-                        class="mt-1 h-10 w-full rounded-lg border border-slate-800 bg-slate-950/50 px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500"
-                        placeholder="Ví dụ: Basic Tee"
-                      />
+                  <!-- Product Info -->
+                  <div class="border-b border-slate-800 pb-3 mb-3">
+                    <p class="text-xs font-semibold text-slate-300 mb-2">Thông tin sản phẩm</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label class="text-xs text-slate-400">Tên sản phẩm *</label>
+                        <input
+                          name="name"
+                          id="productName"
+                          required
+                          class="mt-1 h-10 w-full rounded-lg border border-slate-800 bg-slate-950/50 px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500"
+                          placeholder="Ví dụ: Basic Tee"
+                        />
+                      </div>
+                      <div>
+                        <label class="text-xs text-slate-400">Mã sản phẩm (Product Code)</label>
+                        <input
+                          name="productCode"
+                          id="productCode"
+                          class="mt-1 h-10 w-full rounded-lg border border-slate-800 bg-slate-950/50 px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500"
+                          placeholder="Tự động tạo nếu để trống"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <label class="text-xs text-slate-400">Mã sản phẩm (SKU)</label>
-                      <input
-                        name="sku"
-                        id="productSku"
-                        class="mt-1 h-10 w-full rounded-lg border border-slate-800 bg-slate-950/50 px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500"
-                        placeholder="SKU tuỳ chọn"
-                      />
+                    <div class="mt-3">
+                      <label class="text-xs text-slate-400">Mô tả</label>
+                      <textarea
+                        name="description"
+                        id="productDescription"
+                        rows="2"
+                        class="mt-1 w-full rounded-lg border border-slate-800 bg-slate-950/50 px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500"
+                        placeholder="Mô tả sản phẩm..."
+                      ></textarea>
                     </div>
-                  </div>
-
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label class="text-xs text-slate-400">Giá</label>
-                      <input
-                        name="price"
-                        id="productPrice"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        required
-                        class="mt-1 h-10 w-full rounded-lg border border-slate-800 bg-slate-950/50 px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500"
-                        placeholder="0"
-                      />
-                    </div>
-                    <div>
-                      <label class="text-xs text-slate-400">Số lượng tồn</label>
-                      <input
-                        name="quantity"
-                        id="productQuantity"
-                        type="number"
-                        min="0"
-                        required
-                        class="mt-1 h-10 w-full rounded-lg border border-slate-800 bg-slate-950/50 px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500"
-                        placeholder="0"
-                      />
-                    </div>
-                  </div>
-
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label class="text-xs text-slate-400">Danh mục</label>
+                    <div class="mt-3">
+                      <label class="text-xs text-slate-400">Danh mục *</label>
                       <select
-                        name="category"
+                        name="catID"
                         id="productCategory"
                         required
                         class="mt-1 h-10 w-full rounded-lg border border-slate-800 bg-slate-950/50 px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500"
@@ -279,35 +287,26 @@
                         <option value="">Chọn danh mục</option>
                       </select>
                     </div>
-                    <div>
-                      <label class="text-xs text-slate-400">Trạng thái</label>
-                      <select
-                        name="status"
-                        id="productStatus"
-                        class="mt-1 h-10 w-full rounded-lg border border-slate-800 bg-slate-950/50 px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500"
-                      >
-                        <option value="in_stock">Còn hàng</option>
-                        <option value="out_of_stock">Hết hàng</option>
-                      </select>
-                    </div>
                   </div>
 
-                  <div>
-                    <label class="text-xs text-slate-400">Ảnh sản phẩm</label>
-                    <div
-                      class="mt-1 flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-700 bg-slate-950/40 px-4 py-6 text-center"
-                    >
-                      <p class="text-xs text-slate-500 mb-2">
-                        Kéo & thả hoặc chọn ảnh (PNG/JPG, tối đa 10MB)
-                      </p>
-                      <input
-                        type="file"
-                        id="productImage"
-                        name="image"
-                        accept="image/*"
-                        class="block w-full text-xs text-slate-400 file:mr-3 file:rounded-md file:border-0 file:bg-slate-800 file:px-3 file:py-2 file:text-xs file:font-medium file:text-slate-100 hover:file:bg-slate-700"
-                      />
+                  <!-- Variants Section -->
+                  <div class="border-b border-slate-800 pb-3 mb-3">
+                    <div class="flex items-center justify-between mb-2">
+                      <p class="text-xs font-semibold text-slate-300">Biến thể sản phẩm (Variants) *</p>
+                      <button
+                        type="button"
+                        id="addVariantBtn"
+                        class="text-xs text-blue-400 hover:text-blue-300"
+                      >
+                        + Thêm biến thể
+                      </button>
                     </div>
+                    <div id="variantsContainer" class="space-y-3">
+                      <!-- Variants will be added here -->
+                    </div>
+                    <p class="text-[10px] text-slate-500 mt-2">
+                      * Ít nhất 1 biến thể là bắt buộc (Size, Color, Giá, Số lượng, Ảnh)
+                    </p>
                   </div>
 
                   <p
@@ -334,7 +333,7 @@
                 </form>
               </div>
 
-              <!-- Manage categories (hiển thị, không làm CRUD chi tiết để đơn giản) -->
+              <!-- Manage categories -->
               <div
                 class="rounded-xl border border-slate-800 bg-slate-900/60 shadow-xl"
               >
@@ -344,6 +343,34 @@
                   <p class="text-sm font-semibold">Danh mục</p>
                 </div>
 
+                <!-- Form thêm danh mục -->
+                <form
+                  id="categoryForm"
+                  class="px-4 md:px-6 py-3 border-b border-slate-800"
+                >
+                  <div class="flex gap-2">
+                    <input
+                      type="text"
+                      id="categoryName"
+                      placeholder="Tên danh mục..."
+                      required
+                      class="flex-1 h-9 rounded-lg border border-slate-800 bg-slate-950/50 px-3 text-xs outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                    <button
+                      type="submit"
+                      id="submitCategoryBtn"
+                      class="h-9 rounded-lg bg-blue-600 px-3 text-xs font-semibold text-white hover:bg-blue-500"
+                    >
+                      Thêm
+                    </button>
+                  </div>
+                  <p
+                    id="categoryFormMessage"
+                    class="hidden text-xs mt-1"
+                  ></p>
+                </form>
+
+                <!-- Danh sách danh mục -->
                 <div class="px-4 md:px-6 py-4 space-y-2 max-h-52 overflow-auto scrollbar-thin">
                   <div
                     id="categoryList"
@@ -389,20 +416,65 @@
       const searchInput = document.getElementById("searchInput");
       const categoryList = document.getElementById("categoryList");
       const productCategorySelect = document.getElementById("productCategory");
-      const productStatusSelect = document.getElementById("productStatus");
       const productForm = document.getElementById("productForm");
-      const productNameInput = document.getElementById("productName");
-      const productSkuInput = document.getElementById("productSku");
-      const productPriceInput = document.getElementById("productPrice");
-      const productQuantityInput = document.getElementById("productQuantity");
       const productFormMessage = document.getElementById("productFormMessage");
       const resetProductFormButton = document.getElementById(
         "resetProductForm"
       );
+      const categoryForm = document.getElementById("categoryForm");
+      const categoryNameInput = document.getElementById("categoryName");
+      const categoryFormMessage = document.getElementById("categoryFormMessage");
+      const submitCategoryBtn = document.getElementById("submitCategoryBtn");
       const logoutBtn = document.getElementById("logoutBtn");
+      const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+      const sidebar = document.getElementById("sidebar");
+      const sidebarOverlay = document.getElementById("sidebarOverlay");
+      const closeSidebarBtn = document.getElementById("closeSidebarBtn");
 
       let allProducts = [];
       let allCategories = [];
+      let variantCounter = 0;
+
+      // Mobile menu toggle
+      function toggleMobileMenu() {
+        if (sidebar && sidebarOverlay) {
+          const isHidden = sidebar.classList.contains("hidden");
+          if (isHidden) {
+            // Hiển thị sidebar
+            sidebar.classList.remove("hidden");
+            sidebar.classList.add("flex");
+            sidebarOverlay.classList.remove("hidden");
+          } else {
+            // Ẩn sidebar
+            sidebar.classList.add("hidden");
+            sidebar.classList.remove("flex");
+            sidebarOverlay.classList.add("hidden");
+          }
+        }
+      }
+
+      if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener("click", toggleMobileMenu);
+      }
+
+      if (sidebarOverlay) {
+        sidebarOverlay.addEventListener("click", toggleMobileMenu);
+      }
+
+      if (closeSidebarBtn) {
+        closeSidebarBtn.addEventListener("click", toggleMobileMenu);
+      }
+
+      // Close mobile menu when clicking nav items
+      if (sidebar) {
+        sidebar.querySelectorAll("nav a").forEach((link) => {
+          link.addEventListener("click", () => {
+            if (window.innerWidth < 768) {
+              toggleMobileMenu();
+            }
+          });
+        });
+      }
 
       function formatCurrency(v) {
         const num = Number(v) || 0;
@@ -413,83 +485,118 @@
         });
       }
 
-      function normalizeText(value) {
-        if (value == null) return "";
-        return value
-          .toString()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/đ/g, "d")
-          .replace(/Đ/g, "D")
-          .toLowerCase()
-          .trim();
+      function addVariantRow() {
+        const container = document.getElementById("variantsContainer");
+        const variantId = `variant_${variantCounter++}`;
+        
+        const variantDiv = document.createElement("div");
+        variantDiv.className = "rounded-lg border border-slate-800 bg-slate-950/40 p-3";
+        variantDiv.id = variantId;
+        variantDiv.innerHTML = `
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-medium text-slate-300">Biến thể #${variantCounter}</span>
+            <button
+              type="button"
+              class="text-xs text-rose-400 hover:text-rose-300"
+              onclick="removeVariant('${variantId}')"
+            >
+              Xóa
+            </button>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[10px] text-slate-400">SKU *</label>
+              <input
+                type="text"
+                name="variant_sku"
+                required
+                class="mt-1 h-8 w-full rounded border border-slate-700 bg-slate-900/50 px-2 text-xs outline-none focus:ring-1 focus:ring-blue-500"
+                placeholder="SKU-001"
+              />
+            </div>
+            <div>
+              <label class="text-[10px] text-slate-400">Size *</label>
+              <input
+                type="text"
+                name="variant_size"
+                required
+                class="mt-1 h-8 w-full rounded border border-slate-700 bg-slate-900/50 px-2 text-xs outline-none focus:ring-1 focus:ring-blue-500"
+                placeholder="S, M, L..."
+              />
+            </div>
+            <div>
+              <label class="text-[10px] text-slate-400">Color *</label>
+              <input
+                type="text"
+                name="variant_color"
+                required
+                class="mt-1 h-8 w-full rounded border border-slate-700 bg-slate-900/50 px-2 text-xs outline-none focus:ring-1 focus:ring-blue-500"
+                placeholder="Đỏ, Xanh..."
+              />
+            </div>
+            <div>
+              <label class="text-[10px] text-slate-400">Giá (VNĐ) *</label>
+              <input
+                type="number"
+                name="variant_price"
+                step="0.01"
+                min="0"
+                required
+                class="mt-1 h-8 w-full rounded border border-slate-700 bg-slate-900/50 px-2 text-xs outline-none focus:ring-1 focus:ring-blue-500"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label class="text-[10px] text-slate-400">Số lượng *</label>
+              <input
+                type="number"
+                name="variant_quantity"
+                min="0"
+                required
+                class="mt-1 h-8 w-full rounded border border-slate-700 bg-slate-900/50 px-2 text-xs outline-none focus:ring-1 focus:ring-blue-500"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label class="text-[10px] text-slate-400">Ảnh</label>
+              <input
+                type="file"
+                name="variant_image"
+                accept="image/*"
+                class="mt-1 block w-full text-[10px] text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-800 file:px-2 file:py-1 file:text-[10px] file:text-slate-100 hover:file:bg-slate-700"
+              />
+            </div>
+          </div>
+        `;
+        container.appendChild(variantDiv);
       }
 
-      function getProductCategoryId(product = {}) {
-        return (
-          product.id_cat ||
-          product.catID ||
-          product.categoryId ||
-          product.category ||
-          ""
-        );
-      }
-
-      function getProductImageSrc(product = {}) {
-        const image = product.image || product.thumbnail || "";
-        if (!image) return "";
-        if (/^https?:\/\//i.test(image)) return image;
-        if (image.startsWith("/")) return image;
-        if (image.startsWith("images/") || image.startsWith("upload/")) {
-          return `/${image}`;
+      function removeVariant(variantId) {
+        const variant = document.getElementById(variantId);
+        if (variant) {
+          variant.remove();
         }
-        return `/images/products/${image}`;
-      }
-
-      function getProductById(productId) {
-        if (!productId) return null;
-        return allProducts.find(
-          (p) => String(p._id || p.id) === String(productId)
-        );
-      }
-
-      function getCategoryNameById(catId) {
-        if (!catId) return "";
-        const match = allCategories.find(
-          (c) => String(c._id || c.id) === String(catId)
-        );
-        return match ? match.name || "" : "";
       }
 
       function renderProducts() {
-        const search = normalizeText(searchInput.value || "");
+        const search = searchInput.value.trim().toLowerCase();
         const catId = categoryFilter.value;
         const status = statusFilter.value;
 
         let filtered = allProducts.slice();
 
         if (search) {
-          filtered = filtered.filter((p) => {
-            const normalizedCatName = normalizeText(
-              getCategoryNameById(getProductCategoryId(p))
-            );
-            return (
-              normalizeText(p.name || "").includes(search) ||
-              normalizeText(p.sku || p._id || "").includes(search) ||
-              normalizedCatName.includes(search)
-            );
-          });
-        }
-        if (catId) {
-          filtered = filtered.filter(
-            (p) => String(getProductCategoryId(p)) === String(catId)
+          filtered = filtered.filter((v) =>
+            (v.product_name || "").toLowerCase().includes(search) ||
+            (v.sku || "").toLowerCase().includes(search)
           );
         }
+        if (catId) {
+          filtered = filtered.filter((v) => String(v.catID) === String(catId));
+        }
         if (status) {
-          filtered = filtered.filter((p) => {
-            const quantity = Number(p.quantity || p.qty || 0);
-            const isInStock = quantity > 0;
-            return status === "in_stock" ? isInStock : !isInStock;
+          filtered = filtered.filter((v) => {
+            return status === "in_stock" ? v.is_in_stock : !v.is_in_stock;
           });
         }
 
@@ -497,59 +604,80 @@
 
         if (!filtered.length) {
           productTableBody.innerHTML =
-            '<tr><td colspan="4" class="px-6 py-6 text-center text-xs text-slate-500">Không có sản phẩm nào.</td></tr>';
+            '<tr><td colspan="8" class="px-2 py-4 text-center text-xs text-slate-500">Không có sản phẩm nào.</td></tr>';
           productCount.textContent = "0";
           return;
         }
 
-        filtered.forEach((p) => {
-          const quantity = Number(p.quantity || p.qty || 0);
-          const isInStock = quantity > 0;
-          const imageSrc = getProductImageSrc(p);
+        filtered.forEach((v) => {
+          // v là variant object từ API GetAdminProducts
+          const isInStock = v.is_in_stock;
+          const statusLabel = isInStock ? "Còn hàng" : "Hết hàng";
+          const statusColor = isInStock
+            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
+            : "bg-rose-500/10 text-rose-400 border-rose-500/40";
 
           const cat = allCategories.find(
-            (c) => String(c._id || c.id) === String(getProductCategoryId(p))
+            (c) => String(c._id || c.id) === String(v.catID)
           );
+
+          // Lấy ảnh từ variant
+          const imageUrl = v.image 
+            ? `/images/products/${v.image}` 
+            : null;
+
+          // Tên sản phẩm với size và color
+          const productNameDisplay = `${v.product_name}${v.size ? ` (${v.size}` : ""}${v.color ? `, ${v.color}` : ""}${v.size || v.color ? ")" : ""}`;
 
           const row = document.createElement("tr");
           row.className = "hover:bg-slate-900/80";
           row.innerHTML = `
-            <td class="px-4 md:px-6 py-3">
-              <div class="flex items-center gap-3">
-                <div class="h-12 w-12 rounded-md bg-slate-800 overflow-hidden flex items-center justify-center text-[10px] text-slate-500">
-                  ${
-                    imageSrc
-                      ? `<img src="${imageSrc}" alt="${p.name || "Sản phẩm"}" class="h-full w-full object-cover" />`
-                      : "IMG"
-                  }
-                </div>
-                <div class="flex flex-col">
-                  <span class="text-xs font-medium text-slate-100">${p.name}</span>
-                  <span class="text-[11px] text-slate-500">SKU: ${
-                    p.sku || p._id || "-"
-                  }</span>
-                </div>
+            <td class="px-2 py-2">
+              <div class="h-10 w-10 rounded-md bg-slate-800 overflow-hidden flex items-center justify-center text-[10px] text-slate-500">
+                ${
+                  imageUrl
+                    ? `<img src="${imageUrl}" alt="${v.product_name}" class="h-full w-full object-cover" onerror="this.parentElement.innerHTML='IMG'" />`
+                    : "IMG"
+                }
               </div>
             </td>
-            <td class="px-4 md:px-6 py-3 text-xs text-slate-100">
-              ${formatCurrency(p.price)}
+            <td class="px-2 py-2">
+              <div class="flex flex-col">
+                <span class="text-xs font-medium text-slate-100">${v.product_name || "-"}</span>
+                ${v.size || v.color ? `<span class="text-[10px] text-slate-500">${v.size || ""}${v.size && v.color ? ", " : ""}${v.color || ""}</span>` : ""}
+              </div>
             </td>
-            <td class="px-4 md:px-6 py-3 text-xs text-slate-300">
+            <td class="px-2 py-2 text-xs text-slate-300">
+              ${v.sku || "-"}
+            </td>
+            <td class="px-2 py-2 text-xs text-slate-100">
+              ${formatCurrency(v.price || 0)}
+            </td>
+            <td class="px-2 py-2 text-xs text-slate-300">
               ${cat ? cat.name : "-"}
             </td>
-            <td class="px-4 md:px-6 py-3 text-right">
-              <div class="inline-flex items-center gap-2">
-                <button
-                  class="inline-flex items-center justify-center rounded-md border border-slate-700 bg-slate-900/60 px-3 py-1 text-[11px] font-medium text-slate-200 hover:bg-slate-800 transition-colors"
-                  data-action="add"
-                  data-id="${p._id || p.id || ""}"
+            <td class="px-2 py-2 text-xs text-slate-100">
+              ${v.quantity || 0}
+            </td>
+            <td class="px-2 py-2">
+              <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${statusColor}">
+                ${statusLabel}
+              </span>
+            </td>
+            <td class="px-2 py-2 text-right">
+              <div class="flex items-center justify-end gap-1">
+                <button 
+                  class="inline-flex items-center justify-center rounded-md border border-slate-700 bg-slate-900/60 px-2 py-1 text-[10px] text-slate-200 hover:bg-slate-800" 
+                  data-variant-id="${v.variant_id}"
+                  data-product-id="${v.product_id}"
+                  onclick="editVariant('${v.variant_id}', '${v.product_id}')"
                 >
-                  Thêm
+                  Sửa
                 </button>
-                <button
-                  class="inline-flex items-center justify-center rounded-md border border-rose-700/70 bg-rose-900/20 px-3 py-1 text-[11px] font-medium text-rose-200 hover:bg-rose-800/40 transition-colors"
-                  data-action="delete"
-                  data-id="${p._id || p.id || ""}"
+                <button 
+                  class="inline-flex items-center justify-center rounded-md border border-rose-700 bg-rose-900/60 px-2 py-1 text-[10px] text-rose-200 hover:bg-rose-800" 
+                  data-variant-id="${v.variant_id}"
+                  onclick="deleteVariant('${v.variant_id}', '${v.product_name}')"
                 >
                   Xóa
                 </button>
@@ -560,75 +688,6 @@
         });
 
         productCount.textContent = String(filtered.length);
-      }
-
-      function populateFormFromProduct(product) {
-        if (!product || !productForm) return;
-        const quantity = Number(product.quantity || product.qty || 0);
-        productForm.reset();
-
-        if (productNameInput) {
-          productNameInput.value = product.name || "";
-        }
-        if (productSkuInput) {
-          productSkuInput.value = product.sku || product._id || "";
-        }
-        if (productPriceInput) {
-          productPriceInput.value = product.price || "";
-        }
-        if (productQuantityInput) {
-          productQuantityInput.value = quantity || 0;
-        }
-
-        const categoryId = getProductCategoryId(product);
-        if (productCategorySelect && categoryId) {
-          const hasOption = Array.from(productCategorySelect.options).some(
-            (opt) => String(opt.value) === String(categoryId)
-          );
-          if (hasOption) {
-            productCategorySelect.value = categoryId;
-          }
-        }
-
-        if (productStatusSelect) {
-          productStatusSelect.value = quantity > 0 ? "in_stock" : "out_of_stock";
-        }
-
-        if (productFormMessage) {
-          productFormMessage.className =
-            "block text-xs mt-1 text-slate-400";
-          productFormMessage.textContent =
-            "Đã nạp dữ liệu sản phẩm. Điều chỉnh và nhấn Lưu để thêm mới.";
-        }
-
-        productForm.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-
-      async function handleDeleteProduct(productId) {
-        if (!productId) return;
-        const confirmDelete = window.confirm(
-          "Bạn chắc chắn muốn xóa sản phẩm này?"
-        );
-        if (!confirmDelete) return;
-
-        try {
-          const headers = {};
-          if (token) {
-            headers.Authorization = `Bearer ${token}`;
-          }
-          const res = await fetch(`/api/product/delete/${productId}`, {
-            method: "DELETE",
-            headers,
-          });
-          const data = await res.json().catch(() => ({}));
-          if (!res.ok) {
-            throw new Error(data?.msg || "Không thể xóa sản phẩm.");
-          }
-          await loadProducts();
-        } catch (error) {
-          console.error(error);
-          alert(error.message || "Lỗi khi xóa sản phẩm.");
-        }
       }
 
       function renderCategories() {
@@ -655,10 +714,45 @@
             "flex items-center justify-between rounded-lg border border-slate-800 bg-slate-950/40 px-3 py-2";
           chip.innerHTML = `
             <span class="text-xs">${c.name}</span>
-            <span class="text-[10px] text-slate-500">ID: ${id}</span>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] text-slate-500">ID: ${id}</span>
+              <button
+                type="button"
+                class="text-[10px] text-rose-400 hover:text-rose-300"
+                onclick="deleteCategory('${id}', '${c.name}')"
+              >
+                Xóa
+              </button>
+            </div>
           `;
           categoryList.appendChild(chip);
         });
+      }
+
+      async function deleteCategory(categoryId, categoryName) {
+        if (!confirm(`Bạn có chắc muốn xóa danh mục "${categoryName}"?`)) {
+          return;
+        }
+
+        try {
+          const res = await fetch(`/api/category/delete/${categoryId}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const data = await res.json().catch(() => ({}));
+
+          if (res.ok) {
+            await loadCategories();
+          } else {
+            const msg = data?.msg || data?.message || "Không thể xóa danh mục.";
+            alert(msg);
+          }
+        } catch (err) {
+          console.error(err);
+          alert("Lỗi kết nối server. Vui lòng thử lại.");
+        }
       }
 
       async function loadCategories() {
@@ -680,7 +774,11 @@
 
       async function loadProducts() {
         try {
-          const res = await fetch("/api/product/list");
+          const res = await fetch("/api/product/list/admin", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
           const data = await res.json();
           if (Array.isArray(data.data)) {
             allProducts = data.data;
@@ -695,27 +793,57 @@
         }
       }
 
+      async function deleteVariant(variantId, productName) {
+        if (!confirm(`Bạn có chắc muốn xóa variant của sản phẩm "${productName}"?`)) {
+          return;
+        }
+
+        try {
+          // TODO: Cần tạo API delete variant
+          // const res = await fetch(`/api/variant/delete/${variantId}`, {
+          //   method: "DELETE",
+          //   headers: {
+          //     Authorization: `Bearer ${token}`,
+          //   },
+          // });
+          // const data = await res.json().catch(() => ({}));
+
+          // if (res.ok) {
+          //   await loadProducts();
+          // } else {
+          //   const msg = data?.msg || data?.message || "Không thể xóa variant.";
+          //   alert(msg);
+          // }
+          alert("Chức năng xóa variant đang được phát triển");
+        } catch (err) {
+          console.error(err);
+          alert("Lỗi kết nối server. Vui lòng thử lại.");
+        }
+      }
+
+      function editVariant(variantId, productId) {
+        // TODO: Mở modal hoặc form để sửa variant
+        alert(`Sửa variant ${variantId} của product ${productId} - Chức năng đang được phát triển`);
+      }
+
       searchInput.addEventListener("input", () => renderProducts());
       categoryFilter.addEventListener("change", () => renderProducts());
       statusFilter.addEventListener("change", () => renderProducts());
-      productTableBody.addEventListener("click", (event) => {
-        const actionBtn = event.target.closest("button[data-action]");
-        if (!actionBtn) return;
 
-        const { action, id } = actionBtn.dataset;
-        if (!id) return;
-        const product = getProductById(id);
+      // Thêm variant mặc định khi load trang
+      addVariantRow();
 
-        if (action === "delete") {
-          handleDeleteProduct(id);
-        } else if (action === "add" && product) {
-          populateFormFromProduct(product);
-        }
+      document.getElementById("addVariantBtn").addEventListener("click", () => {
+        addVariantRow();
       });
 
       resetProductFormButton.addEventListener("click", () => {
         productForm.reset();
         productFormMessage.classList.add("hidden");
+        // Reset variants container
+        document.getElementById("variantsContainer").innerHTML = "";
+        variantCounter = 0;
+        addVariantRow(); // Thêm lại variant mặc định
       });
 
       productForm.addEventListener("submit", async (e) => {
@@ -725,13 +853,48 @@
         productFormMessage.className =
           "block text-xs mt-1 text-amber-400";
 
-        const formData = new FormData(productForm);
-        // map field theo backend (tuỳ thuộc pCtrl.AddProduct)
-        // ví dụ: name, price, quantity, id_cat, description, image
-        if (formData.has("category")) {
-          formData.set("id_cat", formData.get("category"));
-          formData.delete("category");
+        // Thu thập dữ liệu variants
+        const variantRows = document.querySelectorAll('[id^="variant_"]');
+        if (variantRows.length === 0) {
+          productFormMessage.textContent = "Vui lòng thêm ít nhất 1 biến thể sản phẩm!";
+          productFormMessage.className = "block text-xs mt-1 text-rose-400";
+          return;
         }
+
+        const variants = [];
+        for (const row of variantRows) {
+          const sku = row.querySelector('[name="variant_sku"]')?.value?.trim();
+          const size = row.querySelector('[name="variant_size"]')?.value?.trim();
+          const color = row.querySelector('[name="variant_color"]')?.value?.trim();
+          const price = row.querySelector('[name="variant_price"]')?.value;
+          const quantity = row.querySelector('[name="variant_quantity"]')?.value;
+
+          if (!sku || !size || !color || !price || !quantity) {
+            productFormMessage.textContent = "Vui lòng điền đầy đủ thông tin cho tất cả biến thể!";
+            productFormMessage.className = "block text-xs mt-1 text-rose-400";
+            return;
+          }
+
+          variants.push({
+            sku,
+            size,
+            color,
+            price: Number(price),
+            quantity: Number(quantity),
+          });
+        }
+
+        // Tạo FormData
+        const formData = new FormData(productForm);
+        formData.set("variants", JSON.stringify(variants));
+        
+        // Xóa các field variant không cần thiết
+        formData.delete("variant_sku");
+        formData.delete("variant_size");
+        formData.delete("variant_color");
+        formData.delete("variant_price");
+        formData.delete("variant_quantity");
+        formData.delete("variant_image"); // Image sẽ được xử lý riêng nếu cần
 
         try {
           const res = await fetch("/api/product/add", {
@@ -749,10 +912,14 @@
             productFormMessage.className =
               "block text-xs mt-1 text-emerald-400";
             productForm.reset();
+            // Reset variants
+            document.getElementById("variantsContainer").innerHTML = "";
+            variantCounter = 0;
+            addVariantRow();
             await loadProducts();
           } else {
             const msg =
-              data?.message || data?.error || "Không thể thêm sản phẩm.";
+              data?.msg || data?.message || data?.error || "Không thể thêm sản phẩm.";
             productFormMessage.textContent = msg;
             productFormMessage.className =
               "block text-xs mt-1 text-rose-400";
@@ -763,6 +930,57 @@
             "Lỗi kết nối server. Vui lòng thử lại.";
           productFormMessage.className =
             "block text-xs mt-1 text-rose-400";
+        }
+      });
+
+      categoryForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const categoryName = categoryNameInput.value.trim();
+
+        if (!categoryName) {
+          categoryFormMessage.textContent = "Vui lòng nhập tên danh mục!";
+          categoryFormMessage.className = "block text-xs mt-1 text-rose-400";
+          return;
+        }
+
+        categoryFormMessage.classList.remove("hidden");
+        categoryFormMessage.textContent = "Đang thêm danh mục...";
+        categoryFormMessage.className = "block text-xs mt-1 text-amber-400";
+        submitCategoryBtn.disabled = true;
+
+        try {
+          const res = await fetch("/api/category/add", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ name: categoryName }),
+          });
+          const data = await res.json().catch(() => ({}));
+
+          if (res.ok) {
+            categoryFormMessage.textContent = "Đã thêm danh mục thành công!";
+            categoryFormMessage.className = "block text-xs mt-1 text-emerald-400";
+            categoryNameInput.value = "";
+            await loadCategories();
+            // Reset message sau 2 giây
+            setTimeout(() => {
+              categoryFormMessage.classList.add("hidden");
+            }, 2000);
+          } else {
+            const msg =
+              data?.msg || data?.message || data?.error || "Không thể thêm danh mục.";
+            categoryFormMessage.textContent = msg;
+            categoryFormMessage.className = "block text-xs mt-1 text-rose-400";
+          }
+        } catch (err) {
+          console.error(err);
+          categoryFormMessage.textContent =
+            "Lỗi kết nối server. Vui lòng thử lại.";
+          categoryFormMessage.className = "block text-xs mt-1 text-rose-400";
+        } finally {
+          submitCategoryBtn.disabled = false;
         }
       });
 
