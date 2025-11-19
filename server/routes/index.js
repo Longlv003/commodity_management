@@ -6,9 +6,14 @@ router.get("/", function (req, res, next) {
   res.render("index", { title: "Express" });
 });
 
-// ví dụ trong routes/index.js hoặc app.js
+// Trang đăng nhập admin
 router.get("/login", (req, res) => {
-  res.render("login"); // render views/login.ejs
+  res.render("login");
+});
+
+// Trang quản lý sản phẩm sau khi đăng nhập
+router.get("/admin", (req, res) => {
+  res.render("admin_products");
 });
 
 module.exports = router;
