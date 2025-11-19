@@ -10,7 +10,7 @@ public class Product {
     private String description;
     private List<String> image;
     private List<Variant> variants;
-    private boolean is_favorite;
+    private boolean is_favorite; // Trạng thái favorite từ server (từ userFavorite)
     private int quantity;
     private double min_price;
     private double max_price;

@@ -16,6 +16,9 @@ import com.example.closethub.models.WalletLoginRequest;
 import com.example.closethub.models.WalletRequest;
 import com.example.closethub.models.WalletResponse;
 import com.example.closethub.models.WalletTransactionRequest;
+import com.example.closethub.models.FavoriteRequest;
+import com.example.closethub.models.FavoriteResponse;
+import com.example.closethub.models.FavoriteCheckResponse;
 
 import java.util.List;
 import java.util.Objects;
@@ -64,14 +67,15 @@ public interface ApiService {
     Call<ApiResponse<List<Category>>> getTopCategories();
 
     @GET("/api/product/list")
-    Call<ApiResponse<List<Product>>> getListProduct();
+    Call<ApiResponse<List<Product>>> getListProduct(@Query("user_id") String userId);
 
     @GET("/api/product/list/top-selling")
-    Call<ApiResponse<List<Product>>> GetTopSellingProducts();
+    Call<ApiResponse<List<Product>>> GetTopSellingProducts(@Query("user_id") String userId);
 
     @GET("/api/product/list-by-cat")
-    Call<ApiResponse<List<Product>>> getListProductByCat(@Query("catID") String catID);
+    Call<ApiResponse<List<Product>>> getListProductByCat(@Query("catID") String catID, @Query("user_id") String userId);
 
+    // Old favorite API (deprecated - using userFavorite API instead)
     @PUT("/api/product/{id}/edit/favorite/{favorite}")
     Call<ApiResponse<Product>> toggleFavorite(
             @Header("Authorization") String token,
@@ -82,6 +86,41 @@ public interface ApiService {
     @GET("/api/product/list/favorite")
     Call<ApiResponse<List<Product>>> getFavoriteProducts(
             @Header("Authorization") String token
+    );
+
+    // New User Favorite APIs
+    @POST("/api/favorite/add")
+    Call<ApiResponse<Object>> addFavorite(
+            @Header("Authorization") String token,
+            @Query("user_id") String userId,
+            @Body FavoriteRequest request
+    );
+
+    @DELETE("/api/favorite/remove/{product_id}")
+    Call<ApiResponse<Object>> removeFavorite(
+            @Header("Authorization") String token,
+            @Path("product_id") String productId,
+            @Query("user_id") String userId
+    );
+
+    @POST("/api/favorite/toggle")
+    Call<ApiResponse<FavoriteResponse>> toggleFavoriteNew(
+            @Header("Authorization") String token,
+            @Query("user_id") String userId,
+            @Body FavoriteRequest request
+    );
+
+    @GET("/api/favorite/check/{product_id}")
+    Call<ApiResponse<FavoriteCheckResponse>> checkFavorite(
+            @Header("Authorization") String token,
+            @Path("product_id") String productId,
+            @Query("user_id") String userId
+    );
+
+    @GET("/api/favorite/list")
+    Call<ApiResponse<List<Product>>> getUserFavorites(
+            @Header("Authorization") String token,
+            @Query("user_id") String userId
     );
 
     @POST("/api/cart/add")

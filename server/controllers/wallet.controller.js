@@ -150,7 +150,7 @@ exports.GetWalletInfo = async (req, res) => {
     const wallet = await walletModel
       .findOne({ id_user: userId })
       .select("-pin_hash") // Không trả về PIN hash
-      .populate("id_user", "name email");
+      .populate("id_user", "name email image");
 
     if (!wallet) {
       return res.status(404).json({ msg: "Không tìm thấy ví", data: null });

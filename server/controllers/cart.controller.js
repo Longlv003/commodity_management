@@ -84,12 +84,12 @@ exports.getCartList = async (req, res, next) => {
       .find({ id_user: id_user })
       .populate({
         path: "id_product",
-        select: "name description image productCode",
+        select: "name description productCode",
         match: { is_deleted: false },
       })
       .populate({
         path: "id_variant",
-        select: "sku size color price quantity",
+        select: "sku size color price quantity image",
         match: { is_deleted: false },
       })
       .sort({ added_date: -1 });
@@ -128,12 +128,12 @@ exports.updateCartQuantity = async (req, res, next) => {
       .findById(_id)
       .populate({
         path: "id_product",
-        select: "name description image productCode",
+        select: "name description productCode",
         match: { is_deleted: false },
       })
       .populate({
         path: "id_variant",
-        select: "sku size color price quantity",
+        select: "sku size color price quantity image",
         match: { is_deleted: false },
       });
 

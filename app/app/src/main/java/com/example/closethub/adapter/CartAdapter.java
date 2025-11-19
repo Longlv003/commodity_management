@@ -72,8 +72,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         CartLookUpProduct product = productArrayList.get(position);
 
         String imageUrl = "";
-        if (product.getId_product().getImage() != null && !product.getId_product().getImage().isEmpty()) {
-            imageUrl = "http://10.0.2.2:3000/images/products/" + product.getId_product().getImage().get(0);
+        // Lấy image từ variant thay vì product
+        if (product.getId_variant() != null && 
+            product.getId_variant().getImage() != null && 
+            !product.getId_variant().getImage().isEmpty()) {
+            imageUrl = "http://10.0.2.2:3000/images/products/" + product.getId_variant().getImage().get(0);
         }
 
         Glide.with(context)

@@ -1,5 +1,6 @@
 let { pModel } = require("../models/product.model");
 let { pVariantModel } = require("../models/product.variants.model");
+const { uploadSingleFile } = require("../helpers/upload.helper");
 
 exports.AddVariant = async (req, res, next) => {
   let dataRes = { msg: "OK" };
@@ -35,7 +36,7 @@ exports.AddVariant = async (req, res, next) => {
     // Nếu upload hình variant
     if (req.file) {
       const fileName = await uploadSingleFile(req.file, "products");
-      variant.image = fileName;
+      variant.image = Array.isArray(fileName) ? fileName : [fileName];
     }
 
     const saved = await variant.save();

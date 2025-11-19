@@ -123,10 +123,11 @@ exports.PlaceOrder = async (req, res, next) => {
 
       const price = variant.price || 0;
 
-      // Tạo bill detail - lưu price, size, color từ variant
+      // Tạo bill detail - lưu id_variant, price, size, color từ variant
       const newBillDetails = new billDetailModel({
         id_bill: savedBill._id,
         id_product: item.id_product._id,
+        id_variant: item.id_variant._id,
         price: price,
         quantity: item.quantity,
         size: variant.size || "",
@@ -191,7 +192,8 @@ exports.GetOrderHistory = async (req, res, next) => {
     for (const bill of bills) {
       const details = await billDetailModel
         .find({ id_bill: bill._id })
-        .populate("id_product");
+        .populate("id_product")
+        .populate("id_variant");
 
       // Tính subtotal (tổng tiền sản phẩm không bao gồm phí vận chuyển)
       const subtotal = details.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -225,7 +227,7 @@ exports.GetOrderHistory = async (req, res, next) => {
           price: item.price, // Giá từ bill_detail
           quantity: item.quantity, // Số lượng từ bill_detail
           amount: item.price * item.quantity, // Tổng tiền = price * quantity
-          image: item.id_product.image,
+          image: item.id_variant && item.id_variant.image ? item.id_variant.image : [],
           size: item.size || "", // Size từ bill_detail
           color: item.color || "" // Color từ bill_detail
         })),

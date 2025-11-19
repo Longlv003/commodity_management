@@ -6,8 +6,6 @@ let pSchema = new db.mongoose.Schema(
     catID: { type: db.mongoose.Schema.Types.ObjectId, required: true },
     name: { type: String, required: true },
     description: { type: String },
-    image: [{ type: String }],
-    is_favorite: { type: Boolean, default: false },
     created_at: { type: Date, default: new Date() },
     updated_at: { type: Date, default: new Date() },
     is_deleted: { type: Boolean, default: false },

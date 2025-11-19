@@ -21,6 +21,8 @@ import com.example.closethub.models.ApiResponse;
 import com.example.closethub.models.Cart;
 import com.example.closethub.models.CartRequest;
 import com.example.closethub.models.Product;
+import com.example.closethub.models.FavoriteRequest;
+import com.example.closethub.models.FavoriteResponse;
 import com.example.closethub.networks.ApiService;
 import com.example.closethub.networks.RetrofitClient;
 
@@ -36,6 +38,17 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     private Context context;
     private ArrayList<Product> productArrayList;
     private ApiService apiService = RetrofitClient.getApiService();
+    
+    // Callback interface để notify khi favorite được toggle
+    public interface OnFavoriteToggleListener {
+        void onFavoriteToggled(boolean isFavorite);
+    }
+    
+    private OnFavoriteToggleListener favoriteToggleListener;
+    
+    public void setOnFavoriteToggleListener(OnFavoriteToggleListener listener) {
+        this.favoriteToggleListener = listener;
+    }
 
     public ProductAdapter(Context context, ArrayList<Product> productArrayList) {
         this.context = context;
@@ -102,6 +115,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             });
         }
 
+        // Hiển thị icon favorite dựa trên is_favorite từ server
         if (product.isIs_favorite()) {
             holder.imgFavorite.setImageResource(R.drawable.ic_favorite_red);
         } else {
@@ -128,8 +142,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     }
 
     private void toggleFavorite(Product product, ProductViewHolder holder) {
-        boolean newFavoriteStatus = !product.isIs_favorite();
-
         SharedPreferences sharedPref = context.getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
         String idUser = sharedPref.getString("id_user", null);
         String token_user = sharedPref.getString("token", null);
@@ -139,22 +151,32 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             return;
         }
 
-        apiService.toggleFavorite(token_user, product.get_id(), newFavoriteStatus).enqueue(new Callback<ApiResponse<Product>>() {
+        // Sử dụng API mới: toggleFavoriteNew
+        FavoriteRequest request = new FavoriteRequest(product.get_id());
+        apiService.toggleFavoriteNew("Bearer " + token_user, idUser, request).enqueue(new Callback<ApiResponse<FavoriteResponse>>() {
             @Override
-            public void onResponse(Call<ApiResponse<Product>> call, Response<ApiResponse<Product>> response) {
+            public void onResponse(Call<ApiResponse<FavoriteResponse>> call, Response<ApiResponse<FavoriteResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    ApiResponse<Product> apiResponse = response.body();
+                    FavoriteResponse favoriteResponse = response.body().getData();
+                    if (favoriteResponse != null) {
+                        boolean newFavoriteStatus = favoriteResponse.isIs_favorite();
 
-                    // Cập nhật trạng thái local
-                    product.setIs_favorite(newFavoriteStatus);
+                        // Cập nhật trạng thái local
+                        product.setIs_favorite(newFavoriteStatus);
 
-                    // Cập nhật icon
-                    if (newFavoriteStatus) {
-                        holder.imgFavorite.setImageResource(R.drawable.ic_favorite_red);
-                        Toast.makeText(context, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show();
-                    } else {
-                        holder.imgFavorite.setImageResource(R.drawable.ic_favorite);
-                        Toast.makeText(context, "Đã xóa khỏi yêu thích", Toast.LENGTH_SHORT).show();
+                        // Cập nhật icon
+                        if (newFavoriteStatus) {
+                            holder.imgFavorite.setImageResource(R.drawable.ic_favorite_red);
+                            Toast.makeText(context, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show();
+                        } else {
+                            holder.imgFavorite.setImageResource(R.drawable.ic_favorite);
+                            Toast.makeText(context, "Đã xóa khỏi yêu thích", Toast.LENGTH_SHORT).show();
+                            
+                            // Nếu đang ở FavoriteFragment, cần reload danh sách
+                            if (favoriteToggleListener != null) {
+                                favoriteToggleListener.onFavoriteToggled(false);
+                            }
+                        }
                     }
                 } else {
                     Toast.makeText(context, "Cập nhật thất bại", Toast.LENGTH_SHORT).show();
@@ -162,7 +184,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<Product>> call, Throwable throwable) {
+            public void onFailure(Call<ApiResponse<FavoriteResponse>> call, Throwable throwable) {
                 Toast.makeText(context, "Lỗi kết nối: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e("ToggleFavorite", "Error: ", throwable);
             }

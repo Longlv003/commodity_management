@@ -8,6 +8,7 @@ public class WalletResponse {
     private double total_deposits;
     private double total_withdrawals;
     private String create_date;
+    private User id_user;
 
     public WalletResponse() {
     }
@@ -66,6 +67,14 @@ public class WalletResponse {
 
     public void setCreate_date(String create_date) {
         this.create_date = create_date;
+    }
+
+    public User getId_user() {
+        return id_user;
+    }
+
+    public void setId_user(User id_user) {
+        this.id_user = id_user;
     }
 }
 

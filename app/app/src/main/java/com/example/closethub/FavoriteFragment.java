@@ -90,6 +90,17 @@ public class FavoriteFragment extends Fragment {
                 new GridLayoutManager(getContext(), 2)
         );
         productAdapter = new ProductAdapter(getContext(), productArrayList);
+        
+        // Set callback để reload danh sách khi favorite được toggle
+        productAdapter.setOnFavoriteToggleListener(isFavorite -> {
+            if (!isFavorite) {
+                // Nếu bỏ favorite, reload danh sách để xóa sản phẩm khỏi danh sách
+                SharedPreferences sharedPref = getContext().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+                String token_user = sharedPref.getString("token", null);
+                GetListFavorite(token_user);
+            }
+        });
+        
         rcvProduct.setAdapter(productAdapter);
 
         SharedPreferences sharedPref = getContext().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
@@ -102,7 +113,16 @@ public class FavoriteFragment extends Fragment {
     }
 
     private void GetListFavorite(String tokenUser) {
-        apiService.getFavoriteProducts(tokenUser).enqueue(new Callback<ApiResponse<List<Product>>>() {
+        SharedPreferences sharedPref = getContext().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+        String idUser = sharedPref.getString("id_user", null);
+
+        if (idUser == null) {
+            Log.e("Error", "User ID not found");
+            return;
+        }
+
+        // Sử dụng API mới: getUserFavorites
+        apiService.getUserFavorites("Bearer " + tokenUser, idUser).enqueue(new Callback<ApiResponse<List<Product>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<Product>>> call, Response<ApiResponse<List<Product>>> response) {
                 if (response.isSuccessful() && response.body() != null) {

@@ -30,6 +30,9 @@ import com.example.closethub.models.CartRequest;
 import com.example.closethub.models.Product;
 import com.example.closethub.models.User;
 import com.example.closethub.models.Variant;
+import com.example.closethub.models.FavoriteRequest;
+import com.example.closethub.models.FavoriteResponse;
+import com.example.closethub.models.FavoriteCheckResponse;
 import com.example.closethub.networks.ApiService;
 import com.example.closethub.networks.RetrofitClient;
 import com.google.gson.Gson;
@@ -86,6 +89,11 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         imgBack.setOnClickListener(v -> {
             finish();
+        });
+
+        // Xử lý click favorite
+        imgFavorite.setOnClickListener(v -> {
+            toggleFavorite();
         });
 
         LoadDataDetail(productId);
@@ -178,13 +186,10 @@ public class ProductDetailActivity extends AppCompatActivity {
                             .error(R.drawable.ic_error)             // Ảnh lỗi nếu load thất bại
                             .into(imgProduct);
 
-                    if (product.isIs_favorite()) {
-                        imgFavorite.setImageResource(R.drawable.ic_favorite_red);
-                    } else {
-                        imgFavorite.setImageResource(R.drawable.ic_favorite);
-                    }
-
                     txtNameProduct.setText(product.getName());
+                    
+                    // Check favorite status từ API
+                    checkFavoriteStatus(productId);
                     txtDescription.setText(product.getDescription());
 
                     ArrayList<String> listSize = new ArrayList<>();
@@ -219,6 +224,7 @@ public class ProductDetailActivity extends AppCompatActivity {
                         sizeProductAdapter.setSelectedSize(selectedSize);
 
                         updatePrice();
+                        updateImage();
                     }
 
                     edtQuantity.setText("1");
@@ -255,6 +261,7 @@ public class ProductDetailActivity extends AppCompatActivity {
             updateQuantityButtons();
 
             updatePrice();
+            updateImage();
         });
         rcvSize.setLayoutManager(new LinearLayoutManager(ProductDetailActivity.this, LinearLayoutManager.HORIZONTAL, false));
         rcvSize.setAdapter(sizeProductAdapter);
@@ -279,6 +286,7 @@ public class ProductDetailActivity extends AppCompatActivity {
             colorProductAdapter.setSelectedColor(selectedColor);
 
             updatePrice();
+            updateImage();
         });
         rcvColor.setLayoutManager(new LinearLayoutManager(ProductDetailActivity.this, LinearLayoutManager.HORIZONTAL, false));
         rcvColor.setAdapter(colorProductAdapter);
@@ -297,6 +305,29 @@ public class ProductDetailActivity extends AppCompatActivity {
                 txtPrice.setText(v.getPrice() + "đ");
                 break;
             }
+        }
+    }
+
+    private void updateImage() {
+        if (selectedSize == null || selectedColor == null) return;
+
+        Variant selectedVariant = getSelectedVariant();
+        if (selectedVariant != null && selectedVariant.getImage() != null && !selectedVariant.getImage().isEmpty()) {
+            // Lấy ảnh từ variant được chọn
+            String imageUrl = "http://10.0.2.2:3000/images/products/" + selectedVariant.getImage().get(0);
+            Glide.with(ProductDetailActivity.this)
+                    .load(imageUrl)
+                    .placeholder(R.drawable.ic_placeholder)
+                    .error(R.drawable.ic_error)
+                    .into(imgProduct);
+        } else if (product.getImage() != null && !product.getImage().isEmpty()) {
+            // Fallback về image từ product nếu variant không có image
+            String imageUrl = "http://10.0.2.2:3000/images/products/" + product.getImage().get(0);
+            Glide.with(ProductDetailActivity.this)
+                    .load(imageUrl)
+                    .placeholder(R.drawable.ic_placeholder)
+                    .error(R.drawable.ic_error)
+                    .into(imgProduct);
         }
     }
 
@@ -346,6 +377,85 @@ public class ProductDetailActivity extends AppCompatActivity {
         // Disable nút cộng nếu số lượng = stock
         imgAddQuantity.setEnabled(current < stock);
         imgAddQuantity.setAlpha(current < stock ? 1f : 0.3f);
+    }
+
+    private void checkFavoriteStatus(String productId) {
+        SharedPreferences prefs = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
+        String token = prefs.getString("token", null);
+        String userId = prefs.getString("id_user", null);
+
+        if (token == null || userId == null) {
+            // Nếu chưa đăng nhập, set icon mặc định
+            imgFavorite.setImageResource(R.drawable.ic_favorite);
+            return;
+        }
+
+        apiService.checkFavorite("Bearer " + token, productId, userId).enqueue(new Callback<ApiResponse<FavoriteCheckResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<FavoriteCheckResponse>> call, Response<ApiResponse<FavoriteCheckResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    FavoriteCheckResponse checkResponse = response.body().getData();
+                    if (checkResponse != null) {
+                        boolean isFavorite = checkResponse.isIs_favorite();
+                        
+                        if (isFavorite) {
+                            imgFavorite.setImageResource(R.drawable.ic_favorite_red);
+                        } else {
+                            imgFavorite.setImageResource(R.drawable.ic_favorite);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<FavoriteCheckResponse>> call, Throwable throwable) {
+                Log.e("CheckFavorite", "Error: ", throwable);
+            }
+        });
+    }
+
+    private void toggleFavorite() {
+        SharedPreferences prefs = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
+        String token = prefs.getString("token", null);
+        String userId = prefs.getString("id_user", null);
+
+        if (token == null || userId == null) {
+            Toast.makeText(this, "Vui lòng đăng nhập để thêm yêu thích", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (product == null || product.get_id() == null) {
+            return;
+        }
+
+        FavoriteRequest request = new FavoriteRequest(product.get_id());
+        apiService.toggleFavoriteNew("Bearer " + token, userId, request).enqueue(new Callback<ApiResponse<FavoriteResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<FavoriteResponse>> call, Response<ApiResponse<FavoriteResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    FavoriteResponse favoriteResponse = response.body().getData();
+                    if (favoriteResponse != null) {
+                        boolean newFavoriteStatus = favoriteResponse.isIs_favorite();
+
+                        if (newFavoriteStatus) {
+                            imgFavorite.setImageResource(R.drawable.ic_favorite_red);
+                            Toast.makeText(ProductDetailActivity.this, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show();
+                        } else {
+                            imgFavorite.setImageResource(R.drawable.ic_favorite);
+                            Toast.makeText(ProductDetailActivity.this, "Đã xóa khỏi yêu thích", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                } else {
+                    Toast.makeText(ProductDetailActivity.this, "Cập nhật thất bại", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<FavoriteResponse>> call, Throwable throwable) {
+                Toast.makeText(ProductDetailActivity.this, "Lỗi kết nối: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("ToggleFavorite", "Error: ", throwable);
+            }
+        });
     }
 
 }

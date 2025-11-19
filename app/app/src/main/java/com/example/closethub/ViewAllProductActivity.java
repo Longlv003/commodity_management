@@ -1,6 +1,7 @@
 package com.example.closethub;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
@@ -100,7 +101,10 @@ public class ViewAllProductActivity extends AppCompatActivity {
     }
 
     private void getListProduct() {
-        apiService.getListProduct().enqueue(new Callback<ApiResponse<List<Product>>>() {
+        SharedPreferences sharedPref = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
+        String idUser = sharedPref.getString("id_user", null);
+        
+        apiService.getListProduct(idUser).enqueue(new Callback<ApiResponse<List<Product>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<Product>>> call, Response<ApiResponse<List<Product>>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -118,7 +122,10 @@ public class ViewAllProductActivity extends AppCompatActivity {
     }
 
     private void GetListProductByCat(String categoryId) {
-        apiService.getListProductByCat(categoryId).enqueue(new Callback<ApiResponse<List<Product>>>() {
+        SharedPreferences sharedPref = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
+        String idUser = sharedPref.getString("id_user", null);
+        
+        apiService.getListProductByCat(categoryId, idUser).enqueue(new Callback<ApiResponse<List<Product>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<Product>>> call, Response<ApiResponse<List<Product>>> response) {
                 if (response.isSuccessful() && response.body() != null) {

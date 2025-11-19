@@ -13,6 +13,7 @@ const pVariantSchema = new db.mongoose.Schema(
     quantity: { type: Number, required: true, min: 0, default: 0 },
     total_sold: { type: Number, required: true, min: 0, default: 0 },
     price: { type: Number, required: true, min: 0, default: 0 },
+    image: [{ type: String }],
     is_deleted: { type: Boolean, default: false },
     deleted_at: { type: Date, default: null },
   },

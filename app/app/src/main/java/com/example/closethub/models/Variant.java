@@ -2,6 +2,8 @@ package com.example.closethub.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class Variant {
     private String _id;
     private String sku;
@@ -12,6 +14,7 @@ public class Variant {
     private double price;
     private int quantity;
     private int total_sold;
+    private List<String> image;
 
     public String get_id() {
         return _id;
@@ -75,5 +78,13 @@ public class Variant {
 
     public void setTotal_sold(int total_sold) {
         this.total_sold = total_sold;
+    }
+
+    public List<String> getImage() {
+        return image;
+    }
+
+    public void setImage(List<String> image) {
+        this.image = image;
     }
 }

@@ -11,6 +11,7 @@ var pCtrl = require("../controllers/product.controller");
 var cartCtrl = require("../controllers/cart.controller");
 var orderCtrl = require("../controllers/order.controller");
 var walletCtrl = require("../controllers/wallet.controller");
+var userFavoriteCtrl = require("../controllers/userFavorite.controller");
 
 // User
 router.post("/account/register", upload.single("image"), accountCtrl.doReg);
@@ -46,12 +47,6 @@ router.post(
   mdw.checkRole(["admin"]),
   upload.single("image"),
   bannerCtrl.AddBanner
-);
-router.delete(
-  "/banner/sale/delete",
-  mdw.api_auth,
-  mdw.checkRole(["admin"]),
-  bannerCtrl.DeleteBanner
 );
 router.get("/banner/sale/list", bannerCtrl.GetAllBanner);
 
@@ -101,6 +96,15 @@ router.put(
 );
 router.get("/product/list/favorite", mdw.api_auth, pCtrl.GetFavoriteProducts);
 router.get("/product/:_id", pCtrl.GetProductDetail);
+
+// User Favorite
+// user_id bắt buộc phải truyền qua query (?user_id=xxx)
+// Ví dụ: GET /api/favorite/list?user_id=xxx hoặc POST /api/favorite/add?user_id=xxx
+router.post("/favorite/add", mdw.api_auth, userFavoriteCtrl.AddFavorite);
+router.delete("/favorite/remove/:product_id", mdw.api_auth, userFavoriteCtrl.RemoveFavorite);
+router.post("/favorite/toggle", mdw.api_auth, userFavoriteCtrl.ToggleFavorite);
+router.get("/favorite/check/:product_id", mdw.api_auth, userFavoriteCtrl.CheckFavorite);
+router.get("/favorite/list", mdw.api_auth, userFavoriteCtrl.GetUserFavorites);
 
 // Cart
 router.post("/cart/add", mdw.api_auth, cartCtrl.addToCart);
