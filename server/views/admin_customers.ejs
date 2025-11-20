@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html class="dark" lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Quản lý khách hàng - Admin</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+      }
+      .scrollbar-thin::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      .scrollbar-thin::-webkit-scrollbar-thumb {
+        background-color: rgba(148, 163, 184, 0.8);
+        border-radius: 9999px;
+      }
+      .modal-backdrop {
+        background: rgba(2, 6, 23, 0.8);
+      }
+    </style>
+  </head>
+
+  <body class="bg-slate-950 text-slate-100">
+    <div class="flex min-h-screen">
+      <button
+        id="mobileMenuBtn"
+        class="md:hidden fixed top-4 left-4 z-30 p-2 rounded-lg bg-slate-800 text-slate-100 hover:bg-slate-700"
+      >
+        <span class="material-symbols-outlined text-xl">menu</span>
+      </button>
+
+      <aside
+        id="sidebar"
+        class="hidden md:flex w-64 flex-col border-r border-slate-800 bg-slate-950/80 backdrop-blur fixed left-0 top-0 h-screen z-20 overflow-y-auto"
+      >
+        <button
+          id="closeSidebarBtn"
+          class="md:hidden absolute top-4 right-4 p-2 rounded-lg bg-slate-800 text-slate-100 hover:bg-slate-700"
+        >
+          <span class="material-symbols-outlined text-xl">close</span>
+        </button>
+        <div class="flex items-center gap-3 px-6 pt-6 pb-4">
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-lg font-black"
+          >
+            CH
+          </div>
+          <div>
+            <p class="text-sm text-slate-400">Admin</p>
+            <p class="text-base font-semibold">ClosetHub Panel</p>
+          </div>
+        </div>
+
+        <nav class="mt-4 flex-1 px-3 space-y-1">
+          <a
+            href="/admin"
+            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-slate-800 hover:text-white"
+          >
+            <span class="material-symbols-outlined text-xl"
+              >space_dashboard</span
+            >
+            <span>Dashboard</span>
+          </a>
+
+          <a
+            href="/admin/products"
+            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-slate-800 hover:text-white"
+          >
+            <span class="material-symbols-outlined text-xl">inventory_2</span>
+            <span>Sản phẩm</span>
+          </a>
+
+          <a
+            href="/admin/orders"
+            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-slate-800 hover:text-white"
+          >
+            <span class="material-symbols-outlined text-xl">receipt_long</span>
+            <span>Đơn hàng</span>
+          </a>
+
+          <a
+            href="/admin/customers"
+            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm bg-slate-800 text-white"
+          >
+            <span class="material-symbols-outlined text-xl">group</span>
+            <span>Khách hàng</span>
+          </a>
+
+          <a
+            href="/admin/reports"
+            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-slate-800 hover:text-white"
+          >
+            <span class="material-symbols-outlined text-xl">insights</span>
+            <span>Thống kê</span>
+          </a>
+        </nav>
+
+        <div class="mt-auto border-t border-slate-800 px-4 py-4">
+          <button
+            id="logoutBtn"
+            class="flex w-full items-center justify-center gap-2 rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-slate-100 hover:bg-slate-700"
+          >
+            <span class="material-symbols-outlined text-xl">logout</span>
+            <span>Đăng xuất</span>
+          </button>
+        </div>
+      </aside>
+
+      <div
+        id="sidebarOverlay"
+        class="hidden fixed inset-0 bg-black/50 z-10 md:hidden"
+      ></div>
+
+      <main class="flex-1 bg-slate-950 md:ml-64">
+        <header
+          class="flex items-center justify-between border-b border-slate-800 px-4 md:px-8 py-4 bg-slate-950/80 backdrop-blur sticky top-0 z-20"
+        >
+          <div>
+            <p class="text-xs uppercase tracking-[0.2em] text-slate-500">
+              Bảng quản trị
+            </p>
+            <h1 class="text-xl md:text-2xl font-semibold">
+              Quản lý khách hàng
+            </h1>
+            <p class="text-xs text-slate-500">
+              Thêm mới, chỉnh sửa, theo dõi hành vi và lịch sử mua hàng.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <div class="hidden sm:flex flex-col items-end">
+              <p class="text-sm font-medium" id="currentUserName">Admin</p>
+              <p class="text-xs text-slate-500" id="currentUserEmail"></p>
+            </div>
+            <div
+              class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 text-sm font-semibold"
+            >
+              A
+            </div>
+          </div>
+        </header>
+
+        <div class="px-4 md:px-8 py-6 flex flex-col gap-6">
+          <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            <article
+              class="rounded-2xl border border-slate-800 bg-gradient-to-br from-blue-900/20 to-slate-950 p-4 shadow-xl"
+            >
+              <p class="text-xs uppercase tracking-wide text-blue-300">
+                Tổng khách hàng
+              </p>
+              <p class="text-3xl font-semibold mt-2" id="totalCustomers">0</p>
+              <p class="text-[11px] text-slate-500">
+                Bao gồm tất cả tài khoản người dùng
+              </p>
+            </article>
+            <article
+              class="rounded-2xl border border-slate-800 bg-gradient-to-br from-emerald-900/20 to-slate-950 p-4 shadow-xl"
+            >
+              <p class="text-xs uppercase tracking-wide text-emerald-300">
+                Khách hàng hoạt động
+              </p>
+              <p class="text-3xl font-semibold mt-2 text-emerald-200" id="activeCustomers">
+                0
+              </p>
+              <p class="text-[11px] text-slate-500">
+                Chưa bị khóa hoặc vô hiệu hóa
+              </p>
+            </article>
+            <article
+              class="rounded-2xl border border-slate-800 bg-gradient-to-br from-amber-900/20 to-slate-950 p-4 shadow-xl"
+            >
+              <p class="text-xs uppercase tracking-wide text-amber-300">
+                Giá trị TB / khách
+              </p>
+              <p class="text-3xl font-semibold mt-2 text-amber-200" id="avgCustomerValue">
+                0₫
+              </p>
+              <p class="text-[11px] text-slate-500">
+                Tổng chi tiêu trung bình trên mỗi khách
+              </p>
+            </article>
+            <article
+              class="rounded-2xl border border-slate-800 bg-gradient-to-br from-rose-900/20 to-slate-950 p-4 shadow-xl"
+            >
+              <p class="text-xs uppercase tracking-wide text-rose-300">
+                Khách cần quan tâm
+              </p>
+              <p class="text-3xl font-semibold mt-2 text-rose-200" id="inactiveCustomers">
+                0
+              </p>
+              <p class="text-[11px] text-slate-500">
+                Khách bị khóa hoặc chưa có đơn hàng
+              </p>
+            </article>
+          </section>
+
+          <section
+            class="rounded-2xl border border-slate-800 bg-slate-950/60 px-4 py-4 flex flex-wrap gap-3 items-center"
+          >
+            <div
+              class="flex flex-1 min-w-[240px] items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2"
+            >
+              <span class="material-symbols-outlined text-slate-500">
+                search
+              </span>
+              <input
+                id="customerSearchInput"
+                type="text"
+                placeholder="Tìm theo tên, email, SĐT..."
+                class="bg-transparent text-sm flex-1 outline-none placeholder:text-slate-500"
+              />
+            </div>
+
+            <select
+              id="customerStatusFilter"
+              class="h-10 rounded-lg border border-slate-800 bg-slate-900/60 px-3 text-sm text-slate-200"
+            >
+              <option value="">Tất cả trạng thái</option>
+              <option value="active">Đang hoạt động</option>
+              <option value="inactive">Đã khóa</option>
+              <option value="no-orders">Chưa từng mua</option>
+            </select>
+
+            <button
+              id="addCustomerBtn"
+              class="ml-auto flex items-center gap-2 h-10 rounded-lg bg-blue-600 px-4 text-xs font-semibold text-white hover:bg-blue-500"
+            >
+              <span class="material-symbols-outlined text-base">add</span>
+              Thêm khách
+            </button>
+          </section>
+
+          <section
+            class="grid grid-cols-1 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-6"
+          >
+            <div
+              class="rounded-2xl border border-slate-800 bg-slate-900/60 shadow-xl overflow-hidden flex flex-col min-h-[520px]"
+            >
+              <div
+                class="flex items-center justify-between px-4 md:px-6 py-3 border-b border-slate-800"
+              >
+                <p class="text-sm font-semibold">Danh sách khách hàng</p>
+                <p class="text-xs text-slate-500">
+                  Hiển thị
+                  <span id="customerCount" class="font-semibold text-slate-200"
+                    >0</span
+                  >
+                  khách
+                </p>
+              </div>
+
+              <div class="overflow-auto scrollbar-thin flex-1">
+                <table class="min-w-full text-sm">
+                  <thead class="bg-slate-900/80 sticky top-0 z-10">
+                    <tr class="text-left text-xs text-slate-400 uppercase">
+                      <th class="px-3 py-2 font-medium">Khách hàng</th>
+                      <th class="px-3 py-2 font-medium">Liên hệ</th>
+                      <th class="px-3 py-2 font-medium">Đơn hàng</th>
+                      <th class="px-3 py-2 font-medium">Chi tiêu</th>
+                      <th class="px-3 py-2 font-medium">Hoạt động</th>
+                      <th class="px-3 py-2 font-medium text-right">Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    id="customerTableBody"
+                    class="divide-y divide-slate-800"
+                  >
+                    <tr>
+                      <td
+                        colspan="6"
+                        class="px-3 py-6 text-center text-xs text-slate-500"
+                      >
+                        Đang tải dữ liệu...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div
+              class="rounded-2xl border border-slate-800 bg-slate-900/60 shadow-xl flex flex-col min-h-[520px]"
+            >
+              <div
+                class="flex items-center justify-between px-4 md:px-6 py-3 border-b border-slate-800"
+              >
+                <p class="text-sm font-semibold">Chi tiết khách hàng</p>
+                <span
+                  id="customerDetailBadge"
+                  class="text-[11px] text-slate-500"
+                ></span>
+              </div>
+
+              <div
+                id="customerDetailPanel"
+                class="flex-1 px-4 md:px-6 py-4 space-y-4 overflow-auto scrollbar-thin text-sm text-slate-200"
+              >
+                <p class="text-xs text-slate-500 text-center mt-10">
+                  Chọn khách hàng để xem chi tiết hành vi và lịch sử mua hàng.
+                </p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <!-- Modal backdrop -->
+    <div
+      id="customerModal"
+      class="hidden fixed inset-0 z-40 items-center justify-center modal-backdrop"
+    >
+      <div
+        class="bg-slate-900 w-full max-w-xl rounded-2xl border border-slate-800 p-6 shadow-2xl overflow-auto max-h-[90vh]"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <p class="text-lg font-semibold" id="customerModalTitle">
+            Thêm khách hàng
+          </p>
+          <button
+            id="closeCustomerModal"
+            class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700"
+          >
+            <span class="material-symbols-outlined text-base">close</span>
+          </button>
+        </div>
+        <form id="customerForm" class="space-y-3" enctype="multipart/form-data">
+          <input type="hidden" id="customerFormMode" value="create" />
+          <input type="hidden" id="customerFormId" />
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs text-slate-400">Họ và tên *</label>
+              <input
+                type="text"
+                id="customerName"
+                required
+                class="mt-1 h-10 w-full rounded-lg border border-slate-800 bg-slate-950/50 px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label class="text-xs text-slate-400">Email *</label>
+              <input
+                type="email"
+                id="customerEmail"
+                required
+                class="mt-1 h-10 w-full rounded-lg border border-slate-800 bg-slate-950/50 px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs text-slate-400">Số điện thoại</label>
+              <input
+                type="text"
+                id="customerPhone"
+                class="mt-1 h-10 w-full rounded-lg border border-slate-800 bg-slate-950/50 px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+            <div id="customerPasswordWrapper">
+              <label class="text-xs text-slate-400">Mật khẩu *</label>
+              <input
+                type="password"
+                id="customerPassword"
+                class="mt-1 h-10 w-full rounded-lg border border-slate-800 bg-slate-950/50 px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500"
+                minlength="6"
+                required
+              />
+            </div>
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Địa chỉ</label>
+            <input
+              type="text"
+              id="customerAddress"
+              class="mt-1 h-10 w-full rounded-lg border border-slate-800 bg-slate-950/50 px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Ảnh đại diện</label>
+            <input
+              type="file"
+              id="customerAvatar"
+              accept="image/*"
+              class="mt-1 block w-full text-[11px] text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-800 file:px-2 file:py-1 file:text-[11px] file:text-slate-100 hover:file:bg-slate-700"
+            />
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <p id="customerFormMessage" class="text-xs text-slate-500"></p>
+            <div class="flex gap-2">
+              <button
+                type="button"
+                id="cancelCustomerForm"
+                class="h-9 rounded-lg border border-slate-700 px-3 text-xs font-medium text-slate-200 hover:bg-slate-800"
+              >
+                Hủy
+              </button>
+              <button
+                type="submit"
+                class="h-9 rounded-lg bg-blue-600 px-4 text-xs font-semibold text-white hover:bg-blue-500"
+              >
+                Lưu
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+
+    <script>
+      const token = localStorage.getItem("auth_token");
+      const user = JSON.parse(localStorage.getItem("auth_user") || "null");
+
+      if (!token) {
+        window.location.href = "/login";
+      }
+
+      if (user) {
+        document.getElementById("currentUserName").textContent =
+          user.fullname || user.name || "Admin";
+        document.getElementById("currentUserEmail").textContent =
+          user.email || "";
+      }
+
+      const logoutBtn = document.getElementById("logoutBtn");
+      logoutBtn.addEventListener("click", () => {
+        localStorage.removeItem("auth_token");
+        localStorage.removeItem("auth_user");
+        window.location.href = "/login";
+      });
+
+      const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+      const sidebar = document.getElementById("sidebar");
+      const sidebarOverlay = document.getElementById("sidebarOverlay");
+      const closeSidebarBtn = document.getElementById("closeSidebarBtn");
+      function toggleMobileMenu() {
+        if (!sidebar || !sidebarOverlay) return;
+        const isHidden = sidebar.classList.contains("hidden");
+        if (isHidden) {
+          sidebar.classList.remove("hidden");
+          sidebar.classList.add("flex");
+          sidebarOverlay.classList.remove("hidden");
+        } else {
+          sidebar.classList.add("hidden");
+          sidebar.classList.remove("flex");
+          sidebarOverlay.classList.add("hidden");
+        }
+      }
+      mobileMenuBtn?.addEventListener("click", toggleMobileMenu);
+      sidebarOverlay?.addEventListener("click", toggleMobileMenu);
+      closeSidebarBtn?.addEventListener("click", toggleMobileMenu);
+
+      const customerSearchInput = document.getElementById("customerSearchInput");
+      const customerStatusFilter = document.getElementById("customerStatusFilter");
+      const customerTableBody = document.getElementById("customerTableBody");
+      const customerCount = document.getElementById("customerCount");
+      const totalCustomersEl = document.getElementById("totalCustomers");
+      const activeCustomersEl = document.getElementById("activeCustomers");
+      const inactiveCustomersEl = document.getElementById("inactiveCustomers");
+      const avgCustomerValueEl = document.getElementById("avgCustomerValue");
+      const customerDetailPanel = document.getElementById("customerDetailPanel");
+      const customerDetailBadge = document.getElementById("customerDetailBadge");
+      const addCustomerBtn = document.getElementById("addCustomerBtn");
+      const customerModal = document.getElementById("customerModal");
+      const closeCustomerModal = document.getElementById("closeCustomerModal");
+      const cancelCustomerForm = document.getElementById("cancelCustomerForm");
+      const customerForm = document.getElementById("customerForm");
+      const customerFormMode = document.getElementById("customerFormMode");
+      const customerFormId = document.getElementById("customerFormId");
+      const customerModalTitle = document.getElementById("customerModalTitle");
+      const customerPasswordWrapper = document.getElementById("customerPasswordWrapper");
+      const customerFormMessage = document.getElementById("customerFormMessage");
+
+      const fields = {
+        name: document.getElementById("customerName"),
+        email: document.getElementById("customerEmail"),
+        phone: document.getElementById("customerPhone"),
+        password: document.getElementById("customerPassword"),
+        address: document.getElementById("customerAddress"),
+        avatar: document.getElementById("customerAvatar"),
+      };
+
+      let allCustomers = [];
+      let filteredCustomers = [];
+      let selectedCustomerId = null;
+
+      function formatCurrency(value) {
+        return (Number(value) || 0).toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+          maximumFractionDigits: 0,
+        });
+      }
+
+      function formatDate(value) {
+        if (!value) return "-";
+        return new Date(value).toLocaleString("vi-VN", {
+          hour12: false,
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      function toggleModal(open) {
+        if (open) {
+          customerModal.classList.remove("hidden");
+          customerModal.classList.add("flex");
+        } else {
+          customerModal.classList.add("hidden");
+          customerModal.classList.remove("flex");
+        }
+      }
+
+      function resetForm() {
+        customerForm.reset();
+        customerFormMessage.textContent = "";
+        customerFormMode.value = "create";
+        customerFormId.value = "";
+        customerPasswordWrapper.classList.remove("hidden");
+        fields.password.required = true;
+        customerModalTitle.textContent = "Thêm khách hàng";
+      }
+
+      addCustomerBtn.addEventListener("click", () => {
+        resetForm();
+        toggleModal(true);
+      });
+
+      closeCustomerModal.addEventListener("click", () => toggleModal(false));
+      cancelCustomerForm.addEventListener("click", () => {
+        toggleModal(false);
+      });
+
+      function updateStats() {
+        totalCustomersEl.textContent = allCustomers.length;
+        const active = allCustomers.filter((c) => c.is_active).length;
+        const inactive = allCustomers.length - active;
+        activeCustomersEl.textContent = active;
+        inactiveCustomersEl.textContent = inactive;
+
+        const totalSpent = allCustomers.reduce(
+          (sum, c) => sum + (c.totalSpent || 0),
+          0
+        );
+        avgCustomerValueEl.textContent = formatCurrency(
+          allCustomers.length ? totalSpent / allCustomers.length : 0
+        );
+      }
+
+      function applyFilters() {
+        const search = customerSearchInput.value.trim().toLowerCase();
+        const status = customerStatusFilter.value;
+
+        filteredCustomers = allCustomers.filter((customer) => {
+          const matchSearch =
+            !search ||
+            (customer.name || "").toLowerCase().includes(search) ||
+            (customer.email || "").toLowerCase().includes(search) ||
+            (customer.phone || "").toLowerCase().includes(search);
+
+          let matchStatus = true;
+          if (status === "active") {
+            matchStatus = customer.is_active;
+          } else if (status === "inactive") {
+            matchStatus = !customer.is_active;
+          } else if (status === "no-orders") {
+            matchStatus = (customer.totalOrders || 0) === 0;
+          }
+
+          return matchSearch && matchStatus;
+        });
+
+        renderCustomerTable();
+      }
+
+      function renderCustomerTable() {
+        if (!filteredCustomers.length) {
+          customerTableBody.innerHTML =
+            '<tr><td colspan="6" class="px-3 py-6 text-center text-xs text-slate-500">Không có khách hàng phù hợp.</td></tr>';
+          customerCount.textContent = "0";
+          return;
+        }
+
+        customerTableBody.innerHTML = filteredCustomers
+          .map((customer) => {
+            const isSelected =
+              selectedCustomerId &&
+              String(selectedCustomerId) === String(customer._id);
+            return `
+              <tr class="hover:bg-slate-900/70 ${isSelected ? "bg-slate-900/80" : ""}">
+                <td class="px-3 py-3">
+                  <div class="flex items-center gap-3">
+                    <div class="h-10 w-10 rounded-full bg-slate-800 flex items-center justify-center text-[10px] text-slate-500 overflow-hidden">
+                      ${
+                        customer.image
+                          ? `<img src="/images/avatars/${customer.image}" alt="${customer.name}" class="h-full w-full object-cover" onerror="this.parentElement.innerHTML='IMG'" />`
+                          : (customer.name || "KH")
+                              .split(" ")
+                              .map((p) => p[0])
+                              .join("")
+                              .slice(0, 2)
+                      }
+                    </div>
+                    <div>
+                      <p class="text-xs font-semibold text-slate-100">${
+                        customer.name || "Khách hàng"
+                      }</p>
+                      <p class="text-[11px] text-slate-500">
+                        ${
+                          customer.totalOrders
+                            ? `${customer.totalOrders} đơn`
+                            : "Chưa mua"
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-3 py-3 text-xs text-slate-300">
+                  <div class="flex flex-col">
+                    <span>${customer.email || "-"}</span>
+                    <span class="text-[11px] text-slate-500">${
+                      customer.phone || "—"
+                    }</span>
+                  </div>
+                </td>
+                <td class="px-3 py-3 text-xs text-slate-300">${
+                  customer.totalOrders || 0
+                }</td>
+                <td class="px-3 py-3 text-xs text-slate-100">
+                  ${formatCurrency(customer.totalSpent || 0)}
+                </td>
+                <td class="px-3 py-3">
+                  <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${
+                    customer.is_active
+                      ? "border-emerald-500/40 text-emerald-300 bg-emerald-500/10"
+                      : "border-rose-500/40 text-rose-300 bg-rose-500/10"
+                  }">
+                    ${customer.is_active ? "Hoạt động" : "Đã khóa"}
+                  </span>
+                </td>
+                <td class="px-3 py-3 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <button
+                      class="view-customer-btn inline-flex items-center justify-center rounded-md border border-slate-700 bg-slate-900/60 px-2 py-1 text-[10px] text-slate-200 hover:bg-slate-800"
+                      data-id="${customer._id}"
+                    >
+                      Xem
+                    </button>
+                    <button
+                      class="edit-customer-btn inline-flex items-center justify-center rounded-md border border-blue-700 bg-blue-900/40 px-2 py-1 text-[10px] text-blue-100 hover:bg-blue-800"
+                      data-id="${customer._id}"
+                    >
+                      Sửa
+                    </button>
+                    <button
+                      class="delete-customer-btn inline-flex items-center justify-center rounded-md border border-rose-700 bg-rose-900/40 px-2 py-1 text-[10px] text-rose-100 hover:bg-rose-800"
+                      data-id="${customer._id}"
+                    >
+                      Xóa
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            `;
+          })
+          .join("");
+
+        customerCount.textContent = filteredCustomers.length;
+
+        customerTableBody
+          .querySelectorAll(".view-customer-btn")
+          .forEach((btn) => {
+            btn.addEventListener("click", () => {
+              selectCustomer(btn.dataset.id);
+            });
+          });
+
+        customerTableBody
+          .querySelectorAll(".edit-customer-btn")
+          .forEach((btn) => {
+            btn.addEventListener("click", () => openEditModal(btn.dataset.id));
+          });
+
+        customerTableBody
+          .querySelectorAll(".delete-customer-btn")
+          .forEach((btn) => {
+            btn.addEventListener("click", () => deleteCustomer(btn.dataset.id));
+          });
+      }
+
+      function renderCustomerDetail(detail) {
+        if (!detail) {
+          customerDetailPanel.innerHTML =
+            '<p class="text-xs text-slate-500 text-center mt-10">Chọn khách hàng để xem chi tiết hành vi và lịch sử mua hàng.</p>';
+          customerDetailBadge.textContent = "";
+          return;
+        }
+
+        const { customer, summary, behavior, orders } = detail;
+        customerDetailBadge.textContent = customer.email || "";
+
+        const ordersHtml = orders
+          .map(
+            (order) => `
+            <div class="border border-slate-800 rounded-xl p-3">
+              <div class="flex items-center justify-between text-xs">
+                <div>
+                  <p class="font-semibold text-slate-100">${formatCurrency(
+                    order.total_amount
+                  )}</p>
+                  <p class="text-[11px] text-slate-500">${formatDate(
+                    order.created_date
+                  )}</p>
+                </div>
+                <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium">
+                  ${order.status || "pending"}
+                </span>
+              </div>
+              <div class="mt-2 space-y-1">
+                ${order.items
+                  .map(
+                    (item) => `
+                    <div class="flex items-center justify-between text-[11px] text-slate-300">
+                      <span>${item.name}</span>
+                      <span>x${item.quantity}</span>
+                    </div>
+                  `
+                  )
+                  .join("")}
+              </div>
+            </div>
+          `
+          )
+          .join("");
+
+        const topProducts = behavior.topProducts || [];
+        const topProductsHtml = topProducts.length
+          ? topProducts
+              .map(
+                (product) => `
+                <div class="flex items-center gap-3">
+                  <div class="h-10 w-10 rounded-lg bg-slate-800 overflow-hidden flex items-center justify-center text-[10px] text-slate-500">
+                    ${
+                      product.image
+                        ? `<img src="/images/products/${product.image}" class="h-full w-full object-cover" onerror="this.parentElement.innerHTML='IMG'" />`
+                        : "IMG"
+                    }
+                  </div>
+                  <div class="flex-1">
+                    <p class="text-xs font-semibold">${product.name}</p>
+                    <p class="text-[11px] text-slate-500">SL: ${
+                      product.quantity
+                    } | ${formatCurrency(product.revenue)}</p>
+                  </div>
+                </div>
+              `
+              )
+              .join("")
+          : '<p class="text-xs text-slate-500">Chưa có dữ liệu hành vi.</p>';
+
+        customerDetailPanel.innerHTML = `
+          <div class="space-y-4">
+            <div class="flex items-center gap-3">
+              <div class="h-12 w-12 rounded-full bg-slate-800 flex items-center justify-center text-[12px] font-semibold text-slate-300 overflow-hidden">
+                ${
+                  customer.image
+                    ? `<img src="/images/avatars/${customer.image}" class="h-full w-full object-cover" onerror="this.parentElement.innerHTML='IMG'" />`
+                    : (customer.name || "KH")
+                        .split(" ")
+                        .map((p) => p[0])
+                        .join("")
+                        .slice(0, 2)
+                }
+              </div>
+              <div>
+                <p class="text-sm font-semibold">${customer.name || "Khách hàng"}</p>
+                <p class="text-[11px] text-slate-500">${customer.phone || ""}</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 text-[11px]">
+              <div class="rounded-xl border border-slate-800 p-3">
+                <p class="text-slate-500 mb-1">Tổng chi tiêu</p>
+                <p class="text-base font-semibold text-white">${formatCurrency(
+                  summary.totalSpent
+                )}</p>
+              </div>
+              <div class="rounded-xl border border-slate-800 p-3">
+                <p class="text-slate-500 mb-1">Số đơn</p>
+                <p class="text-base font-semibold text-white">${summary.totalOrders}</p>
+              </div>
+              <div class="rounded-xl border border-slate-800 p-3">
+                <p class="text-slate-500 mb-1">Giá trị trung bình</p>
+                <p class="text-base font-semibold text-white">${formatCurrency(
+                  summary.avgOrderValue
+                )}</p>
+              </div>
+              <div class="rounded-xl border border-slate-800 p-3">
+                <p class="text-slate-500 mb-1">Lần mua gần nhất</p>
+                <p class="text-base font-semibold text-white">${formatDate(
+                  summary.lastOrderDate
+                )}</p>
+              </div>
+            </div>
+
+            <div class="border border-slate-800 rounded-xl p-3">
+              <p class="text-xs font-semibold mb-2">Hành vi nổi bật</p>
+              ${topProductsHtml}
+            </div>
+
+            <div class="border border-slate-800 rounded-xl p-3 space-y-2">
+              <p class="text-xs font-semibold">Lịch sử giao dịch</p>
+              ${
+                orders.length
+                  ? ordersHtml
+                  : '<p class="text-xs text-slate-500">Khách chưa có đơn hàng.</p>'
+              }
+            </div>
+          </div>
+        `;
+      }
+
+      async function selectCustomer(customerId) {
+        selectedCustomerId = customerId;
+        renderCustomerTable();
+        try {
+          const res = await fetch(`/api/customers/admin/${customerId}/detail`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            throw new Error(data?.msg || "Không thể tải chi tiết khách hàng.");
+          }
+          renderCustomerDetail(data.data);
+        } catch (error) {
+          console.error(error);
+          customerDetailPanel.innerHTML = `<p class="text-xs text-rose-400">${error.message}</p>`;
+        }
+      }
+
+      function openEditModal(customerId) {
+        const customer = allCustomers.find(
+          (c) => String(c._id) === String(customerId)
+        );
+        if (!customer) return;
+
+        resetForm();
+        customerFormMode.value = "edit";
+        customerFormId.value = customerId;
+        customerModalTitle.textContent = "Chỉnh sửa khách hàng";
+        customerPasswordWrapper.classList.add("hidden");
+        fields.password.required = false;
+
+        fields.name.value = customer.name || "";
+        fields.email.value = customer.email || "";
+        fields.phone.value = customer.phone || "";
+        fields.address.value = customer.address || "";
+
+        toggleModal(true);
+      }
+
+      async function deleteCustomer(customerId) {
+        const customer = allCustomers.find(
+          (c) => String(c._id) === String(customerId)
+        );
+        if (!customer) return;
+        if (
+          !confirm(
+            `Bạn có chắc muốn xóa khách hàng "${customer.name || customer.email}"?`
+          )
+        ) {
+          return;
+        }
+
+        try {
+          const res = await fetch(`/api/customers/admin/${customerId}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            throw new Error(data?.msg || "Không thể xóa khách hàng.");
+          }
+          await loadCustomers();
+          customerDetailPanel.innerHTML =
+            '<p class="text-xs text-slate-500 text-center mt-10">Chọn khách hàng để xem chi tiết hành vi và lịch sử mua hàng.</p>';
+          customerDetailBadge.textContent = "";
+        } catch (error) {
+          alert(error.message || "Có lỗi xảy ra.");
+        }
+      }
+
+      customerForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        customerFormMessage.textContent = "Đang xử lý...";
+        customerFormMessage.className = "text-xs text-amber-400";
+
+        const mode = customerFormMode.value;
+        const formData = new FormData();
+        formData.append("name", fields.name.value.trim());
+        formData.append("email", fields.email.value.trim());
+        if (fields.phone.value.trim()) formData.append("phone", fields.phone.value.trim());
+        if (fields.address.value.trim())
+          formData.append("address", fields.address.value.trim());
+        if (fields.avatar.files[0]) {
+          formData.append("image", fields.avatar.files[0]);
+        }
+
+        try {
+          let url = "";
+          let options = {};
+          if (mode === "create") {
+            if (!fields.password.value.trim()) {
+              throw new Error("Vui lòng nhập mật khẩu.");
+            }
+            formData.append("pass", fields.password.value.trim());
+            url = "/api/account/register";
+            options = {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              body: formData,
+            };
+          } else {
+            url = `/api/account/update/${customerFormId.value}`;
+            if (typeof fields.password.value === "string" && fields.password.value.trim()) {
+              formData.append("pass", fields.password.value.trim());
+            }
+            options = {
+              method: "PUT",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              body: formData,
+            };
+          }
+
+          const res = await fetch(url, options);
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            throw new Error(data?.msg || data?.error || "Không thể lưu khách hàng.");
+          }
+
+          customerFormMessage.textContent = "Thành công!";
+          customerFormMessage.className = "text-xs text-emerald-400";
+          setTimeout(() => {
+            toggleModal(false);
+            customerFormMessage.textContent = "";
+          }, 800);
+          await loadCustomers();
+        } catch (error) {
+          customerFormMessage.textContent = error.message || "Có lỗi xảy ra.";
+          customerFormMessage.className = "text-xs text-rose-400";
+        }
+      });
+
+      customerSearchInput.addEventListener("input", applyFilters);
+      customerStatusFilter.addEventListener("change", applyFilters);
+
+      async function loadCustomers() {
+        try {
+          const res = await fetch("/api/customers/admin/overview", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            throw new Error(data?.msg || "Không thể tải khách hàng.");
+          }
+          allCustomers = Array.isArray(data.data) ? data.data : [];
+          updateStats();
+          applyFilters();
+          if (selectedCustomerId) {
+            selectCustomer(selectedCustomerId);
+          }
+        } catch (error) {
+          console.error(error);
+          customerTableBody.innerHTML = `<tr><td colspan="6" class="px-3 py-6 text-center text-xs text-rose-400">${error.message}</td></tr>`;
+        }
+      }
+
+      loadCustomers();
+    </script>
+  </body>
+</html>
+
