@@ -30,4 +30,3 @@ userFavoriteSchema.index({ product_id: 1 });
 
 const userFavoriteModel = db.mongoose.model("userFavoriteModel", userFavoriteSchema);
 module.exports = { userFavoriteModel };
-

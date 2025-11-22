@@ -12,6 +12,8 @@ var cartCtrl = require("../controllers/cart.controller");
 var orderCtrl = require("../controllers/order.controller");
 var walletCtrl = require("../controllers/wallet.controller");
 var userFavoriteCtrl = require("../controllers/userFavorite.controller");
+var statisticsCtrl = require("../controllers/statistics.controller");
+var customerCtrl = require("../controllers/customer.controller");
 
 // User
 router.post("/account/register", upload.single("image"), accountCtrl.doReg);
@@ -116,6 +118,7 @@ router.delete("/cart/delete/:_id", mdw.api_auth, cartCtrl.deleteCartItem);
 //router.post('/order/:id_user/place/:address', mdw.api_auth, orderCtrl.PlaceOrder);
 router.post("/order", mdw.api_auth, orderCtrl.PlaceOrder);
 router.get("/order/history/:id_user", orderCtrl.GetOrderHistory);
+router.get("/order/list/admin", mdw.api_auth, mdw.checkRole(["admin"]), orderCtrl.GetAllOrders);
 
 // Wallet
 router.post("/wallet/create", mdw.api_auth, walletCtrl.CreateWallet);
@@ -126,5 +129,16 @@ router.post("/wallet/deposit", mdw.api_auth, walletCtrl.Deposit);
 router.post("/wallet/withdraw", mdw.api_auth, walletCtrl.Withdraw);
 router.put("/wallet/change-pin", mdw.api_auth, walletCtrl.ChangePin);
 router.get("/wallet/history", mdw.api_auth, walletCtrl.GetTransactionHistory);
+
+// Statistics
+router.get("/statistics/revenue", mdw.api_auth, mdw.checkRole(["admin"]), statisticsCtrl.GetRevenueStatistics);
+router.get("/statistics/top-selling", mdw.api_auth, mdw.checkRole(["admin"]), statisticsCtrl.GetTopSellingProductsStats);
+
+// Customer Management
+router.get("/customer/list", mdw.api_auth, mdw.checkRole(["admin"]), customerCtrl.GetAllCustomers);
+router.get("/customer/detail/:id", mdw.api_auth, mdw.checkRole(["admin"]), customerCtrl.GetCustomerDetail);
+router.post("/customer/add", mdw.api_auth, mdw.checkRole(["admin"]), upload.single("image"), customerCtrl.AddCustomer);
+router.put("/customer/update/:id", mdw.api_auth, mdw.checkRole(["admin"]), upload.single("image"), customerCtrl.UpdateCustomer);
+router.delete("/customer/delete/:id", mdw.api_auth, mdw.checkRole(["admin"]), customerCtrl.DeleteCustomer);
 
 module.exports = router;

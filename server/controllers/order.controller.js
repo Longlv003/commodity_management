@@ -242,3 +242,116 @@ exports.GetOrderHistory = async (req, res, next) => {
 
   res.json(dataRes);
 };
+
+// API cho admin: Lấy tất cả đơn hàng
+exports.GetAllOrders = async (req, res, next) => {
+  let dataRes = { msg: "OK", data: null };
+
+  try {
+    const { userModel } = require("../models/account.model");
+    
+    // Lấy tất cả hóa đơn, sắp xếp theo ngày mới nhất
+    const bills = await billModel.find().sort({ created_date: -1 }).populate("id_user");
+
+    if (!bills || bills.length === 0) {
+      dataRes.data = [];
+      return res.json(dataRes);
+    }
+
+    // Lấy chi tiết từng hóa đơn
+    const orders = [];
+    for (const bill of bills) {
+      const details = await billDetailModel
+        .find({ id_bill: bill._id })
+        .populate("id_product")
+        .populate("id_variant");
+
+      // Tính subtotal (tổng tiền sản phẩm không bao gồm phí vận chuyển)
+      const subtotal = details.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      
+      // Parse phí vận chuyển từ address
+      let shippingFee = 0;
+      let customerName = "";
+      let customerPhone = "";
+      let deliveryAddress = "";
+      let shippingMethod = "";
+      let paymentMethod = "";
+      
+      if (bill.address && bill.address.includes("|")) {
+        const parts = bill.address.split("|");
+        if (parts.length > 0) {
+          // Parse thông tin khách hàng: "Name - Phone - Address"
+          const customerInfo = parts[0].trim();
+          const customerParts = customerInfo.split(" - ");
+          if (customerParts.length >= 3) {
+            customerName = customerParts[0].trim();
+            customerPhone = customerParts[1].trim();
+            deliveryAddress = customerParts.slice(2).join(" - ").trim();
+          } else {
+            deliveryAddress = customerInfo;
+          }
+        }
+        if (parts.length > 1) {
+          const shippingInfo = parts[1].trim();
+          shippingMethod = shippingInfo;
+          // Extract số tiền từ chuỗi như "Giao hàng nhanh (25.000đ)" hoặc "Giao hàng hoả tốc (40.000đ)"
+          const shippingMatch = shippingInfo.match(/\(([\d.]+)đ\)/);
+          if (shippingMatch && shippingMatch[1]) {
+            const priceString = shippingMatch[1].replace(/\./g, "");
+            shippingFee = parseFloat(priceString) || 0;
+          }
+        }
+        if (parts.length > 2) {
+          paymentMethod = parts[2].trim();
+        }
+      } else {
+        deliveryAddress = bill.address || "";
+      }
+
+      // Lấy thông tin user
+      const user = bill.id_user;
+      const userEmail = user ? (user.email || "") : "";
+      const userName = user ? (user.name || customerName || "") : customerName;
+
+      orders.push({
+        bill_id: bill._id,
+        created_date: bill.created_date,
+        total_amount: bill.total_amount,
+        subtotal: subtotal,
+        shipping_fee: shippingFee,
+        address: bill.address,
+        customer: {
+          id: user ? user._id : null,
+          name: userName,
+          email: userEmail,
+          phone: customerPhone,
+        },
+        delivery: {
+          address: deliveryAddress,
+          method: shippingMethod,
+        },
+        payment: paymentMethod,
+        products: details.map((item) => ({
+          product_id: item.id_product ? item.id_product._id : null,
+          name: item.id_product ? item.id_product.name : "Sản phẩm đã bị xóa",
+          price: item.price,
+          quantity: item.quantity,
+          amount: item.price * item.quantity,
+          image: item.id_variant && item.id_variant.image && Array.isArray(item.id_variant.image) && item.id_variant.image.length > 0 
+            ? item.id_variant.image[0] 
+            : (item.id_variant && typeof item.id_variant.image === 'string' ? item.id_variant.image : null),
+          size: item.size || "",
+          color: item.color || "",
+        })),
+      });
+    }
+
+    dataRes.data = orders;
+  } catch (error) {
+    console.error("GetAllOrders Error:", error);
+    dataRes.msg = error.message;
+    dataRes.data = null;
+  }
+
+  res.json(dataRes);
+};

@@ -55,4 +55,5 @@ exports.GetAllBanner = async (req, res, next) => {
     dataRes.msg = error.message;
   }
   res.json(dataRes);
+
 };

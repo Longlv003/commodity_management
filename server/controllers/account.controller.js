@@ -158,6 +158,10 @@ exports.UpdateUser = async (req, res, next) => {
     if (name) updateData.name = name;
     if (address) updateData.address = address;
 
+    // ✅ Thêm name và address
+    if (name) updateData.name = name;
+    if (address) updateData.address = address;
+
     // ✅ Nếu có file upload
     if (req.file) {
       const fileName = await uploadSingleFile(req.file, "avatars");
