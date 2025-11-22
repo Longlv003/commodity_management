@@ -22,14 +22,12 @@
         background-color: rgba(148, 163, 184, 0.8);
         border-radius: 9999px;
       }
-      .order-row-active {
-        background-color: rgba(59, 130, 246, 0.08);
-      }
     </style>
   </head>
 
   <body class="bg-slate-950 text-slate-100">
     <div class="flex min-h-screen">
+      <!-- Mobile menu button -->
       <button
         id="mobileMenuBtn"
         class="md:hidden fixed top-4 left-4 z-30 p-2 rounded-lg bg-slate-800 text-slate-100 hover:bg-slate-700"
@@ -37,10 +35,12 @@
         <span class="material-symbols-outlined text-xl">menu</span>
       </button>
 
+      <!-- Sidebar -->
       <aside
         id="sidebar"
         class="hidden md:flex w-64 flex-col border-r border-slate-800 bg-slate-950/80 backdrop-blur fixed left-0 top-0 h-screen z-20 overflow-y-auto"
       >
+        <!-- Close button for mobile -->
         <button
           id="closeSidebarBtn"
           class="md:hidden absolute top-4 right-4 p-2 rounded-lg bg-slate-800 text-slate-100 hover:bg-slate-700"
@@ -61,20 +61,18 @@
 
         <nav class="mt-4 flex-1 px-3 space-y-1">
           <a
-            href="/admin"
+            href="#"
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-slate-800 hover:text-white"
           >
-            <span class="material-symbols-outlined text-xl"
-              >space_dashboard</span
-            >
+            <span class="material-symbols-outlined text-xl">space_dashboard</span>
             <span>Dashboard</span>
           </a>
 
           <a
-            href="/admin/products"
+            href="/admin"
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-slate-800 hover:text-white"
           >
-            <span class="material-symbols-outlined text-xl">inventory_2</span>
+            <span class="material-symbols-outlined text-xl"> inventory_2 </span>
             <span>Sản phẩm</span>
           </a>
 
@@ -82,23 +80,23 @@
             href="/admin/orders"
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm bg-slate-800 text-white"
           >
-            <span class="material-symbols-outlined text-xl">receipt_long</span>
+            <span class="material-symbols-outlined text-xl"> receipt_long </span>
             <span>Đơn hàng</span>
           </a>
 
           <a
-            href="/admin/customers"
+            href="#"
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-slate-800 hover:text-white"
           >
-            <span class="material-symbols-outlined text-xl">group</span>
+            <span class="material-symbols-outlined text-xl"> group </span>
             <span>Khách hàng</span>
           </a>
 
           <a
-            href="/admin/reports"
+            href="#"
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-slate-800 hover:text-white"
           >
-            <span class="material-symbols-outlined text-xl">insights</span>
+            <span class="material-symbols-outlined text-xl"> insights </span>
             <span>Thống kê</span>
           </a>
         </nav>
@@ -114,12 +112,15 @@
         </div>
       </aside>
 
+      <!-- Sidebar overlay for mobile -->
       <div
         id="sidebarOverlay"
         class="hidden fixed inset-0 bg-black/50 z-10 md:hidden"
       ></div>
 
+      <!-- Main content -->
       <main class="flex-1 bg-slate-950 md:ml-64">
+        <!-- Top bar -->
         <header
           class="flex items-center justify-between border-b border-slate-800 px-4 md:px-8 py-4 bg-slate-950/80 backdrop-blur sticky top-0 z-20"
         >
@@ -129,8 +130,7 @@
             </p>
             <h1 class="text-xl md:text-2xl font-semibold">Quản lý đơn hàng</h1>
             <p class="text-xs text-slate-500">
-              Theo dõi trạng thái giao hàng, cập nhật tiến độ và chăm sóc khách
-              hàng.
+              Xem danh sách hóa đơn và chi tiết từng giao dịch trong hệ thống.
             </p>
           </div>
 
@@ -147,125 +147,45 @@
           </div>
         </header>
 
-        <div class="px-4 md:px-8 py-6 flex flex-col gap-6">
-          <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-            <article
-              class="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 to-slate-950 p-4 shadow-xl"
-            >
-              <p class="text-xs uppercase tracking-wide text-slate-500">
-                Tổng đơn hàng
-              </p>
-              <p class="text-3xl font-semibold mt-2" id="totalOrders">0</p>
-              <p class="text-[11px] text-slate-500">Trong toàn bộ hệ thống</p>
-            </article>
-            <article
-              class="rounded-2xl border border-slate-800 bg-gradient-to-br from-blue-900/20 to-slate-950 p-4 shadow-xl"
-            >
-              <p class="text-xs uppercase tracking-wide text-blue-300">
-                Đơn chờ xử lý
-              </p>
-              <p class="text-3xl font-semibold mt-2 text-blue-200" id="pendingOrders">
-                0
-              </p>
-              <p class="text-[11px] text-slate-500">
-                Cần xác nhận & chuẩn bị
-              </p>
-            </article>
-            <article
-              class="rounded-2xl border border-slate-800 bg-gradient-to-br from-emerald-900/20 to-slate-950 p-4 shadow-xl"
-            >
-              <p class="text-xs uppercase tracking-wide text-emerald-300">
-                Doanh thu tháng
-              </p>
-              <p
-                class="text-3xl font-semibold mt-2 text-emerald-200"
-                id="monthlyRevenue"
-              >
-                0₫
-              </p>
-              <p class="text-[11px] text-slate-500">
-                Tổng tiền đơn trong tháng hiện tại
-              </p>
-            </article>
-            <article
-              class="rounded-2xl border border-slate-800 bg-gradient-to-br from-indigo-900/20 to-slate-950 p-4 shadow-xl"
-            >
-              <p class="text-xs uppercase tracking-wide text-indigo-300">
-                Giá trị trung bình
-              </p>
-              <p class="text-3xl font-semibold mt-2 text-indigo-200" id="avgOrderValue">
-                0₫
-              </p>
-              <p class="text-[11px] text-slate-500">
-                Trung bình mỗi đơn hàng
-              </p>
-            </article>
-          </section>
-
+        <div class="px-4 md:px-8 py-6 flex flex-col gap-6 h-[calc(100vh-120px)]">
+          <!-- Filters & search -->
           <section
-            class="rounded-2xl border border-slate-800 bg-slate-950/60 px-4 py-4 flex flex-wrap gap-3 items-center"
+            class="flex flex-col md:flex-row md:items-center gap-3 md:gap-4"
           >
             <div
-              class="flex flex-1 min-w-[240px] items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2"
+              class="flex flex-1 items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2"
             >
               <span class="material-symbols-outlined text-slate-500">
                 search
               </span>
               <input
-                id="orderSearchInput"
+                id="searchInput"
                 type="text"
-                placeholder="Tìm kiếm theo mã đơn, khách hàng, email..."
+                placeholder="Tìm kiếm đơn hàng..."
                 class="bg-transparent text-sm flex-1 outline-none placeholder:text-slate-500"
               />
             </div>
 
             <select
-              id="orderStatusFilter"
+              id="dateFilter"
               class="h-10 rounded-lg border border-slate-800 bg-slate-900/60 px-3 text-sm text-slate-200"
             >
-              <option value="">Tất cả trạng thái</option>
-              <option value="pending">Chờ xử lý</option>
-              <option value="processing">Đang chuẩn bị</option>
-              <option value="shipping">Đang giao</option>
-              <option value="delivered">Hoàn thành</option>
-              <option value="cancelled">Đã hủy</option>
+              <option value="">Tất cả thời gian</option>
+              <option value="today">Hôm nay</option>
+              <option value="week">Tuần này</option>
+              <option value="month">Tháng này</option>
             </select>
-
-            <input
-              type="date"
-              id="dateFromInput"
-              class="h-10 rounded-lg border border-slate-800 bg-slate-900/60 px-3 text-sm text-slate-200"
-            />
-            <span class="text-xs text-slate-500">đến</span>
-            <input
-              type="date"
-              id="dateToInput"
-              class="h-10 rounded-lg border border-slate-800 bg-slate-900/60 px-3 text-sm text-slate-200"
-            />
-
-            <button
-              id="clearFilterBtn"
-              class="h-10 rounded-lg border border-slate-700 px-3 text-xs font-medium text-slate-200 hover:bg-slate-800"
-            >
-              Xóa lọc
-            </button>
           </section>
 
-          <section
-            class="grid grid-cols-1 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-6"
-          >
+          <!-- Orders table -->
+          <section class="flex-1 min-h-0">
             <div
-              class="rounded-2xl border border-slate-800 bg-slate-900/60 shadow-xl overflow-hidden flex flex-col"
+              class="rounded-xl border border-slate-800 bg-slate-900/60 shadow-xl overflow-hidden flex flex-col h-full"
             >
               <div
-                class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 px-4 md:px-6 py-3 border-b border-slate-800"
+                class="flex items-center justify-between px-4 md:px-6 py-3 border-b border-slate-800"
               >
-                <div>
-                  <p class="text-sm font-semibold">Danh sách đơn hàng</p>
-                  <p class="text-[11px] text-slate-500">
-                    Theo dõi và cập nhật trạng thái đơn hàng theo thời gian thực.
-                  </p>
-                </div>
+                <p class="text-sm font-semibold">Danh sách đơn hàng</p>
                 <p class="text-xs text-slate-500">
                   Hiển thị
                   <span id="orderCount" class="font-semibold text-slate-200"
@@ -279,53 +199,64 @@
                 <table class="min-w-full text-sm">
                   <thead class="bg-slate-900/80 sticky top-0 z-10">
                     <tr class="text-left text-xs text-slate-400 uppercase">
-                      <th class="px-3 py-2 font-medium">Mã đơn</th>
-                      <th class="px-3 py-2 font-medium">Khách hàng</th>
-                      <th class="px-3 py-2 font-medium">Sản phẩm</th>
-                      <th class="px-3 py-2 font-medium">Tổng tiền</th>
-                      <th class="px-3 py-2 font-medium">Ngày đặt</th>
-                      <th class="px-3 py-2 font-medium">Trạng thái</th>
-                      <th class="px-3 py-2 font-medium text-right">Hành động</th>
+                      <th class="px-4 py-3 font-medium">Mã đơn</th>
+                      <th class="px-4 py-3 font-medium">Khách hàng</th>
+                      <th class="px-4 py-3 font-medium">Ngày đặt</th>
+                      <th class="px-4 py-3 font-medium">Số sản phẩm</th>
+                      <th class="px-4 py-3 font-medium">Tổng tiền</th>
+                      <th class="px-4 py-3 font-medium">Trạng thái</th>
+                      <th class="px-4 py-3 font-medium text-right">
+                        Hành động
+                      </th>
                     </tr>
                   </thead>
-                  <tbody id="ordersTableBody" class="divide-y divide-slate-800">
-                    <tr>
-                      <td colspan="7" class="px-3 py-6 text-center text-xs text-slate-500">
-                        Đang tải dữ liệu...
-                      </td>
-                    </tr>
+                  <tbody id="orderTableBody" class="divide-y divide-slate-800">
+                    <!-- JS render rows -->
                   </tbody>
                 </table>
-              </div>
-            </div>
-
-            <div
-              class="rounded-2xl border border-slate-800 bg-slate-900/60 shadow-xl flex flex-col min-h-[480px]"
-            >
-              <div
-                class="flex items-center justify-between px-4 md:px-6 py-3 border-b border-slate-800"
-              >
-                <p class="text-sm font-semibold">Chi tiết đơn hàng</p>
-                <span
-                  class="text-[11px] text-slate-500"
-                  id="orderDetailBadge"
-                ></span>
-              </div>
-
-              <div
-                id="orderDetailPanel"
-                class="flex-1 px-4 md:px-6 py-4 space-y-4 overflow-auto scrollbar-thin text-sm text-slate-200"
-              >
-                <p class="text-xs text-slate-500 text-center mt-10">
-                  Chọn một đơn hàng để xem chi tiết.
-                </p>
               </div>
             </div>
           </section>
         </div>
       </main>
-    </div>
 
+      <!-- Order Detail Modal -->
+      <div
+        id="orderDetailModal"
+        class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
+      >
+        <div
+          class="bg-slate-900 rounded-xl border border-slate-800 shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
+        >
+          <!-- Modal Header -->
+          <div
+            class="flex items-center justify-between px-6 py-4 border-b border-slate-800"
+          >
+            <div>
+              <h2 class="text-lg font-semibold">Chi tiết đơn hàng</h2>
+              <p class="text-xs text-slate-500" id="modalOrderId"></p>
+            </div>
+            <button
+              id="closeModalBtn"
+              class="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white"
+            >
+              <span class="material-symbols-outlined text-xl">close</span>
+            </button>
+          </div>
+
+          <!-- Modal Content -->
+          <div class="overflow-auto scrollbar-thin flex-1 px-6 py-4">
+            <div id="orderDetailContent" class="space-y-6">
+              <!-- Loading state -->
+              <div class="text-center py-8">
+                <p class="text-slate-400">Đang tải...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <!-- Google Icons -->
     <link
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
       rel="stylesheet"
@@ -335,10 +266,12 @@
       const token = localStorage.getItem("auth_token");
       const user = JSON.parse(localStorage.getItem("auth_user") || "null");
 
+      // Nếu chưa đăng nhập thì quay lại /login
       if (!token) {
         window.location.href = "/login";
       }
 
+      // Hiển thị thông tin user
       if (user) {
         document.getElementById("currentUserName").textContent =
           user.fullname || user.name || "Admin";
@@ -346,32 +279,14 @@
           user.email || "";
       }
 
-      const STATUS_OPTIONS = [
-        { value: "pending", label: "Chờ xử lý", badge: "bg-amber-500/10 text-amber-300 border-amber-500/30" },
-        { value: "processing", label: "Đang chuẩn bị", badge: "bg-sky-500/10 text-sky-300 border-sky-500/30" },
-        { value: "shipping", label: "Đang giao", badge: "bg-indigo-500/10 text-indigo-300 border-indigo-500/30" },
-        { value: "delivered", label: "Hoàn thành", badge: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30" },
-        { value: "cancelled", label: "Đã hủy", badge: "bg-rose-500/10 text-rose-300 border-rose-500/30" },
-      ];
-      const STATUS_MAP = STATUS_OPTIONS.reduce((acc, cur) => {
-        acc[cur.value] = cur;
-        return acc;
-      }, {});
-      const STATUS_FLOW = ["pending", "processing", "shipping", "delivered"];
-
-      const ordersTableBody = document.getElementById("ordersTableBody");
+      const orderTableBody = document.getElementById("orderTableBody");
       const orderCount = document.getElementById("orderCount");
-      const searchInput = document.getElementById("orderSearchInput");
-      const statusFilter = document.getElementById("orderStatusFilter");
-      const dateFromInput = document.getElementById("dateFromInput");
-      const dateToInput = document.getElementById("dateToInput");
-      const clearFilterBtn = document.getElementById("clearFilterBtn");
-      const orderDetailPanel = document.getElementById("orderDetailPanel");
-      const orderDetailBadge = document.getElementById("orderDetailBadge");
-      const totalOrdersEl = document.getElementById("totalOrders");
-      const pendingOrdersEl = document.getElementById("pendingOrders");
-      const monthlyRevenueEl = document.getElementById("monthlyRevenue");
-      const avgOrderValueEl = document.getElementById("avgOrderValue");
+      const searchInput = document.getElementById("searchInput");
+      const dateFilter = document.getElementById("dateFilter");
+      const orderDetailModal = document.getElementById("orderDetailModal");
+      const orderDetailContent = document.getElementById("orderDetailContent");
+      const closeModalBtn = document.getElementById("closeModalBtn");
+      const modalOrderId = document.getElementById("modalOrderId");
       const logoutBtn = document.getElementById("logoutBtn");
       const mobileMenuBtn = document.getElementById("mobileMenuBtn");
       const sidebar = document.getElementById("sidebar");
@@ -379,9 +294,8 @@
       const closeSidebarBtn = document.getElementById("closeSidebarBtn");
 
       let allOrders = [];
-      let filteredOrders = [];
-      let selectedOrderId = null;
 
+      // Mobile menu toggle
       function toggleMobileMenu() {
         if (sidebar && sidebarOverlay) {
           const isHidden = sidebar.classList.contains("hidden");
@@ -397,12 +311,30 @@
         }
       }
 
-      mobileMenuBtn?.addEventListener("click", toggleMobileMenu);
-      sidebarOverlay?.addEventListener("click", toggleMobileMenu);
-      closeSidebarBtn?.addEventListener("click", toggleMobileMenu);
+      if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener("click", toggleMobileMenu);
+      }
 
-      function formatCurrency(value) {
-        const num = Number(value) || 0;
+      if (sidebarOverlay) {
+        sidebarOverlay.addEventListener("click", toggleMobileMenu);
+      }
+
+      if (closeSidebarBtn) {
+        closeSidebarBtn.addEventListener("click", toggleMobileMenu);
+      }
+
+      if (sidebar) {
+        sidebar.querySelectorAll("nav a").forEach((link) => {
+          link.addEventListener("click", () => {
+            if (window.innerWidth < 768) {
+              toggleMobileMenu();
+            }
+          });
+        });
+      }
+
+      function formatCurrency(v) {
+        const num = Number(v) || 0;
         return num.toLocaleString("vi-VN", {
           style: "currency",
           currency: "VND",
@@ -410,10 +342,10 @@
         });
       }
 
-      function formatDate(date) {
-        if (!date) return "-";
-        return new Date(date).toLocaleString("vi-VN", {
-          hour12: false,
+      function formatDate(dateString) {
+        if (!dateString) return "-";
+        const date = new Date(dateString);
+        return date.toLocaleString("vi-VN", {
           day: "2-digit",
           month: "2-digit",
           year: "numeric",
@@ -422,410 +354,286 @@
         });
       }
 
-      function updateStats() {
-        totalOrdersEl.textContent = allOrders.length;
-        pendingOrdersEl.textContent = allOrders.filter(
-          (o) => o.status === "pending"
-        ).length;
-
-        const now = new Date();
-        const monthRevenue = allOrders
-          .filter((o) => {
-            const d = new Date(o.created_date);
-            return (
-              d.getMonth() === now.getMonth() &&
-              d.getFullYear() === now.getFullYear()
-            );
-          })
-          .reduce((sum, order) => sum + (order.total_amount || 0), 0);
-
-        const totalRevenue = allOrders.reduce(
-          (sum, order) => sum + (order.total_amount || 0),
-          0
-        );
-
-        monthlyRevenueEl.textContent = formatCurrency(monthRevenue);
-        avgOrderValueEl.textContent = formatCurrency(
-          allOrders.length ? totalRevenue / allOrders.length : 0
-        );
-      }
-
-      function applyFilters() {
-        const search = searchInput.value.trim().toLowerCase();
-        const statusValue = statusFilter.value;
-        const dateFrom = dateFromInput.value ? new Date(dateFromInput.value) : null;
-        const dateTo = dateToInput.value
-          ? new Date(dateToInput.value + "T23:59:59")
-          : null;
-
-        filteredOrders = allOrders.filter((order) => {
-          const matchesSearch =
-            !search ||
-            order.code.toLowerCase().includes(search) ||
-            order.customer.name.toLowerCase().includes(search) ||
-            order.customer.email.toLowerCase().includes(search);
-
-          const matchesStatus =
-            !statusValue || order.status === statusValue;
-
-          const created = new Date(order.created_date);
-          const matchesDate =
-            (!dateFrom || created >= dateFrom) &&
-            (!dateTo || created <= dateTo);
-
-          return matchesSearch && matchesStatus && matchesDate;
-        });
-
-        renderOrders();
-      }
-
       function renderOrders() {
-        if (!filteredOrders.length) {
-          ordersTableBody.innerHTML =
-            '<tr><td colspan="7" class="px-3 py-6 text-center text-xs text-slate-500">Không có đơn hàng phù hợp.</td></tr>';
+        const search = searchInput.value.trim().toLowerCase();
+        const dateFilterValue = dateFilter.value;
+
+        let filtered = allOrders.slice();
+
+        // Filter by search
+        if (search) {
+          filtered = filtered.filter((order) => {
+            const billId = (order.bill_id || "").toString().toLowerCase();
+            const customerName = (order.customer?.name || "").toLowerCase();
+            const customerEmail = (order.customer?.email || "").toLowerCase();
+            const customerPhone = (order.customer?.phone || "").toLowerCase();
+            return (
+              billId.includes(search) ||
+              customerName.includes(search) ||
+              customerEmail.includes(search) ||
+              customerPhone.includes(search)
+            );
+          });
+        }
+
+        // Filter by date
+        if (dateFilterValue) {
+          const now = new Date();
+          const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          const weekAgo = new Date(today);
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          const monthAgo = new Date(today);
+          monthAgo.setMonth(monthAgo.getMonth() - 1);
+
+          filtered = filtered.filter((order) => {
+            const orderDate = new Date(order.created_date);
+            switch (dateFilterValue) {
+              case "today":
+                return orderDate >= today;
+              case "week":
+                return orderDate >= weekAgo;
+              case "month":
+                return orderDate >= monthAgo;
+              default:
+                return true;
+            }
+          });
+        }
+
+        orderTableBody.innerHTML = "";
+
+        if (!filtered.length) {
+          orderTableBody.innerHTML =
+            '<tr><td colspan="7" class="px-4 py-8 text-center text-xs text-slate-500">Không có đơn hàng nào.</td></tr>';
           orderCount.textContent = "0";
           return;
         }
 
-        ordersTableBody.innerHTML = filteredOrders
-          .map((order) => {
-            const statusMeta = STATUS_MAP[order.status] || STATUS_MAP.pending;
-            const isActive =
-              selectedOrderId && String(selectedOrderId) === String(order._id);
-            const firstItem = order.items[0];
-            return `
-              <tr class="hover:bg-slate-900/80 ${
-                isActive ? "order-row-active" : ""
-              }">
-                <td class="px-3 py-3 text-xs font-semibold text-slate-100">
-                  ${order.code}
-                </td>
-                <td class="px-3 py-3 text-xs text-slate-300">
-                  <div class="flex flex-col">
-                    <span>${order.customer.name || "Khách hàng"}</span>
-                    ${
-                      order.customer.email
-                        ? `<span class="text-[10px] text-slate-500">${order.customer.email}</span>`
-                        : ""
-                    }
-                  </div>
-                </td>
-                <td class="px-3 py-3 text-xs text-slate-300">
-                  ${
-                    firstItem
-                      ? `${firstItem.name} ${
-                          order.item_count > 1
-                            ? `+ ${order.item_count - 1} sp`
-                            : ""
-                        }`
-                      : "-"
-                  }
-                </td>
-                <td class="px-3 py-3 text-xs text-slate-100">
-                  ${formatCurrency(order.total_amount)}
-                </td>
-                <td class="px-3 py-3 text-xs text-slate-400">
-                  ${formatDate(order.created_date)}
-                </td>
-                <td class="px-3 py-3">
-                  <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${
-                    statusMeta.badge
-                  }">
-                    ${statusMeta.label}
-                  </span>
-                </td>
-                <td class="px-3 py-3 text-right">
-                  <button
-                    class="view-order-btn inline-flex items-center justify-center rounded-md border border-slate-700 bg-slate-900/60 px-3 py-1 text-[11px] text-slate-200 hover:bg-slate-800"
-                    data-order-id="${order._id}"
-                  >
-                    Xem
-                  </button>
-                </td>
-              </tr>
-            `;
-          })
-          .join("");
+        filtered.forEach((order) => {
+          const row = document.createElement("tr");
+          row.className = "hover:bg-slate-900/80";
+          
+          const billIdShort = order.bill_id ? order.bill_id.toString().substring(0, 8) : "-";
+          const customerName = order.customer?.name || "Khách hàng";
+          const customerEmail = order.customer?.email || "";
+          const productCount = order.products?.length || 0;
+          const totalAmount = order.total_amount || 0;
 
-        orderCount.textContent = filteredOrders.length;
-
-        ordersTableBody
-          .querySelectorAll(".view-order-btn")
-          .forEach((btn) => {
-            btn.addEventListener("click", (event) => {
-              event.stopPropagation();
-              const orderId = btn.getAttribute("data-order-id");
-              selectOrder(orderId);
-            });
-          });
-      }
-
-      function renderOrderDetail(order) {
-        if (!order) {
-          orderDetailPanel.innerHTML =
-            '<p class="text-xs text-slate-500 text-center mt-10">Chọn một đơn hàng để xem chi tiết.</p>';
-          orderDetailBadge.textContent = "";
-          return;
-        }
-
-        const statusMeta = STATUS_MAP[order.status] || STATUS_MAP.pending;
-        orderDetailBadge.textContent = order.code;
-
-        const itemsHtml = order.items
-          .map(
-            (item) => `
-            <div class="flex items-center gap-3 border border-slate-800 rounded-xl p-3">
-              <div class="h-12 w-12 rounded-lg bg-slate-800 overflow-hidden flex items-center justify-center text-[10px] text-slate-500">
-                ${
-                  item.image
-                    ? `<img src="/images/products/${item.image}" alt="${item.name}" class="h-full w-full object-cover" onerror="this.parentElement.innerHTML='IMG'" />`
-                    : "IMG"
-                }
+          row.innerHTML = `
+            <td class="px-4 py-3">
+              <span class="text-xs font-mono text-blue-400">#${billIdShort}</span>
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex flex-col">
+                <span class="text-xs font-medium text-slate-100">${customerName}</span>
+                ${customerEmail ? `<span class="text-[10px] text-slate-500">${customerEmail}</span>` : ""}
               </div>
-              <div class="flex-1">
-                <p class="text-xs font-semibold">${item.name}</p>
-                <p class="text-[11px] text-slate-500">SL: ${item.quantity}</p>
-              </div>
-              <p class="text-xs font-semibold">${formatCurrency(
-                (item.price || 0) * (item.quantity || 1)
-              )}</p>
-            </div>
-          `
-          )
-          .join("");
-
-        const statusStepsHtml = STATUS_FLOW.map((status, index) => {
-          const isActive = order.status === status;
-          const isDone =
-            STATUS_FLOW.indexOf(order.status) > index ||
-            order.status === status;
-          const meta = STATUS_MAP[status] || STATUS_MAP.pending;
-          return `
-            <div class="flex gap-3">
-              <div class="flex flex-col items-center">
-                <span class="h-6 w-6 rounded-full border ${
-                  isDone ? "bg-blue-600 border-blue-400" : "border-slate-600"
-                } flex items-center justify-center text-[11px]">
-                  ${index + 1}
-                </span>
-                ${
-                  index < STATUS_FLOW.length - 1
-                    ? `<span class="w-px flex-1 ${
-                        isDone ? "bg-blue-500/40" : "bg-slate-700"
-                      }"></span>`
-                    : ""
-                }
-              </div>
-              <div class="pt-0.5">
-                <p class="text-xs font-semibold ${
-                  isActive ? "text-white" : "text-slate-400"
-                }">${meta.label}</p>
-                <p class="text-[11px] text-slate-500">
-                  ${isActive ? "Trạng thái hiện tại" : ""}
-                </p>
-              </div>
-            </div>
-          `;
-        }).join("");
-
-        orderDetailPanel.innerHTML = `
-          <div class="space-y-4">
-            <div class="flex items-center justify-between gap-3">
-              <div>
-                <p class="text-xs text-slate-500">Mã đơn</p>
-                <p class="text-base font-semibold">${order.code}</p>
-              </div>
-              <span class="inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-medium ${
-                statusMeta.badge
-              }">
-                ${statusMeta.label}
+            </td>
+            <td class="px-4 py-3 text-xs text-slate-300">
+              ${formatDate(order.created_date)}
+            </td>
+            <td class="px-4 py-3 text-xs text-slate-100">
+              ${productCount} sản phẩm
+            </td>
+            <td class="px-4 py-3 text-xs font-semibold text-slate-100">
+              ${formatCurrency(totalAmount)}
+            </td>
+            <td class="px-4 py-3">
+              <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border-emerald-500/40">
+                Đã đặt hàng
               </span>
-            </div>
+            </td>
+            <td class="px-4 py-3 text-right">
+              <button
+                onclick="viewOrderDetail('${order.bill_id}')"
+                class="inline-flex items-center justify-center rounded-md border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-[10px] text-slate-200 hover:bg-slate-800 hover:text-white transition-colors"
+              >
+                <span class="material-symbols-outlined text-sm mr-1">visibility</span>
+                Xem chi tiết
+              </button>
+            </td>
+          `;
+          orderTableBody.appendChild(row);
+        });
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 border border-slate-800 rounded-xl p-3">
-              <div>
-                <p class="text-[11px] text-slate-500">Khách hàng</p>
-                <p class="text-sm font-semibold">${order.customer.name}</p>
-                <p class="text-[11px] text-slate-500">${order.customer.email ||
-                  ""}</p>
-              </div>
-              <div>
-                <p class="text-[11px] text-slate-500">Thông tin liên hệ</p>
-                <p class="text-sm">${order.customer.phone || "Chưa cập nhật"}</p>
-                <p class="text-[11px] text-slate-500">${order.customer.address ||
-                  order.address ||
-                  "Chưa cập nhật"}</p>
-              </div>
-            </div>
-
-            <div class="border border-slate-800 rounded-xl p-3 space-y-3">
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="text-[11px] text-slate-500">Ngày đặt</p>
-                  <p class="text-sm font-medium">${formatDate(
-                    order.created_date
-                  )}</p>
-                </div>
-                <div class="text-right">
-                  <p class="text-[11px] text-slate-500">Tổng tiền</p>
-                  <p class="text-sm font-semibold">${formatCurrency(
-                    order.total_amount
-                  )}</p>
-                </div>
-              </div>
-
-              <div class="flex flex-col gap-2">
-                <label class="text-[11px] text-slate-500">Cập nhật trạng thái</label>
-                <div class="flex flex-wrap items-center gap-2">
-                  <select
-                    id="orderStatusSelect"
-                    class="flex-1 min-w-[160px] h-9 rounded-lg border border-slate-800 bg-slate-950/60 px-3 text-xs outline-none"
-                  >
-                    ${STATUS_OPTIONS.map(
-                      (option) => `
-                        <option value="${option.value}" ${
-                          option.value === order.status ? "selected" : ""
-                        }>
-                          ${option.label}
-                        </option>
-                      `
-                    ).join("")}
-                  </select>
-                  <button
-                    id="updateStatusBtn"
-                    class="h-9 rounded-lg bg-blue-600 px-4 text-xs font-semibold text-white hover:bg-blue-500"
-                  >
-                    Lưu
-                  </button>
-                </div>
-                <p id="orderDetailMessage" class="hidden text-[11px]"></p>
-              </div>
-            </div>
-
-            <div class="border border-slate-800 rounded-xl p-3">
-              <p class="text-xs font-semibold mb-2">Tiến độ đơn hàng</p>
-              <div class="space-y-4">
-                ${statusStepsHtml}
-              </div>
-            </div>
-
-            <div class="border border-slate-800 rounded-xl p-3 space-y-3">
-              <p class="text-xs font-semibold">Sản phẩm (${order.item_count})</p>
-              ${
-                itemsHtml ||
-                '<p class="text-[11px] text-slate-500">Chưa có sản phẩm cho đơn này.</p>'
-              }
-            </div>
-          </div>
-        `;
-
-        setupDetailActions(order);
-      }
-
-      function setupDetailActions(order) {
-        const statusSelect = document.getElementById("orderStatusSelect");
-        const updateBtn = document.getElementById("updateStatusBtn");
-        const messageEl = document.getElementById("orderDetailMessage");
-
-        if (updateBtn) {
-          updateBtn.addEventListener("click", async () => {
-            const newStatus = statusSelect.value;
-            await updateOrderStatus(order._id, newStatus, messageEl);
-          });
-        }
-      }
-
-      async function updateOrderStatus(orderId, newStatus, messageEl) {
-        if (!orderId || !newStatus) return;
-
-        messageEl?.classList.remove("hidden", "text-emerald-400", "text-rose-400");
-        messageEl.textContent = "Đang cập nhật trạng thái...";
-        messageEl.classList.add("text-amber-400");
-
-        try {
-          const res = await fetch(`/api/order/${orderId}/status`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ status: newStatus }),
-          });
-
-          const data = await res.json().catch(() => ({}));
-
-          if (!res.ok) {
-            throw new Error(data?.msg || "Không thể cập nhật trạng thái.");
-          }
-
-          messageEl.textContent = "Đã cập nhật trạng thái đơn hàng.";
-          messageEl.classList.remove("text-amber-400");
-          messageEl.classList.add("text-emerald-400");
-
-          const updatedOrder = data.data;
-          const idx = allOrders.findIndex(
-            (order) => String(order._id) === String(orderId)
-          );
-          if (idx > -1) {
-            allOrders[idx] = updatedOrder;
-          }
-
-          selectedOrderId = orderId;
-          updateStats();
-          applyFilters();
-          renderOrderDetail(updatedOrder);
-        } catch (error) {
-          console.error(error);
-          if (messageEl) {
-            messageEl.textContent = error.message || "Có lỗi xảy ra.";
-            messageEl.classList.remove("text-amber-400");
-            messageEl.classList.add("text-rose-400");
-          }
-        }
-      }
-
-      function selectOrder(orderId) {
-        const order = allOrders.find(
-          (item) => String(item._id) === String(orderId)
-        );
-        if (!order) return;
-        selectedOrderId = orderId;
-        renderOrderDetail(order);
-        renderOrders();
+        orderCount.textContent = String(filtered.length);
       }
 
       async function loadOrders() {
         try {
-          const res = await fetch("/api/order/admin", {
+          const res = await fetch("/api/order/list/admin", {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           });
-          const data = await res.json().catch(() => ({}));
-          allOrders = Array.isArray(data.data) ? data.data : [];
-          updateStats();
-          applyFilters();
-          if (allOrders.length) {
-            selectOrder(allOrders[0]._id);
+          const data = await res.json();
+          if (Array.isArray(data.data)) {
+            allOrders = data.data;
+          } else if (Array.isArray(data)) {
+            allOrders = data;
+          } else {
+            allOrders = [];
           }
-        } catch (error) {
-          console.error("Load orders error", error);
-          ordersTableBody.innerHTML =
-            '<tr><td colspan="7" class="px-3 py-6 text-center text-xs text-rose-400">Không thể tải dữ liệu đơn hàng.</td></tr>';
+          renderOrders();
+        } catch (err) {
+          console.error("Load orders error", err);
+          alert("Lỗi khi tải danh sách đơn hàng. Vui lòng thử lại.");
         }
       }
 
-      searchInput.addEventListener("input", applyFilters);
-      statusFilter.addEventListener("change", applyFilters);
-      dateFromInput.addEventListener("change", applyFilters);
-      dateToInput.addEventListener("change", applyFilters);
+      function viewOrderDetail(billId) {
+        const order = allOrders.find((o) => o.bill_id === billId);
+        if (!order) {
+          alert("Không tìm thấy đơn hàng!");
+          return;
+        }
 
-      clearFilterBtn.addEventListener("click", () => {
-        searchInput.value = "";
-        statusFilter.value = "";
-        dateFromInput.value = "";
-        dateToInput.value = "";
-        applyFilters();
+        modalOrderId.textContent = `Mã đơn: #${billId}`;
+        orderDetailContent.innerHTML = `
+          <!-- Customer Info -->
+          <div class="rounded-lg border border-slate-800 bg-slate-950/40 p-4">
+            <h3 class="text-sm font-semibold text-slate-300 mb-3 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base">person</span>
+              Thông tin khách hàng
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+              <div>
+                <p class="text-slate-500 mb-1">Tên khách hàng</p>
+                <p class="text-slate-100 font-medium">${order.customer?.name || "N/A"}</p>
+              </div>
+              <div>
+                <p class="text-slate-500 mb-1">Email</p>
+                <p class="text-slate-100">${order.customer?.email || "N/A"}</p>
+              </div>
+              <div>
+                <p class="text-slate-500 mb-1">Số điện thoại</p>
+                <p class="text-slate-100">${order.customer?.phone || "N/A"}</p>
+              </div>
+              <div>
+                <p class="text-slate-500 mb-1">Mã khách hàng</p>
+                <p class="text-slate-100 font-mono text-[10px]">${order.customer?.id || "N/A"}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Delivery Info -->
+          <div class="rounded-lg border border-slate-800 bg-slate-950/40 p-4">
+            <h3 class="text-sm font-semibold text-slate-300 mb-3 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base">local_shipping</span>
+              Thông tin giao hàng
+            </h3>
+            <div class="space-y-2 text-xs">
+              <div>
+                <p class="text-slate-500 mb-1">Địa chỉ giao hàng</p>
+                <p class="text-slate-100">${order.delivery?.address || order.address || "N/A"}</p>
+              </div>
+              <div>
+                <p class="text-slate-500 mb-1">Phương thức vận chuyển</p>
+                <p class="text-slate-100">${order.delivery?.method || "N/A"}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Order Info -->
+          <div class="rounded-lg border border-slate-800 bg-slate-950/40 p-4">
+            <h3 class="text-sm font-semibold text-slate-300 mb-3 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base">receipt</span>
+              Thông tin đơn hàng
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+              <div>
+                <p class="text-slate-500 mb-1">Ngày đặt hàng</p>
+                <p class="text-slate-100">${formatDate(order.created_date)}</p>
+              </div>
+              <div>
+                <p class="text-slate-500 mb-1">Phương thức thanh toán</p>
+                <p class="text-slate-100">${order.payment || "N/A"}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Products List -->
+          <div class="rounded-lg border border-slate-800 bg-slate-950/40 p-4">
+            <h3 class="text-sm font-semibold text-slate-300 mb-3 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base">shopping_bag</span>
+              Sản phẩm (${order.products?.length || 0})
+            </h3>
+            <div class="space-y-3">
+              ${(order.products || []).map((product, index) => {
+                const imageUrl = product.image 
+                  ? `/images/products/${product.image}` 
+                  : null;
+                return `
+                  <div class="flex gap-3 p-3 rounded-lg border border-slate-800 bg-slate-900/40">
+                    <div class="h-16 w-16 rounded-md bg-slate-800 overflow-hidden flex items-center justify-center flex-shrink-0">
+                      ${
+                        imageUrl
+                          ? `<img src="${imageUrl}" alt="${product.name}" class="h-full w-full object-cover" onerror="this.parentElement.innerHTML='IMG'" />`
+                          : '<span class="text-[10px] text-slate-500">IMG</span>'
+                      }
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-medium text-slate-100 mb-1">${product.name || "N/A"}</p>
+                      ${product.size || product.color ? `
+                        <p class="text-[10px] text-slate-500 mb-1">
+                          ${product.size ? `Size: ${product.size}` : ""}${product.size && product.color ? " | " : ""}${product.color ? `Màu: ${product.color}` : ""}
+                        </p>
+                      ` : ""}
+                      <div class="flex items-center justify-between mt-2">
+                        <p class="text-[10px] text-slate-500">
+                          Số lượng: <span class="text-slate-300 font-medium">${product.quantity || 0}</span>
+                        </p>
+                        <p class="text-xs font-semibold text-slate-100">
+                          ${formatCurrency(product.amount || 0)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          </div>
+
+          <!-- Summary -->
+          <div class="rounded-lg border border-slate-800 bg-slate-950/40 p-4">
+            <h3 class="text-sm font-semibold text-slate-300 mb-3 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base">calculate</span>
+              Tổng kết
+            </h3>
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between text-slate-400">
+                <span>Tổng tiền sản phẩm:</span>
+                <span class="text-slate-200">${formatCurrency(order.subtotal || 0)}</span>
+              </div>
+              ${order.shipping_fee > 0 ? `
+                <div class="flex justify-between text-slate-400">
+                  <span>Phí vận chuyển:</span>
+                  <span class="text-slate-200">${formatCurrency(order.shipping_fee || 0)}</span>
+                </div>
+              ` : ""}
+              <div class="flex justify-between text-sm font-semibold text-slate-100 pt-2 border-t border-slate-800">
+                <span>Tổng cộng:</span>
+                <span class="text-blue-400">${formatCurrency(order.total_amount || 0)}</span>
+              </div>
+            </div>
+          </div>
+        `;
+
+        orderDetailModal.classList.remove("hidden");
+      }
+
+      function closeModal() {
+        orderDetailModal.classList.add("hidden");
+      }
+
+      // Event listeners
+      searchInput.addEventListener("input", () => renderOrders());
+      dateFilter.addEventListener("change", () => renderOrders());
+      closeModalBtn.addEventListener("click", closeModal);
+      orderDetailModal.addEventListener("click", (e) => {
+        if (e.target === orderDetailModal) {
+          closeModal();
+        }
       });
 
       logoutBtn.addEventListener("click", () => {
@@ -834,8 +642,13 @@
         window.location.href = "/login";
       });
 
+      // Make viewOrderDetail available globally
+      window.viewOrderDetail = viewOrderDetail;
+
+      // Khởi chạy
       loadOrders();
     </script>
   </body>
 </html>
+
 
