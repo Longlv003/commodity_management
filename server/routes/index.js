@@ -11,31 +11,29 @@ router.get("/login", (req, res) => {
   res.render("login");
 });
 
-// Admin views
-const renderAdminDashboard = (req, res) => {
+// Trang dashboard (trang chủ admin)
+router.get("/admin/dashboard", (req, res) => {
   res.render("admin_dashboard");
-};
+});
 
-const renderAdminProducts = (req, res) => {
+// Trang quản lý sản phẩm sau khi đăng nhập
+router.get("/admin", (req, res) => {
   res.render("admin_products");
-};
+});
 
-const renderAdminOrders = (req, res) => {
+// Trang quản lý đơn hàng
+router.get("/admin/orders", (req, res) => {
   res.render("admin_orders");
-};
+});
 
-const renderAdminReports = (req, res) => {
-  res.render("admin_reports");
-};
+// Trang thống kê báo cáo doanh thu
+router.get("/admin/statistics", (req, res) => {
+  res.render("admin_statistics");
+});
 
-const renderAdminCustomers = (req, res) => {
+// Trang quản lý khách hàng
+router.get("/admin/customers", (req, res) => {
   res.render("admin_customers");
-};
-
-router.get("/admin", renderAdminDashboard);
-router.get("/admin/products", renderAdminProducts);
-router.get("/admin/orders", renderAdminOrders);
-router.get("/admin/customers", renderAdminCustomers);
-router.get("/admin/reports", renderAdminReports);
+});
 
 module.exports = router;

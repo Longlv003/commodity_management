@@ -1,19 +1,28 @@
 const db = require("./db");
 
-const pSchema = new db.mongoose.Schema(
+let pSchema = new db.mongoose.Schema(
   {
-    name: { type: String, required: true },
-    price: { type: Number, required: true, min: 0 },
-    quantity: { type: Number, required: true, min: 0 },
-    is_favorite: { type: Boolean, default: false },
-    description: { type: String },
-    image: { type: String },
+    productCode: { type: String, required: true, unique: true },
     catID: { type: db.mongoose.Schema.Types.ObjectId, required: true },
-    total_sold: { type: Number, required: true, min: 0 },
-    createdAt: { type: Date, default: new Date() },
+    name: { type: String, required: true },
+    description: { type: String },
+    created_at: { type: Date, default: new Date() },
+    updated_at: { type: Date, default: new Date() },
+    is_deleted: { type: Boolean, default: false },
+    deleted_at: { type: Date, default: null },
   },
   { collection: "products" }
 );
+
+pSchema.virtual("variants", {
+  ref: "pVariantModel", // model được populate tới
+  localField: "_id", // field ở product
+  foreignField: "product_id", // field ở variant
+});
+
+// Bật virtual khi chuyển sang JSON hoặc Object
+pSchema.set("toObject", { virtuals: true });
+pSchema.set("toJSON", { virtuals: true });
 
 let pModel = db.mongoose.model("pModel", pSchema);
 module.exports = { pModel };

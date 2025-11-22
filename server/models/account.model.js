@@ -1,66 +1,53 @@
 const db = require("./db");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
 require("dotenv").config();
+const token_auto = process.env.TOKEN_SEC_KEY;
+const bcrypt = require("bcrypt");
 
-const tokenSecret = process.env.TOKEN_SEC_KEY || "default_secret";
-
-const userSchema = new db.mongoose.Schema(
+const accSchema = new db.mongoose.Schema(
   {
-    email: {
+    name: { type: String },
+    email: { type: String, required: true, unique: true },
+    pass: { type: String, required: true, unique: true },
+    role: {
       type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-      trim: true,
+      enum: ["user", "admin"],
+      default: "user",
     },
-    pass: { type: String, required: true },
-    name: { type: String, trim: true },
-    address: { type: String, trim: true },
-    phone: { type: String, trim: true },
-    role: { type: String, default: "user" },
     is_active: { type: Boolean, default: true },
+    has_wallet: { type: Boolean, default: false },
+    //is_delete: {type: Boolean, default: false},
+    phone: { type: String },
+    address: { type: String },
     image: { type: String },
     token: { type: String },
   },
   {
-    collection: "account",
-    timestamps: true,
+    collection: "accounts",
   }
 );
 
-userSchema.statics.findByEmailPasswd = async function (email, pass) {
-  const user = await this.findOne({ email });
+accSchema.statics.makeAuthToken = async (user) => {
+  const token = jwt.sign({ _id: user._id, email: user.email }, token_auto);
+
+  user.token = token;
+  await user.save();
+  return token;
+};
+
+accSchema.statics.findByEmailPasswd = async (email, passwd) => {
+  const user = await userModel.findOne({ email });
   if (!user) {
-    return null;
+    throw new Error("User not found");
   }
 
-  const isMatch = await bcrypt.compare(pass, user.pass);
-  if (!isMatch) {
-    return null;
+  const checkPass = await bcrypt.compare(passwd, user.pass);
+  if (!checkPass) {
+    throw new Error("Wrong password");
   }
 
   return user;
 };
 
-userSchema.statics.makeAuthToken = async function (user) {
-  const payload = {
-    _id: user._id,
-    email: user.email,
-    role: user.role,
-  };
-
-  const token = jwt.sign(payload, tokenSecret, { expiresIn: "24h" });
-  user.token = token;
-
-  // Save immediately only if document already exists in DB
-  if (!user.isNew) {
-    await user.save();
-  }
-
-  return token;
-};
-
-const userModel = db.mongoose.model("userModel", userSchema);
-
+let userModel = db.mongoose.model("userModel", accSchema);
 module.exports = { userModel };

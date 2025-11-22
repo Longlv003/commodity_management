@@ -1,10 +1,9 @@
 const { userModel } = require("../models/account.model");
-const { billModel } = require("../models/bill.model");
-const { billDetailModel } = require("../models/billDetail.model");
 const bcrypt = require("bcrypt");
 const { uploadSingleFile } = require("../helpers/upload.helper");
 
-const baseLoginHandler = async (req, res, { requiredRoles = [] } = {}) => {
+exports.doLogin = async (req, res, next) => {
+  // method luôn là post
   try {
     const { email, pass } = req.body;
 
@@ -23,15 +22,6 @@ const baseLoginHandler = async (req, res, { requiredRoles = [] } = {}) => {
         .json({ error: "Account is locked. Please contact admin" });
     }
 
-    if (
-      requiredRoles.length > 0 &&
-      (!user.role || !requiredRoles.includes(user.role))
-    ) {
-      return res
-        .status(403)
-        .json({ error: "Không có quyền truy cập trang quản trị" });
-    }
-
     const token = await userModel.makeAuthToken(user);
     return res.status(200).json({
       message: "Login successful",
@@ -42,11 +32,6 @@ const baseLoginHandler = async (req, res, { requiredRoles = [] } = {}) => {
     return res.status(400).send(error);
   }
 };
-
-exports.doLogin = (req, res, next) => baseLoginHandler(req, res);
-
-exports.doAdminLogin = (req, res, next) =>
-  baseLoginHandler(req, res, { requiredRoles: ["admin"] });
 
 exports.doReg = async (req, res, next) => {
   try {
@@ -154,7 +139,7 @@ exports.UpdateUser = async (req, res, next) => {
 
   try {
     const { _id } = req.params;
-    const { email, phone, name, address, is_active } = req.body; // đọc text fields từ multipart
+    const { email, phone, name, address } = req.body; // đọc text fields từ multipart
 
     const user = await userModel.findById(_id);
     if (!user) throw new Error("Người dùng không tồn tại");
@@ -168,12 +153,10 @@ exports.UpdateUser = async (req, res, next) => {
     }
 
     if (phone) updateData.phone = phone;
+
+    // ✅ Thêm name và address
     if (name) updateData.name = name;
     if (address) updateData.address = address;
-    if (typeof is_active !== "undefined") {
-      updateData.is_active =
-        typeof is_active === "string" ? is_active === "true" : !!is_active;
-    }
 
     // ✅ Nếu có file upload
     if (req.file) {
@@ -200,189 +183,4 @@ exports.UpdateUser = async (req, res, next) => {
   }
 
   res.json(dataRes);
-};
-
-exports.DeleteUser = async (req, res) => {
-  const dataRes = { msg: "OK", data: null };
-  try {
-    const { id } = req.params;
-    const user = await userModel.findById(id);
-    if (!user) {
-      return res.status(404).json({ msg: "Không tìm thấy khách hàng" });
-    }
-    if (user.role === "admin") {
-      throw new Error("Không thể xóa tài khoản admin.");
-    }
-    await userModel.findByIdAndDelete(id);
-    dataRes.msg = "Đã xóa khách hàng.";
-    res.json(dataRes);
-  } catch (error) {
-    console.error("DeleteUser error", error);
-    dataRes.msg = error.message;
-    res.status(400).json(dataRes);
-  }
-};
-
-exports.GetAdminCustomerOverview = async (req, res) => {
-  const dataRes = { msg: "OK", data: [] };
-  try {
-    const customers = await userModel
-      .find({ role: { $ne: "admin" } })
-      .select("name email phone address role is_active createdAt image");
-
-    const customerIds = customers.map((c) => c._id);
-    const bills = await billModel
-      .find({ id_user: { $in: customerIds } })
-      .select("id_user total_amount created_date")
-      .lean();
-
-    const billMap = new Map();
-    bills.forEach((bill) => {
-      const key = String(bill.id_user);
-      if (!billMap.has(key)) {
-        billMap.set(key, {
-          totalOrders: 0,
-          totalSpent: 0,
-          lastOrderDate: null,
-        });
-      }
-      const entry = billMap.get(key);
-      entry.totalOrders += 1;
-      entry.totalSpent += bill.total_amount || 0;
-      if (
-        !entry.lastOrderDate ||
-        new Date(bill.created_date) > entry.lastOrderDate
-      ) {
-        entry.lastOrderDate = new Date(bill.created_date);
-      }
-    });
-
-    dataRes.data = customers.map((customer) => {
-      const stats = billMap.get(String(customer._id)) || {
-        totalOrders: 0,
-        totalSpent: 0,
-        lastOrderDate: null,
-      };
-      return {
-        _id: customer._id,
-        name: customer.name,
-        email: customer.email,
-        phone: customer.phone,
-        address: customer.address,
-        image: customer.image,
-        is_active: customer.is_active,
-        totalOrders: stats.totalOrders,
-        totalSpent: stats.totalSpent,
-        lastOrderDate: stats.lastOrderDate,
-        createdAt: customer.createdAt,
-      };
-    });
-
-    res.json(dataRes);
-  } catch (error) {
-    console.error("GetAdminCustomerOverview error", error);
-    dataRes.msg = error.message;
-    res.status(500).json(dataRes);
-  }
-};
-
-exports.GetCustomerDetail = async (req, res) => {
-  const dataRes = { msg: "OK", data: null };
-  try {
-    const { id } = req.params;
-    const customer = await userModel
-      .findById(id)
-      .select("-pass -token")
-      .lean();
-    if (!customer) {
-      return res.status(404).json({ msg: "Không tìm thấy khách hàng" });
-    }
-
-    const bills = await billModel
-      .find({ id_user: id })
-      .sort({ created_date: -1 })
-      .lean();
-    const billIds = bills.map((bill) => bill._id);
-    const details = await billDetailModel
-      .find({ id_bill: { $in: billIds } })
-      .populate({ path: "id_product", select: "name image catID price" })
-      .lean();
-
-    const detailMap = new Map();
-    const productBehavior = new Map();
-    details.forEach((detail) => {
-      const billKey = String(detail.id_bill);
-      if (!detailMap.has(billKey)) {
-        detailMap.set(billKey, []);
-      }
-      detailMap.get(billKey).push(detail);
-
-      const productId =
-        detail.id_product?._id?.toString() || detail.id_product?.toString();
-      if (!productId) return;
-      if (!productBehavior.has(productId)) {
-        productBehavior.set(productId, {
-          product_id: productId,
-          name: detail.id_product?.name || "Sản phẩm",
-          image: detail.id_product?.image || null,
-          quantity: 0,
-          revenue: 0,
-        });
-      }
-      const entry = productBehavior.get(productId);
-      const price = detail.price || detail.id_product?.price || 0;
-      entry.quantity += detail.quantity || 0;
-      entry.revenue += price * (detail.quantity || 0);
-    });
-
-    const orders = bills.map((bill) => {
-      const items = detailMap.get(String(bill._id)) || [];
-      return {
-        _id: bill._id,
-        created_date: bill.created_date,
-        total_amount: bill.total_amount,
-        address: bill.address,
-        status: bill.status,
-        items: items.map((item) => ({
-          product_id: item.id_product?._id,
-          name: item.id_product?.name || "Sản phẩm",
-          image: item.id_product?.image,
-          quantity: item.quantity,
-          price: item.price,
-        })),
-      };
-    });
-
-    const totalOrders = bills.length;
-    const totalSpent = bills.reduce(
-      (sum, bill) => sum + (bill.total_amount || 0),
-      0
-    );
-    const avgOrderValue = totalOrders ? totalSpent / totalOrders : 0;
-    const lastOrderDate = bills[0]?.created_date || null;
-
-    const topProducts = Array.from(productBehavior.values())
-      .sort((a, b) => b.quantity - a.quantity)
-      .slice(0, 5);
-
-    dataRes.data = {
-      customer,
-      summary: {
-        totalOrders,
-        totalSpent,
-        avgOrderValue,
-        lastOrderDate,
-      },
-      behavior: {
-        topProducts,
-      },
-      orders,
-    };
-
-    res.json(dataRes);
-  } catch (error) {
-    console.error("GetCustomerDetail error", error);
-    dataRes.msg = error.message;
-    res.status(400).json(dataRes);
-  }
 };

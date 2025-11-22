@@ -49,7 +49,7 @@
             </p>
           </div>
 
-          <!-- form không submit trực tiếp (JS sẽ gọi API /api/account/login/admin) -->
+          <!-- form không submit trực tiếp (JS sẽ gọi API /api/account/login) -->
           <form
             id="loginForm"
             class="flex flex-col gap-4"
@@ -220,7 +220,7 @@
     }
 
         try {
-          const res = await fetch("/api/account/login/admin", {
+          const res = await fetch("/api/account/login", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -239,8 +239,8 @@
               localStorage.setItem("auth_token", token);
               localStorage.setItem("auth_user", JSON.stringify(user));
 
-              // chuyển trang vào dashboard sản phẩm
-              window.location.href = "/admin/products";
+              // chuyển trang vào dashboard (bạn có thể đổi URL sang /admin hoặc khác)
+              window.location.href = "/admin"; // chỉnh theo route dashboard bên bạn
               return;
             } else {
               errorText.textContent = "Không nhận được token từ server.";
