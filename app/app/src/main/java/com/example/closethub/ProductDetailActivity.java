@@ -110,6 +110,7 @@ public class ProductDetailActivity extends AppCompatActivity {
             }
 
             updateQuantityButtons();
+            updateAddToCartButton();
         });
 
 
@@ -121,6 +122,7 @@ public class ProductDetailActivity extends AppCompatActivity {
             }
 
             updateQuantityButtons();
+            updateAddToCartButton();
         });
 
         SharedPreferences prefs = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
@@ -136,7 +138,16 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         btnAddToCart.setOnClickListener(v -> {
             Variant variant = getSelectedVariant();
-            if (variant == null) return;
+            if (variant == null) {
+                Toast.makeText(this, "Vui lòng chọn biến thể", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Kiểm tra lại số lượng trước khi thêm vào giỏ hàng
+            if (variant.getQuantity() <= 0) {
+                Toast.makeText(this, "Biến thể hết hàng", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             CartRequest request = new CartRequest();
             request.setId_user(user.get_id());
@@ -229,6 +240,7 @@ public class ProductDetailActivity extends AppCompatActivity {
 
                     edtQuantity.setText("1");
                     updateQuantityButtons();
+                    updateAddToCartButton();
                 }
             }
 
@@ -259,6 +271,7 @@ public class ProductDetailActivity extends AppCompatActivity {
 
             edtQuantity.setText("1");
             updateQuantityButtons();
+            updateAddToCartButton();
 
             updatePrice();
             updateImage();
@@ -284,6 +297,10 @@ public class ProductDetailActivity extends AppCompatActivity {
             List<String> validColors = getColorsBySize(selectedSize);
             colorProductAdapter.updateAvailableColors(validColors);
             colorProductAdapter.setSelectedColor(selectedColor);
+
+            edtQuantity.setText("1");
+            updateQuantityButtons();
+            updateAddToCartButton();
 
             updatePrice();
             updateImage();
@@ -377,6 +394,28 @@ public class ProductDetailActivity extends AppCompatActivity {
         // Disable nút cộng nếu số lượng = stock
         imgAddQuantity.setEnabled(current < stock);
         imgAddQuantity.setAlpha(current < stock ? 1f : 0.3f);
+    }
+
+    private void updateAddToCartButton() {
+        Variant selected = getSelectedVariant();
+        if (selected == null) {
+            btnAddToCart.setEnabled(false);
+            btnAddToCart.setAlpha(0.5f);
+            return;
+        }
+
+        int stock = selected.getQuantity();
+        
+        if (stock <= 0) {
+            // Disable nút và hiển thị toast khi hết hàng
+            btnAddToCart.setEnabled(false);
+            btnAddToCart.setAlpha(0.5f);
+            Toast.makeText(this, "Biến thể hết hàng", Toast.LENGTH_SHORT).show();
+        } else {
+            // Enable nút khi còn hàng
+            btnAddToCart.setEnabled(true);
+            btnAddToCart.setAlpha(1f);
+        }
     }
 
     private void checkFavoriteStatus(String productId) {
