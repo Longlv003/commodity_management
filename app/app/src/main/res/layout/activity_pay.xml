@@ -335,22 +335,41 @@
                         android:id="@+id/linearLayoutPayOnline"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
+                        android:orientation="vertical"
                         android:layout_marginBottom="12dp">
 
-                        <RadioButton
-                            android:id="@+id/radioPayOnline"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-
-                        <TextView
-                            android:id="@+id/txtPayOnline"
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Thanh toán online"
-                            android:textSize="16sp"
-                            android:textColor="#333333"
-                            android:layout_marginStart="12dp" />
+                            android:orientation="horizontal">
+
+                            <RadioButton
+                                android:id="@+id/radioPayOnline"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+
+                            <TextView
+                                android:id="@+id/txtPayOnline"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Thanh toán online"
+                                android:textSize="16sp"
+                                android:textColor="#333333"
+                                android:layout_marginStart="12dp" />
+
+                        </LinearLayout>
+
+                        <!-- TextView hiển thị số dư ví (ẩn mặc định) -->
+                        <TextView
+                            android:id="@+id/txtWalletBalance"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Số dư ví: 0 ₫"
+                            android:textSize="14sp"
+                            android:textColor="#4CAF50"
+                            android:layout_marginStart="44dp"
+                            android:layout_marginTop="8dp"
+                            android:visibility="gone" />
 
                     </LinearLayout>
 

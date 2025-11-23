@@ -181,6 +181,3 @@ exports.GetTopSellingProductsStats = async (req, res, next) => {
 
   res.json(dataRes);
 };
-
-
-

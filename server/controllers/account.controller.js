@@ -42,7 +42,20 @@ exports.doReg = async (req, res, next) => {
       return res.status(400).json({ error: "Email already exists" });
     }
 
-    const user = new userModel(req.body);
+    // Tạo user từ req.body nhưng loại bỏ các field không được phép set khi đăng ký
+    const userData = { ...req.body };
+    // Loại bỏ is_active và role - không cho user tự set khi đăng ký
+    delete userData.is_active;
+    delete userData.role;
+    
+    const user = new userModel(userData);
+    
+    // Force set is_active = true cho user mới đăng ký
+    user.is_active = true;
+    // Đảm bảo role mặc định là "user"
+    if (!user.role) {
+      user.role = "user";
+    }
 
     user.pass = await bcrypt.hash(req.body.pass, salt);
 

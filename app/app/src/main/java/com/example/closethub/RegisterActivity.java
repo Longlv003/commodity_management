@@ -27,7 +27,7 @@ import retrofit2.Response;
 
 public class RegisterActivity extends AppCompatActivity {
     private ImageView imgBack, imgGoogle, imgFacebook, imgApple;
-    private TextInputEditText edtEmail, edtPass;
+    private TextInputEditText edtName, edtEmail, edtPhone, edtAddress, edtPass, edtConfirmPass;
     private Button btnCreate;
     private TextView txtLogin;
     private void initUI() {
@@ -35,8 +35,12 @@ public class RegisterActivity extends AppCompatActivity {
 //        imgGoogle = findViewById(R.id.imgGoogle);
 //        imgFacebook = findViewById(R.id.imgFacebook);
 //        imgApple = findViewById(R.id.imgApple);
+        edtName = findViewById(R.id.edtName);
         edtEmail = findViewById(R.id.edtEmail);
+        edtPhone = findViewById(R.id.edtPhone);
+        edtAddress = findViewById(R.id.edtAddress);
         edtPass = findViewById(R.id.edtPass);
+        edtConfirmPass = findViewById(R.id.edtConfirmPass);
         btnCreate = findViewById(R.id.btnCreate);
         txtLogin = findViewById(R.id.txtLogin);
     }
@@ -60,21 +64,74 @@ public class RegisterActivity extends AppCompatActivity {
         apiService = RetrofitClient.getApiService();
 
         btnCreate.setOnClickListener(v -> {
+            String name = edtName.getText().toString().trim();
             String email = edtEmail.getText().toString().trim();
+            String phone = edtPhone.getText().toString().trim();
+            String address = edtAddress.getText().toString().trim();
             String pass = edtPass.getText().toString().trim();
+            String confirmPass = edtConfirmPass.getText().toString().trim();
 
-            if (!email.endsWith("@gmail.com")) {
-                Toast.makeText(this, "Email Error", Toast.LENGTH_SHORT).show();
+            // Validate các trường bắt buộc
+            if (name.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập họ và tên", Toast.LENGTH_SHORT).show();
+                edtName.requestFocus();
                 return;
             }
 
-            if (email.length() == 0 || pass.length() == 0) {
-                Toast.makeText(this, "Nhap email va pass", Toast.LENGTH_SHORT).show();
+            if (email.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập email", Toast.LENGTH_SHORT).show();
+                edtEmail.requestFocus();
+                return;
+            }
+
+            if (!email.endsWith("@gmail.com")) {
+                Toast.makeText(this, "Email phải là @gmail.com", Toast.LENGTH_SHORT).show();
+                edtEmail.requestFocus();
+                return;
+            }
+
+            if (phone.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập số điện thoại", Toast.LENGTH_SHORT).show();
+                edtPhone.requestFocus();
+                return;
+            }
+
+            if (address.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập địa chỉ", Toast.LENGTH_SHORT).show();
+                edtAddress.requestFocus();
+                return;
+            }
+
+            if (pass.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập mật khẩu", Toast.LENGTH_SHORT).show();
+                edtPass.requestFocus();
+                return;
+            }
+
+            if (pass.length() < 6) {
+                Toast.makeText(this, "Mật khẩu phải có ít nhất 6 ký tự", Toast.LENGTH_SHORT).show();
+                edtPass.requestFocus();
+                return;
+            }
+
+            if (confirmPass.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập lại mật khẩu", Toast.LENGTH_SHORT).show();
+                edtConfirmPass.requestFocus();
+                return;
+            }
+
+            // Kiểm tra mật khẩu trùng khớp
+            if (!pass.equals(confirmPass)) {
+                Toast.makeText(this, "Mật khẩu không trùng khớp", Toast.LENGTH_SHORT).show();
+                edtConfirmPass.requestFocus();
                 return;
             }
 
             User user = new User();
+            user.setName(name);
             user.setEmail(email);
+            user.setPhone(phone);
+            user.setAddress(address);
             user.setPass(pass);
 
             RegisterAccount(user);

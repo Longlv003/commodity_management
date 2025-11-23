@@ -1,6 +1,7 @@
 package com.example.closethub;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import android.widget.Button;
 import com.bumptech.glide.Glide;
 import com.example.closethub.models.ApiResponse;
+import com.example.closethub.models.ChangePinRequest;
 import com.example.closethub.models.User;
 import com.example.closethub.models.WalletResponse;
 import com.example.closethub.networks.ApiService;
@@ -35,7 +37,7 @@ import retrofit2.Response;
 
 public class WalletAccountFragment extends Fragment {
     private TextView txtWalletNumber, txtCreateDate, txtTotalDeposits,
-            txtTotalWithdrawals, txtChangePin, txtNameAccount, txtEmail;
+            txtTotalWithdrawals, txtChangePin, txtLogOut, txtNameAccount, txtEmail;
     private ImageView imgAvatar;
     private ApiService apiService;
     private SharedPreferences sharedPreferences;
@@ -50,6 +52,7 @@ public class WalletAccountFragment extends Fragment {
         sharedPreferences = getContext().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
 
         txtChangePin.setOnClickListener(v -> showChangePinDialog());
+        txtLogOut.setOnClickListener(v -> showLogoutConfirmDialog());
 
         loadWalletInfo();
         
@@ -62,6 +65,7 @@ public class WalletAccountFragment extends Fragment {
         txtTotalDeposits = view.findViewById(R.id.txtTotalDeposits);
         txtTotalWithdrawals = view.findViewById(R.id.txtTotalWithdrawals);
         txtChangePin = view.findViewById(R.id.txtChangePin);
+        txtLogOut = view.findViewById(R.id.txtLogOut);
         imgAvatar = view.findViewById(R.id.imgAvatar);
         txtEmail = view.findViewById(R.id.txtEmailAccount);
         txtNameAccount = view.findViewById(R.id.txtNameAccount);
@@ -192,9 +196,64 @@ public class WalletAccountFragment extends Fragment {
             return;
         }
 
-        // TODO: Implement change PIN API call
-        Toast.makeText(getContext(), "Tính năng đổi PIN đang phát triển", Toast.LENGTH_SHORT).show();
-        dialog.dismiss();
+        // Kiểm tra PIN cũ và PIN mới không được giống nhau
+        if (oldPin.equals(newPin)) {
+            Toast.makeText(getContext(), "PIN mới phải khác PIN cũ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ChangePinRequest request = new ChangePinRequest(oldPin, newPin);
+        apiService.changePin("Bearer " + token, request).enqueue(new Callback<ApiResponse<Object>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    String message = response.body().getMsg();
+                    if (message != null && !message.isEmpty()) {
+                        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "Đổi PIN thành công", Toast.LENGTH_SHORT).show();
+                    }
+                    dialog.dismiss();
+                } else {
+                    String errorMsg = "Đổi PIN thất bại";
+                    if (response.body() != null && response.body().getMsg() != null) {
+                        errorMsg = response.body().getMsg();
+                    }
+                    Toast.makeText(getContext(), errorMsg, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {
+                Toast.makeText(getContext(), "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void showLogoutConfirmDialog() {
+        new AlertDialog.Builder(getContext())
+                .setTitle("Đăng xuất ví")
+                .setMessage("Bạn có chắc chắn muốn đăng xuất khỏi ví?")
+                .setPositiveButton("Đăng xuất", (dialog, which) -> {
+                    logoutWallet();
+                })
+                .setNegativeButton("Hủy", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .show();
+    }
+
+    private void logoutWallet() {
+        // Đóng WalletActivity và quay về MainActivity
+        if (getActivity() != null) {
+            Toast.makeText(getContext(), "Đã đăng xuất khỏi ví", Toast.LENGTH_SHORT).show();
+            
+            // Quay về MainActivity
+            Intent intent = new Intent(getActivity(), MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            getActivity().finish();
+        }
     }
 
     @Override

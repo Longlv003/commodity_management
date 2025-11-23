@@ -11,7 +11,7 @@ const transactionSchema = new db.mongoose.Schema(
     type: {
       type: String,
       required: true,
-      enum: ["deposit", "withdraw"],
+      enum: ["deposit", "withdraw", "payment"], // payment: thanh toán đơn hàng
       index: true,
     },
     amount: {

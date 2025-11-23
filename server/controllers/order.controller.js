@@ -3,6 +3,8 @@ const { billModel } = require("../models/bill.model");
 const { billDetailModel } = require("../models/billDetail.model");
 const { pModel } = require("../models/product.model");
 const { pVariantModel } = require("../models/product.variants.model");
+const { walletModel } = require("../models/wallet.model");
+const { transactionModel } = require("../models/transaction.model");
 
 exports.PlaceOrder = async (req, res, next) => {
   let dataRes = { msg: "OK" };
@@ -78,15 +80,19 @@ exports.PlaceOrder = async (req, res, next) => {
       }
 
       if (variant.quantity < item.quantity) {
-        throw new Error(`Sản phẩm ${product.name} (${variant.size} - ${variant.color}) không đủ số lượng. Chỉ còn ${variant.quantity} sản phẩm`);
+        throw new Error(
+          `Sản phẩm ${product.name} (${variant.size} - ${variant.color}) không đủ số lượng. Chỉ còn ${variant.quantity} sản phẩm`
+        );
       }
 
       // Lấy price từ variant, không phải từ product
       const price = variant.price || 0;
       const itemTotal = price * item.quantity;
-      
+
       if (isNaN(itemTotal) || itemTotal < 0) {
-        throw new Error(`Giá sản phẩm không hợp lệ: ${product.name} - ${variant.sku}`);
+        throw new Error(
+          `Giá sản phẩm không hợp lệ: ${product.name} - ${variant.sku}`
+        );
       }
 
       totalAmount += itemTotal;
@@ -99,8 +105,72 @@ exports.PlaceOrder = async (req, res, next) => {
 
     // Tổng tiền cuối cùng = tiền sản phẩm + phí vận chuyển
     const finalTotalAmount = totalAmount + shippingFee;
-    
-    console.log("Subtotal:", totalAmount, "Shipping:", shippingFee, "Total:", finalTotalAmount);
+
+    console.log(
+      "Subtotal:",
+      totalAmount,
+      "Shipping:",
+      shippingFee,
+      "Total:",
+      finalTotalAmount
+    );
+
+    // XÁC ĐỊNH PHƯƠNG THỨC THANH TOÁN
+    let paymentMethod = "cod"; // Mặc định là COD
+    if (address && address.includes("|")) {
+      const parts = address.split("|");
+      if (parts.length > 2) {
+        const paymentInfo = parts[2].trim();
+        if (paymentInfo.includes("online") || paymentInfo.includes("Online")) {
+          paymentMethod = "online";
+        }
+      }
+    }
+
+    // NẾU THANH TOÁN ONLINE, KIỂM TRA VÀ TRỪ TIỀN TỪ VÍ
+    if (paymentMethod === "online") {
+      // Tìm ví của user
+      const wallet = await walletModel.findOne({ id_user: id_user });
+
+      if (!wallet) {
+        throw new Error(
+          "Bạn chưa có ví. Vui lòng tạo ví trước khi thanh toán online."
+        );
+      }
+
+      if (!wallet.is_active) {
+        throw new Error("Ví của bạn đã bị khóa. Vui lòng liên hệ admin.");
+      }
+
+      // Kiểm tra số dư
+      if (wallet.balance < finalTotalAmount) {
+        throw new Error(
+          `Số dư ví không đủ. Số dư hiện tại: ${wallet.balance.toLocaleString(
+            "vi-VN"
+          )}đ. Tổng tiền: ${finalTotalAmount.toLocaleString("vi-VN")}đ`
+        );
+      }
+
+      // Trừ tiền từ ví
+      wallet.balance -= finalTotalAmount;
+      await wallet.save();
+
+      // Tạo transaction record
+      const transaction = new transactionModel({
+        id_wallet: wallet._id,
+        type: "payment", // Loại giao dịch: payment (thanh toán)
+        amount: finalTotalAmount,
+        description: `Thanh toán đơn hàng - Tổng: ${finalTotalAmount.toLocaleString(
+          "vi-VN"
+        )}đ`,
+        balance_after: wallet.balance,
+      });
+      await transaction.save();
+
+      console.log(
+        `Đã trừ ${finalTotalAmount}đ từ ví. Số dư còn lại: ${wallet.balance}đ`
+      );
+    }
 
     // TẠO BILL
     const newBill = new billModel({
@@ -108,6 +178,7 @@ exports.PlaceOrder = async (req, res, next) => {
       address: address,
       created_date: new Date(),
       total_amount: finalTotalAmount, // Bao gồm cả phí vận chuyển
+      payment_method: paymentMethod, // Lưu phương thức thanh toán
     });
 
     const savedBill = await newBill.save();
@@ -131,7 +202,7 @@ exports.PlaceOrder = async (req, res, next) => {
         price: price,
         quantity: item.quantity,
         size: variant.size || "",
-        color: variant.color || ""
+        color: variant.color || "",
       });
       await newBillDetails.save();
 
@@ -196,8 +267,11 @@ exports.GetOrderHistory = async (req, res, next) => {
         .populate("id_variant");
 
       // Tính subtotal (tổng tiền sản phẩm không bao gồm phí vận chuyển)
-      const subtotal = details.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      
+      const subtotal = details.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0
+      );
+
       // Parse phí vận chuyển từ address
       let shippingFee = 0;
       if (bill.address && bill.address.includes("|")) {
@@ -227,9 +301,12 @@ exports.GetOrderHistory = async (req, res, next) => {
           price: item.price, // Giá từ bill_detail
           quantity: item.quantity, // Số lượng từ bill_detail
           amount: item.price * item.quantity, // Tổng tiền = price * quantity
-          image: item.id_variant && item.id_variant.image ? item.id_variant.image : [],
+          image:
+            item.id_variant && item.id_variant.image
+              ? item.id_variant.image
+              : [],
           size: item.size || "", // Size từ bill_detail
-          color: item.color || "" // Color từ bill_detail
+          color: item.color || "", // Color từ bill_detail
         })),
       });
     }
@@ -249,9 +326,12 @@ exports.GetAllOrders = async (req, res, next) => {
 
   try {
     const { userModel } = require("../models/account.model");
-    
+
     // Lấy tất cả hóa đơn, sắp xếp theo ngày mới nhất
-    const bills = await billModel.find().sort({ created_date: -1 }).populate("id_user");
+    const bills = await billModel
+      .find()
+      .sort({ created_date: -1 })
+      .populate("id_user");
 
     if (!bills || bills.length === 0) {
       dataRes.data = [];
@@ -267,8 +347,11 @@ exports.GetAllOrders = async (req, res, next) => {
         .populate("id_variant");
 
       // Tính subtotal (tổng tiền sản phẩm không bao gồm phí vận chuyển)
-      const subtotal = details.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      
+      const subtotal = details.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0
+      );
+
       // Parse phí vận chuyển từ address
       let shippingFee = 0;
       let customerName = "";
@@ -276,7 +359,7 @@ exports.GetAllOrders = async (req, res, next) => {
       let deliveryAddress = "";
       let shippingMethod = "";
       let paymentMethod = "";
-      
+
       if (bill.address && bill.address.includes("|")) {
         const parts = bill.address.split("|");
         if (parts.length > 0) {
@@ -337,9 +420,15 @@ exports.GetAllOrders = async (req, res, next) => {
           price: item.price,
           quantity: item.quantity,
           amount: item.price * item.quantity,
-          image: item.id_variant && item.id_variant.image && Array.isArray(item.id_variant.image) && item.id_variant.image.length > 0 
-            ? item.id_variant.image[0] 
-            : (item.id_variant && typeof item.id_variant.image === 'string' ? item.id_variant.image : null),
+          image:
+            item.id_variant &&
+            item.id_variant.image &&
+            Array.isArray(item.id_variant.image) &&
+            item.id_variant.image.length > 0
+              ? item.id_variant.image[0]
+              : item.id_variant && typeof item.id_variant.image === "string"
+              ? item.id_variant.image
+              : null,
           size: item.size || "",
           color: item.color || "",
         })),

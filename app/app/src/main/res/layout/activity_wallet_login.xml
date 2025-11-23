@@ -85,6 +85,7 @@
 
         <!-- PIN Input -->
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayoutPin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Mã PIN"
@@ -115,6 +116,7 @@
 
         <!-- PIN Hint -->
         <TextView
+            android:id="@+id/txtPinHint"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Mã PIN gồm 6 chữ số"

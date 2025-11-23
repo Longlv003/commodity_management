@@ -16,6 +16,7 @@ import com.example.closethub.models.WalletLoginRequest;
 import com.example.closethub.models.WalletRequest;
 import com.example.closethub.models.WalletResponse;
 import com.example.closethub.models.WalletTransactionRequest;
+import com.example.closethub.models.ChangePinRequest;
 import com.example.closethub.models.FavoriteRequest;
 import com.example.closethub.models.FavoriteResponse;
 import com.example.closethub.models.FavoriteCheckResponse;
@@ -201,6 +202,12 @@ public interface ApiService {
     @GET("/api/wallet/history")
     Call<ApiResponse<List<Transaction>>> getWalletHistory(
             @Header("Authorization") String token
+    );
+
+    @PUT("/api/wallet/change-pin")
+    Call<ApiResponse<Object>> changePin(
+            @Header("Authorization") String token,
+            @Body ChangePinRequest request
     );
 
 }

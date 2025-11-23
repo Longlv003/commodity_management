@@ -16,7 +16,7 @@ const accSchema = new db.mongoose.Schema(
     },
     is_active: { type: Boolean, default: true },
     has_wallet: { type: Boolean, default: false },
-    is_delete: {type: Boolean, default: false},
+    is_delete: { type: Boolean, default: false },
     phone: { type: String },
     address: { type: String },
     image: { type: String },

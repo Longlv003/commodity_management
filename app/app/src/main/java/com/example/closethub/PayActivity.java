@@ -23,6 +23,7 @@ import com.example.closethub.models.Bill;
 import com.example.closethub.models.CartLookUpProduct;
 import com.example.closethub.models.OrderRequest;
 import com.example.closethub.models.User;
+import com.example.closethub.models.WalletResponse;
 import com.example.closethub.networks.ApiService;
 import com.example.closethub.networks.RetrofitClient;
 import com.google.gson.Gson;
@@ -39,7 +40,7 @@ import retrofit2.Response;
 public class PayActivity extends AppCompatActivity {
     private ImageView imgBack;
     private TextView txtNameAccount, txtPhoneAccount, txtAddressAccount,
-            txtSubtotal, txtShipping, txtTotal;
+            txtSubtotal, txtShipping, txtTotal, txtWalletBalance;
     private Button btnChangeAddress, btnContinue;
     private RadioGroup radioGroupShipping, radioGroupPayment;
     private RadioButton radioFastDelivery, radioExpressDelivery, radioPayOff, radioPayOnline;
@@ -61,6 +62,7 @@ public class PayActivity extends AppCompatActivity {
         txtSubtotal = findViewById(R.id.txtSubtotal);
         txtShipping = findViewById(R.id.txtShipping);
         txtTotal = findViewById(R.id.txtTotal);
+        txtWalletBalance = findViewById(R.id.txtWalletBalance);
         btnChangeAddress = findViewById(R.id.btnChangeAddress);
         btnContinue = findViewById(R.id.btnContinue);
         radioGroupShipping = findViewById(R.id.radioGroupShipping);
@@ -187,6 +189,11 @@ public class PayActivity extends AppCompatActivity {
         double total = subtotal + currentShipping;
         NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
         txtTotal.setText(formatter.format(total) + " ₫");
+        
+        // Cập nhật lại số dư ví nếu đang chọn thanh toán online
+        if (selectedPaymentMethod.equals("online") && txtWalletBalance.getVisibility() == android.view.View.VISIBLE) {
+            checkWalletBalance();
+        }
     }
 
     private void setupEvent() {
@@ -258,6 +265,14 @@ public class PayActivity extends AppCompatActivity {
                 
                 selectedPaymentMethod = "cod"; // Cash on Delivery - Thanh toán khi nhận hàng
                 Log.d("Payment", "Selected: COD (Cash on Delivery)");
+                
+                // Ẩn TextView số dư ví
+                txtWalletBalance.setVisibility(android.view.View.GONE);
+                
+                // Enable nút thanh toán khi chọn COD
+                btnContinue.setEnabled(true);
+                btnContinue.setText("Đặt hàng");
+                btnContinue.setAlpha(1f);
             }
         });
         
@@ -270,8 +285,9 @@ public class PayActivity extends AppCompatActivity {
                 
                 selectedPaymentMethod = "online"; // Thanh toán online
                 Log.d("Payment", "Selected: Online Payment");
-                // Có thể thêm logic xử lý thanh toán online ở đây (ví dụ: mở gateway thanh toán)
-                // Hiện tại chỉ lưu thông tin, chưa tích hợp gateway thanh toán
+                
+                // Kiểm tra số dư ví khi chọn thanh toán online
+                checkWalletBalance();
             }
         });
     }
@@ -378,6 +394,12 @@ public class PayActivity extends AppCompatActivity {
             return;
         }
 
+        // Kiểm tra nếu chọn thanh toán online nhưng button bị disable (số dư không đủ)
+        if (selectedPaymentMethod.equals("online") && !btnContinue.isEnabled()) {
+            Toast.makeText(this, "Số dư ví không đủ. Vui lòng nạp thêm tiền hoặc chọn thanh toán khi nhận hàng.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         // Tạo địa chỉ đầy đủ kèm thông tin phương thức vận chuyển và thanh toán
         String shippingInfo = "";
         if (selectedShippingMethod.equals("fast")) {
@@ -473,5 +495,104 @@ public class PayActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Kiểm tra số dư ví khi chọn thanh toán online
+     */
+    private void checkWalletBalance() {
+        if (user == null || user.getToken() == null) {
+            Toast.makeText(this, "Vui lòng đăng nhập", Toast.LENGTH_SHORT).show();
+            // Không tự động chuyển về COD, chỉ ẩn TextView và disable button
+            txtWalletBalance.setVisibility(android.view.View.GONE);
+            btnContinue.setEnabled(false);
+            btnContinue.setText("Vui lòng đăng nhập");
+            return;
+        }
+
+        // Kiểm tra user có ví chưa
+        if (!user.isHas_wallet()) {
+            Toast.makeText(this, "Bạn chưa có ví. Vui lòng tạo ví trước khi thanh toán online.", Toast.LENGTH_LONG).show();
+            // Không tự động chuyển về COD, chỉ ẩn TextView và disable button
+            txtWalletBalance.setVisibility(android.view.View.GONE);
+            btnContinue.setEnabled(false);
+            btnContinue.setText("Chưa có ví");
+            return;
+        }
+
+        String token = "Bearer " + user.getToken();
+        double totalAmount = subtotal + currentShipping;
+
+        // Hiển thị TextView số dư (đang tải)
+        txtWalletBalance.setVisibility(android.view.View.VISIBLE);
+        txtWalletBalance.setText("Đang kiểm tra số dư...");
+        txtWalletBalance.setTextColor(getResources().getColor(android.R.color.darker_gray));
+        
+        // Tạm thời disable button khi đang kiểm tra
+        btnContinue.setEnabled(false);
+        btnContinue.setText("Đang kiểm tra...");
+
+        // Lấy thông tin ví
+        apiService.getWalletInfo(token).enqueue(new Callback<ApiResponse<WalletResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<WalletResponse>> call, Response<ApiResponse<WalletResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    WalletResponse walletInfo = response.body().getData();
+                    if (walletInfo != null) {
+                        double balance = walletInfo.getBalance();
+                        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
+                        String balanceStr = formatter.format(balance);
+                        String totalStr = formatter.format(totalAmount);
+                        
+                        if (balance < totalAmount) {
+                            // Số dư không đủ - hiển thị màu đỏ và DISABLE button
+                            txtWalletBalance.setText("Số dư ví: " + balanceStr + " ₫ (Không đủ. Cần: " + totalStr + " ₫)");
+                            txtWalletBalance.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                            
+                            // DISABLE nút thanh toán, KHÔNG tự động chuyển về COD
+                            btnContinue.setEnabled(false);
+                            btnContinue.setText("Số dư không đủ");
+                            btnContinue.setAlpha(0.5f);
+                            
+                            Toast.makeText(PayActivity.this, 
+                                "Số dư ví không đủ!\nSố dư: " + balanceStr + " ₫\nTổng tiền: " + totalStr + " ₫\nVui lòng nạp thêm tiền hoặc chọn thanh toán khi nhận hàng", 
+                                Toast.LENGTH_LONG).show();
+                        } else {
+                            // Số dư đủ - hiển thị màu xanh và ENABLE button
+                            double remaining = balance - totalAmount;
+                            String remainingStr = formatter.format(remaining);
+                            txtWalletBalance.setText("Số dư ví: " + balanceStr + " ₫ (Sau thanh toán còn: " + remainingStr + " ₫)");
+                            txtWalletBalance.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+                            
+                            // ENABLE nút thanh toán
+                            btnContinue.setEnabled(true);
+                            btnContinue.setText("Đặt hàng");
+                            btnContinue.setAlpha(1f);
+                        }
+                    } else {
+                        txtWalletBalance.setVisibility(android.view.View.GONE);
+                        Toast.makeText(PayActivity.this, "Không thể kiểm tra số dư ví", Toast.LENGTH_SHORT).show();
+                        // Không tự động chuyển về COD, chỉ disable button
+                        btnContinue.setEnabled(false);
+                        btnContinue.setText("Lỗi kiểm tra ví");
+                    }
+                } else {
+                    txtWalletBalance.setVisibility(android.view.View.GONE);
+                    Toast.makeText(PayActivity.this, "Không thể kiểm tra số dư ví", Toast.LENGTH_SHORT).show();
+                    // Không tự động chuyển về COD, chỉ disable button
+                    btnContinue.setEnabled(false);
+                    btnContinue.setText("Lỗi kiểm tra ví");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<WalletResponse>> call, Throwable t) {
+                Log.e("CheckWalletBalance", "Error: ", t);
+                txtWalletBalance.setVisibility(android.view.View.GONE);
+                Toast.makeText(PayActivity.this, "Lỗi kết nối khi kiểm tra ví", Toast.LENGTH_SHORT).show();
+                // Không tự động chuyển về COD, chỉ disable button
+                btnContinue.setEnabled(false);
+                btnContinue.setText("Lỗi kết nối");
+            }
+        });
+    }
 
 }

@@ -25,6 +25,7 @@ import com.example.closethub.models.WalletResponse;
 import com.example.closethub.networks.ApiService;
 import com.example.closethub.networks.RetrofitClient;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 
 import retrofit2.Call;
@@ -33,20 +34,24 @@ import retrofit2.Response;
 
 public class WalletLoginActivity extends AppCompatActivity {
     private ImageView imgBack;
+    private TextInputLayout textInputLayoutPin;
     private TextInputEditText edtPinHash;
     private Button btnLogin;
     private TextView txtForgotPin;
     private TextView txtCreateWallet;
+    private TextView txtPinHint;
     private ApiService apiService;
     private User currentUser;
     private SharedPreferences sharedPreferences;
 
     private void initUI() {
         imgBack = findViewById(R.id.imgBack);
+        textInputLayoutPin = findViewById(R.id.textInputLayoutPin);
         edtPinHash = findViewById(R.id.edtPinHash);
         btnLogin = findViewById(R.id.btnLogin);
         txtForgotPin = findViewById(R.id.txtForgotPin);
         txtCreateWallet = findViewById(R.id.txtCreateWallet);
+        txtPinHint = findViewById(R.id.txtPinHint);
     }
 
     @Override
@@ -69,21 +74,10 @@ public class WalletLoginActivity extends AppCompatActivity {
         if (userJson != null) {
             Gson gson = new Gson();
             currentUser = gson.fromJson(userJson, User.class);
-            // Kiểm tra has_wallet và cập nhật UI
-            checkWalletStatus();
         }
 
         imgBack.setOnClickListener(v -> {
             finish();
-        });
-
-        btnLogin.setOnClickListener(v -> {
-            String pin = edtPinHash.getText().toString().trim();
-            if (pin.isEmpty() || pin.length() != 6 || !pin.matches("\\d+")) {
-                Toast.makeText(this, "Mã PIN phải là 6 chữ số", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            checkWalletAndLogin();
         });
 
         txtForgotPin.setOnClickListener(v -> {
@@ -94,23 +88,58 @@ public class WalletLoginActivity extends AppCompatActivity {
             // Mở dialog tạo ví
             showCreateWalletDialog();
         });
+
+        // Kiểm tra has_wallet và cập nhật UI (sau khi set các listener khác)
+        checkWalletStatus();
     }
 
     private void checkWalletStatus() {
-        if (currentUser != null && !currentUser.isHas_wallet()) {
-            // Chưa có ví - disable button và đổi text
-            btnLogin.setText("Chưa có ví");
+        if (currentUser == null) {
+            // Chưa đăng nhập - ẩn input và disable button
+            textInputLayoutPin.setVisibility(android.view.View.GONE);
+            txtPinHint.setVisibility(android.view.View.GONE);
+            txtForgotPin.setVisibility(android.view.View.GONE);
+            
+            btnLogin.setText("Vui lòng đăng nhập");
             btnLogin.setEnabled(false);
             btnLogin.setAlpha(0.5f);
-            edtPinHash.setEnabled(false);
-            edtPinHash.setHint("Tạo ví mới để sử dụng");
+            return;
+        }
+        
+        if (!currentUser.isHas_wallet()) {
+            // Chưa có ví - ẩn input PIN và hint
+            textInputLayoutPin.setVisibility(android.view.View.GONE);
+            txtPinHint.setVisibility(android.view.View.GONE);
+            txtForgotPin.setVisibility(android.view.View.GONE);
+            
+            btnLogin.setText("Tạo ví mới");
+            btnLogin.setEnabled(true);
+            btnLogin.setAlpha(1.0f);
+            btnLogin.setOnClickListener(v -> {
+                // Mở dialog tạo ví khi click vào button
+                showCreateWalletDialog();
+            });
         } else {
-            // Đã có ví - enable button
+            // Đã có ví - hiển thị input PIN và hint
+            textInputLayoutPin.setVisibility(android.view.View.VISIBLE);
+            txtPinHint.setVisibility(android.view.View.VISIBLE);
+            txtForgotPin.setVisibility(android.view.View.VISIBLE);
+            
             btnLogin.setText("Đăng nhập");
             btnLogin.setEnabled(true);
             btnLogin.setAlpha(1.0f);
             edtPinHash.setEnabled(true);
-            edtPinHash.setHint("Mã PIN");
+            textInputLayoutPin.setHint("Mã PIN");
+            
+            // Set lại listener cho button login
+            btnLogin.setOnClickListener(v -> {
+                String pin = edtPinHash.getText().toString().trim();
+                if (pin.isEmpty() || pin.length() != 6 || !pin.matches("\\d+")) {
+                    Toast.makeText(this, "Mã PIN phải là 6 chữ số", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                checkWalletAndLogin();
+            });
         }
     }
 
