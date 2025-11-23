@@ -553,7 +553,7 @@
         }
       }
 
-      function openAddModal() {
+      function resetBannerForm() {
         isEditMode = false;
         bannerFormTitle.textContent = "Thêm banner mới";
         submitButtonText.textContent = "Lưu banner";
@@ -631,7 +631,9 @@
       }
 
       // Event listeners
-      addBannerBtnMobile.addEventListener("click", openAddModal);
+      if (addBannerBtnMobile) {
+        addBannerBtnMobile.addEventListener("click", resetBannerForm);
+      }
       searchInput.addEventListener("input", () => renderBanners());
       statusFilter.addEventListener("change", () => renderBanners());
 
