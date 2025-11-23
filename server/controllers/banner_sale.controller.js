@@ -68,12 +68,11 @@ exports.GetAllBannersAdmin = async (req, res, next) => {
     if (search) {
       query.name = { $regex: search, $options: "i" };
     }
-    if (is_delete !== undefined) {
+    // Chỉ filter theo is_delete nếu có query parameter, mặc định lấy tất cả
+    if (is_delete !== undefined && is_delete !== "") {
       query.is_delete = is_delete === "true";
-    } else {
-      // Mặc định chỉ lấy banner chưa bị xóa
-      query.is_delete = false;
     }
+    // Nếu không có query parameter is_delete, không filter (lấy tất cả)
 
     const banners = await bannerModel.find(query).sort({ created_date: -1 });
     dataRes.data = banners;

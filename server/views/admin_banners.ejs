@@ -71,12 +71,14 @@
             href="/admin/dashboard"
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-slate-800 hover:text-white"
           >
-            <span class="material-symbols-outlined text-xl">space_dashboard</span>
+            <span class="material-symbols-outlined text-xl"
+              >space_dashboard</span
+            >
             <span>Dashboard</span>
           </a>
 
           <a
-            href="/admin"
+            href="/admin/products"
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-slate-800 hover:text-white"
           >
             <span class="material-symbols-outlined text-xl"> inventory_2 </span>
@@ -87,7 +89,9 @@
             href="/admin/orders"
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-slate-800 hover:text-white"
           >
-            <span class="material-symbols-outlined text-xl"> receipt_long </span>
+            <span class="material-symbols-outlined text-xl">
+              receipt_long
+            </span>
             <span>Đơn hàng</span>
           </a>
 
@@ -150,13 +154,6 @@
           </div>
 
           <div class="flex items-center gap-4">
-            <button
-              id="addBannerBtn"
-              class="hidden sm:flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500 transition-colors"
-            >
-              <span class="material-symbols-outlined text-base">add</span>
-              <span>Thêm banner</span>
-            </button>
             <div class="hidden sm:flex flex-col items-end">
               <p class="text-sm font-medium" id="currentUserName">Admin</p>
               <p class="text-xs text-slate-500" id="currentUserEmail"></p>
@@ -192,9 +189,9 @@
               id="statusFilter"
               class="h-10 rounded-lg border border-slate-800 bg-slate-900/60 px-3 text-sm text-slate-200"
             >
+              <option value="">Tất cả</option>
               <option value="false">Đang hoạt động</option>
               <option value="true">Đã xóa</option>
-              <option value="">Tất cả</option>
             </select>
 
             <button
@@ -207,7 +204,9 @@
           </section>
 
           <!-- Main grid -->
-          <section class="grid grid-cols-1 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-6">
+          <section
+            class="grid grid-cols-1 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-6"
+          >
             <!-- Banners grid -->
             <div
               class="rounded-xl border border-slate-800 bg-slate-900/60 shadow-xl overflow-hidden flex flex-col"
@@ -225,8 +224,13 @@
                 </p>
               </div>
 
-              <div class="overflow-auto scrollbar-thin flex-1 min-h-[500px] p-4">
-                <div id="bannerList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div
+                class="overflow-auto scrollbar-thin flex-1 min-h-[500px] p-4"
+              >
+                <div
+                  id="bannerList"
+                  class="grid grid-cols-1 md:grid-cols-2 gap-4"
+                >
                   <!-- JS render banners -->
                 </div>
               </div>
@@ -241,7 +245,9 @@
                 <div
                   class="flex items-center justify-between px-4 md:px-6 py-3 border-b border-slate-800"
                 >
-                  <p class="text-sm font-semibold" id="bannerFormTitle">Thêm banner mới</p>
+                  <p class="text-sm font-semibold" id="bannerFormTitle">
+                    Thêm banner mới
+                  </p>
                 </div>
 
                 <form
@@ -252,7 +258,9 @@
                   <input type="hidden" id="editingBannerId" name="banner_id" />
 
                   <div>
-                    <label class="text-xs text-slate-400 mb-1 block">Tên banner *</label>
+                    <label class="text-xs text-slate-400 mb-1 block"
+                      >Tên banner *</label
+                    >
                     <input
                       type="text"
                       id="bannerName"
@@ -264,8 +272,12 @@
                   </div>
 
                   <div>
-                    <label class="text-xs text-slate-400 mb-1 block">Ảnh banner *</label>
-                    <div class="mt-1 rounded-lg border-2 border-dashed border-slate-700 bg-slate-950/30 p-4">
+                    <label class="text-xs text-slate-400 mb-1 block"
+                      >Ảnh banner *</label
+                    >
+                    <div
+                      class="mt-1 rounded-lg border-2 border-dashed border-slate-700 bg-slate-950/30 p-4"
+                    >
                       <input
                         type="file"
                         id="bannerImage"
@@ -279,23 +291,29 @@
                     </div>
                     <div id="bannerImagePreview" class="mt-3 hidden">
                       <p class="text-xs text-slate-400 mb-2">Preview:</p>
-                      <div class="relative rounded-lg border border-slate-800 overflow-hidden bg-slate-900/40">
-                        <img id="previewBannerImg" src="" alt="Preview" class="w-full h-48 object-cover" />
+                      <div
+                        class="relative rounded-lg border border-slate-800 overflow-hidden bg-slate-900/40"
+                      >
+                        <img
+                          id="previewBannerImg"
+                          src=""
+                          alt="Preview"
+                          class="w-full h-48 object-cover"
+                        />
                         <button
                           type="button"
                           onclick="clearImagePreview()"
                           class="absolute top-2 right-2 p-1.5 rounded-full bg-slate-900/80 hover:bg-slate-800 text-slate-300"
                         >
-                          <span class="material-symbols-outlined text-sm">close</span>
+                          <span class="material-symbols-outlined text-sm"
+                            >close</span
+                          >
                         </button>
                       </div>
                     </div>
                   </div>
 
-                  <p
-                    id="bannerFormMessage"
-                    class="hidden text-xs mt-1"
-                  ></p>
+                  <p id="bannerFormMessage" class="hidden text-xs mt-1"></p>
 
                   <div class="flex justify-end gap-2 pt-2">
                     <button
@@ -348,7 +366,6 @@
       const bannerCount = document.getElementById("bannerCount");
       const searchInput = document.getElementById("searchInput");
       const statusFilter = document.getElementById("statusFilter");
-      const addBannerBtn = document.getElementById("addBannerBtn");
       const addBannerBtnMobile = document.getElementById("addBannerBtnMobile");
       const bannerForm = document.getElementById("bannerForm");
       const bannerFormMessage = document.getElementById("bannerFormMessage");
@@ -432,7 +449,9 @@
         // Filter by status
         if (statusFilterValue !== "") {
           const isDeleted = statusFilterValue === "true";
-          filtered = filtered.filter((banner) => banner.is_delete === isDeleted);
+          filtered = filtered.filter(
+            (banner) => banner.is_delete === isDeleted
+          );
         }
 
         bannerList.innerHTML = "";
@@ -445,8 +464,8 @@
         }
 
         filtered.forEach((banner) => {
-          const imageUrl = banner.image 
-            ? `/images/banners/${banner.image}` 
+          const imageUrl = banner.image
+            ? `/images/banners/${banner.image}`
             : null;
 
           const statusLabel = banner.is_delete ? "Đã xóa" : "Đang hoạt động";
@@ -455,7 +474,8 @@
             : "bg-emerald-500/10 text-emerald-400 border-emerald-500/40";
 
           const bannerCard = document.createElement("div");
-          bannerCard.className = "banner-card rounded-xl border border-slate-800 bg-slate-950/40 overflow-hidden flex flex-col";
+          bannerCard.className =
+            "banner-card rounded-xl border border-slate-800 bg-slate-950/40 overflow-hidden flex flex-col";
           bannerCard.innerHTML = `
             <div class="relative aspect-video bg-slate-900 overflow-hidden">
               ${
@@ -470,7 +490,9 @@
               </div>
             </div>
             <div class="p-4 flex-1 flex flex-col">
-              <h3 class="text-sm font-semibold text-slate-100 mb-2 line-clamp-1">${banner.name || "-"}</h3>
+              <h3 class="text-sm font-semibold text-slate-100 mb-2 line-clamp-1">${
+                banner.name || "-"
+              }</h3>
               <p class="text-[10px] text-slate-500 mb-3">
                 <span class="material-symbols-outlined text-xs align-middle">schedule</span>
                 ${formatDate(banner.created_date)}
@@ -479,14 +501,24 @@
                 <button
                   onclick="editBanner('${banner._id}')"
                   class="flex-1 inline-flex items-center justify-center gap-1 rounded-md border border-slate-700 bg-slate-900/60 px-3 py-2 text-[10px] text-slate-200 hover:bg-slate-800 transition-colors"
-                  ${banner.is_delete ? 'disabled title="Không thể sửa banner đã xóa"' : ''}
-                  ${banner.is_delete ? 'style="opacity: 0.5; cursor: not-allowed;"' : ''}
+                  ${
+                    banner.is_delete
+                      ? 'disabled title="Không thể sửa banner đã xóa"'
+                      : ""
+                  }
+                  ${
+                    banner.is_delete
+                      ? 'style="opacity: 0.5; cursor: not-allowed;"'
+                      : ""
+                  }
                 >
                   <span class="material-symbols-outlined text-sm">edit</span>
                   Sửa
                 </button>
                 <button
-                  onclick="deleteBanner('${banner._id}', '${(banner.name || "").replace(/'/g, "\\'")}')"
+                  onclick="deleteBanner('${banner._id}', '${(
+            banner.name || ""
+          ).replace(/'/g, "\\'")}')"
                   class="flex-1 inline-flex items-center justify-center gap-1 rounded-md border border-rose-700 bg-rose-900/60 px-3 py-2 text-[10px] text-rose-200 hover:bg-rose-800 transition-colors"
                 >
                   <span class="material-symbols-outlined text-sm">delete</span>
@@ -552,15 +584,19 @@
         if (banner.image) {
           const previewImg = document.getElementById("previewBannerImg");
           previewImg.src = `/images/banners/${banner.image}`;
-          document.getElementById("bannerImagePreview").classList.remove("hidden");
+          document
+            .getElementById("bannerImagePreview")
+            .classList.remove("hidden");
         } else {
           document.getElementById("bannerImagePreview").classList.add("hidden");
         }
 
         bannerFormMessage.classList.add("hidden");
-        
+
         // Scroll đến form
-        document.querySelector('[id^="bannerForm"]').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document
+          .querySelector('[id^="bannerForm"]')
+          .scrollIntoView({ behavior: "smooth", block: "start" });
       }
 
       async function deleteBanner(bannerId, bannerName) {
@@ -595,7 +631,6 @@
       }
 
       // Event listeners
-      addBannerBtn.addEventListener("click", openAddModal);
       addBannerBtnMobile.addEventListener("click", openAddModal);
       searchInput.addEventListener("input", () => renderBanners());
       statusFilter.addEventListener("change", () => renderBanners());
@@ -613,11 +648,14 @@
       bannerForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         bannerFormMessage.classList.remove("hidden");
-        bannerFormMessage.textContent = isEditMode ? "Đang cập nhật..." : "Đang thêm banner...";
+        bannerFormMessage.textContent = isEditMode
+          ? "Đang cập nhật..."
+          : "Đang thêm banner...";
         bannerFormMessage.className = "block text-xs mt-1 text-amber-400";
 
         const formData = new FormData(bannerForm);
-        const editingBannerId = document.getElementById("editingBannerId").value;
+        const editingBannerId =
+          document.getElementById("editingBannerId").value;
 
         // Kiểm tra ảnh khi thêm mới
         if (!isEditMode && !formData.get("image")) {
@@ -649,25 +687,33 @@
           const data = await res.json().catch(() => ({}));
 
           if (res.ok && data.data) {
-            bannerFormMessage.textContent = data.msg || (isEditMode ? "Đã cập nhật banner thành công!" : "Đã thêm banner thành công!");
+            bannerFormMessage.textContent =
+              data.msg ||
+              (isEditMode
+                ? "Đã cập nhật banner thành công!"
+                : "Đã thêm banner thành công!");
             bannerFormMessage.className = "block text-xs mt-1 text-emerald-400";
             bannerForm.reset();
             document.getElementById("editingBannerId").value = "";
             bannerFormTitle.textContent = "Thêm banner mới";
             submitButtonText.textContent = "Lưu banner";
-            document.getElementById("bannerImagePreview").classList.add("hidden");
+            document
+              .getElementById("bannerImagePreview")
+              .classList.add("hidden");
             isEditMode = false;
             setTimeout(async () => {
               await loadBanners();
             }, 500);
           } else {
-            const msg = data?.msg || data?.message || data?.error || "Có lỗi xảy ra";
+            const msg =
+              data?.msg || data?.message || data?.error || "Có lỗi xảy ra";
             bannerFormMessage.textContent = msg;
             bannerFormMessage.className = "block text-xs mt-1 text-rose-400";
           }
         } catch (err) {
           console.error(err);
-          bannerFormMessage.textContent = "Lỗi kết nối server. Vui lòng thử lại.";
+          bannerFormMessage.textContent =
+            "Lỗi kết nối server. Vui lòng thử lại.";
           bannerFormMessage.className = "block text-xs mt-1 text-rose-400";
         }
       });
@@ -679,7 +725,9 @@
           const reader = new FileReader();
           reader.onload = (e) => {
             document.getElementById("previewBannerImg").src = e.target.result;
-            document.getElementById("bannerImagePreview").classList.remove("hidden");
+            document
+              .getElementById("bannerImagePreview")
+              .classList.remove("hidden");
           };
           reader.readAsDataURL(file);
         } else {

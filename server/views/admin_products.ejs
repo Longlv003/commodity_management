@@ -71,7 +71,7 @@
           </a>
 
           <a
-            href="/admin"
+            href="/admin/products"
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm bg-slate-800 text-white"
           >
             <span class="material-symbols-outlined text-xl"> inventory_2 </span>
@@ -253,7 +253,9 @@
                 <div
                   class="flex items-center justify-between px-4 md:px-6 py-3 border-b border-slate-800"
                 >
-                  <p class="text-sm font-semibold" id="productFormTitle">Thêm sản phẩm mới</p>
+                  <p class="text-sm font-semibold" id="productFormTitle">
+                    Thêm sản phẩm mới
+                  </p>
                 </div>
 
                 <form
@@ -261,8 +263,16 @@
                   class="px-4 md:px-6 py-4 flex flex-col gap-3"
                   enctype="multipart/form-data"
                 >
-                  <input type="hidden" id="editingProductId" name="product_id" />
-                  <input type="hidden" id="editingVariantId" name="variant_id" />
+                  <input
+                    type="hidden"
+                    id="editingProductId"
+                    name="product_id"
+                  />
+                  <input
+                    type="hidden"
+                    id="editingVariantId"
+                    name="variant_id"
+                  />
                   <!-- Product Info -->
                   <div class="border-b border-slate-800 pb-3 mb-3">
                     <p class="text-xs font-semibold text-slate-300 mb-2">
@@ -282,7 +292,9 @@
                         />
                       </div>
                       <div>
-                        <label class="text-xs text-slate-400">Mã sản phẩm (Product Code) *</label>
+                        <label class="text-xs text-slate-400"
+                          >Mã sản phẩm (Product Code) *</label
+                        >
                         <input
                           name="productCode"
                           id="productCode"
@@ -851,7 +863,10 @@
           if (res.ok) {
             const message = data?.msg || "Đã xóa variant thành công!";
             if (data?.data?.product_deleted) {
-              alert(message + "\n\nLưu ý: Sản phẩm cũng đã bị xóa vì không còn variant nào.");
+              alert(
+                message +
+                  "\n\nLưu ý: Sản phẩm cũng đã bị xóa vì không còn variant nào."
+              );
             } else {
               alert(message);
             }
@@ -882,7 +897,7 @@
           }
 
           const product = data.data;
-          const variant = product.variants?.find(v => v._id === variantId);
+          const variant = product.variants?.find((v) => v._id === variantId);
 
           if (!variant) {
             alert("Không tìm thấy biến thể sản phẩm!");
@@ -893,13 +908,18 @@
           document.getElementById("editingProductId").value = productId;
           document.getElementById("editingVariantId").value = variantId;
           document.getElementById("productName").value = product.name || "";
-          document.getElementById("productCode").value = product.productCode || "";
-          document.getElementById("productDescription").value = product.description || "";
-          document.getElementById("productCategory").value = product.catID || "";
+          document.getElementById("productCode").value =
+            product.productCode || "";
+          document.getElementById("productDescription").value =
+            product.description || "";
+          document.getElementById("productCategory").value =
+            product.catID || "";
 
           // Thay đổi title và button
-          document.getElementById("productFormTitle").textContent = "Sửa sản phẩm";
-          document.getElementById("submitButtonText").textContent = "Cập nhật sản phẩm";
+          document.getElementById("productFormTitle").textContent =
+            "Sửa sản phẩm";
+          document.getElementById("submitButtonText").textContent =
+            "Cập nhật sản phẩm";
 
           // Ẩn nút "Thêm biến thể" khi ở chế độ edit
           document.getElementById("addVariantBtn").style.display = "none";
@@ -911,9 +931,10 @@
           // Thêm variant cần sửa vào form
           const container = document.getElementById("variantsContainer");
           const variantIdForm = `variant_${variantCounter++}`;
-          
+
           const variantDiv = document.createElement("div");
-          variantDiv.className = "rounded-lg border border-slate-800 bg-slate-950/40 p-3";
+          variantDiv.className =
+            "rounded-lg border border-slate-800 bg-slate-950/40 p-3";
           variantDiv.id = variantIdForm;
           variantDiv.innerHTML = `
             <div class="flex items-center justify-between mb-2">
@@ -987,23 +1008,32 @@
                   accept="image/*"
                   class="mt-1 block w-full text-[10px] text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-800 file:px-2 file:py-1 file:text-[10px] file:text-slate-100 hover:file:bg-slate-700"
                 />
-                ${variant.image && variant.image.length > 0 ? `
+                ${
+                  variant.image && variant.image.length > 0
+                    ? `
                   <div class="mt-2">
                     <p class="text-[10px] text-slate-500 mb-1">Ảnh hiện tại:</p>
-                    <img src="/images/products/${Array.isArray(variant.image) ? variant.image[0] : variant.image}" 
+                    <img src="/images/products/${
+                      Array.isArray(variant.image)
+                        ? variant.image[0]
+                        : variant.image
+                    }" 
                          alt="Current image" 
                          class="h-16 w-16 rounded border border-slate-700 object-cover"
                          onerror="this.style.display='none'" />
                   </div>
-                ` : ""}
+                `
+                    : ""
+                }
               </div>
             </div>
           `;
           container.appendChild(variantDiv);
 
           // Scroll đến form
-          document.querySelector('[id^="productForm"]').scrollIntoView({ behavior: 'smooth', block: 'start' });
-
+          document
+            .querySelector('[id^="productForm"]')
+            .scrollIntoView({ behavior: "smooth", block: "start" });
         } catch (err) {
           console.error("Edit variant error", err);
           alert("Lỗi khi tải thông tin sản phẩm. Vui lòng thử lại.");
@@ -1027,8 +1057,10 @@
         // Reset editing mode
         document.getElementById("editingProductId").value = "";
         document.getElementById("editingVariantId").value = "";
-        document.getElementById("productFormTitle").textContent = "Thêm sản phẩm mới";
-        document.getElementById("submitButtonText").textContent = "Lưu sản phẩm";
+        document.getElementById("productFormTitle").textContent =
+          "Thêm sản phẩm mới";
+        document.getElementById("submitButtonText").textContent =
+          "Lưu sản phẩm";
         // Hiển thị lại nút "Thêm biến thể"
         document.getElementById("addVariantBtn").style.display = "block";
         // Reset variants container
@@ -1063,7 +1095,7 @@
 
         const variants = [];
         const variantImageFiles = [];
-        
+
         for (const row of variantRows) {
           const sku = row.querySelector('[name="variant_sku"]')?.value?.trim();
           const size = row
@@ -1073,8 +1105,11 @@
             .querySelector('[name="variant_color"]')
             ?.value?.trim();
           const price = row.querySelector('[name="variant_price"]')?.value;
-          const quantity = row.querySelector('[name="variant_quantity"]')?.value;
-          const imageFile = row.querySelector('[name="variant_image"]')?.files?.[0];
+          const quantity = row.querySelector(
+            '[name="variant_quantity"]'
+          )?.value;
+          const imageFile = row.querySelector('[name="variant_image"]')
+            ?.files?.[0];
 
           if (!sku || !size || !color || !price || !quantity) {
             productFormMessage.textContent =
@@ -1090,7 +1125,7 @@
             price: Number(price),
             quantity: Number(quantity),
           });
-          
+
           // Lưu file image để gửi riêng
           if (imageFile) {
             variantImageFiles.push(imageFile);
@@ -1102,14 +1137,14 @@
         // Tạo FormData
         const formData = new FormData(productForm);
         formData.set("variants", JSON.stringify(variants));
-        
+
         // Thêm variant images vào FormData với tên riêng biệt
         variantImageFiles.forEach((file, index) => {
           if (file) {
             formData.append(`variant_image_${index}`, file);
           }
         });
-        
+
         // Xóa các field variant không cần thiết
         formData.delete("variant_sku");
         formData.delete("variant_size");
@@ -1119,8 +1154,10 @@
         formData.delete("variant_image");
 
         try {
-          const editingProductId = document.getElementById("editingProductId").value;
-          const editingVariantId = document.getElementById("editingVariantId").value;
+          const editingProductId =
+            document.getElementById("editingProductId").value;
+          const editingVariantId =
+            document.getElementById("editingVariantId").value;
           let res;
           let data;
 
@@ -1147,12 +1184,24 @@
               const variantRows = document.querySelectorAll('[id^="variant_"]');
               if (variantRows.length > 0) {
                 const variantRow = variantRows[0];
-                const variantSku = variantRow.querySelector('[name="variant_sku"]')?.value?.trim();
-                const variantSize = variantRow.querySelector('[name="variant_size"]')?.value?.trim();
-                const variantColor = variantRow.querySelector('[name="variant_color"]')?.value?.trim();
-                const variantPrice = variantRow.querySelector('[name="variant_price"]')?.value;
-                const variantQuantity = variantRow.querySelector('[name="variant_quantity"]')?.value;
-                const variantImageFile = variantRow.querySelector('[name="variant_image"]')?.files?.[0];
+                const variantSku = variantRow
+                  .querySelector('[name="variant_sku"]')
+                  ?.value?.trim();
+                const variantSize = variantRow
+                  .querySelector('[name="variant_size"]')
+                  ?.value?.trim();
+                const variantColor = variantRow
+                  .querySelector('[name="variant_color"]')
+                  ?.value?.trim();
+                const variantPrice = variantRow.querySelector(
+                  '[name="variant_price"]'
+                )?.value;
+                const variantQuantity = variantRow.querySelector(
+                  '[name="variant_quantity"]'
+                )?.value;
+                const variantImageFile = variantRow.querySelector(
+                  '[name="variant_image"]'
+                )?.files?.[0];
 
                 // Tạo FormData cho variant
                 const variantFormData = new FormData();
@@ -1166,33 +1215,45 @@
                 }
 
                 // Gọi API cập nhật variant
-                const variantRes = await fetch(`/api/variant/edit/${editingVariantId}`, {
-                  method: "PUT",
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                  },
-                  body: variantFormData,
-                });
+                const variantRes = await fetch(
+                  `/api/variant/edit/${editingVariantId}`,
+                  {
+                    method: "PUT",
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                    body: variantFormData,
+                  }
+                );
                 const variantData = await variantRes.json().catch(() => ({}));
 
                 if (variantRes.ok) {
-                  productFormMessage.textContent = "Đã cập nhật sản phẩm và biến thể thành công!";
-                  productFormMessage.className = "block text-xs mt-1 text-emerald-400";
+                  productFormMessage.textContent =
+                    "Đã cập nhật sản phẩm và biến thể thành công!";
+                  productFormMessage.className =
+                    "block text-xs mt-1 text-emerald-400";
                 } else {
-                  productFormMessage.textContent = `Đã cập nhật sản phẩm nhưng lỗi khi cập nhật biến thể: ${variantData?.msg || "Lỗi không xác định"}`;
-                  productFormMessage.className = "block text-xs mt-1 text-amber-400";
+                  productFormMessage.textContent = `Đã cập nhật sản phẩm nhưng lỗi khi cập nhật biến thể: ${
+                    variantData?.msg || "Lỗi không xác định"
+                  }`;
+                  productFormMessage.className =
+                    "block text-xs mt-1 text-amber-400";
                 }
               } else {
-                productFormMessage.textContent = "Đã cập nhật sản phẩm thành công!";
-                productFormMessage.className = "block text-xs mt-1 text-emerald-400";
+                productFormMessage.textContent =
+                  "Đã cập nhật sản phẩm thành công!";
+                productFormMessage.className =
+                  "block text-xs mt-1 text-emerald-400";
               }
-              
+
               // Reset form
               productForm.reset();
               document.getElementById("editingProductId").value = "";
               document.getElementById("editingVariantId").value = "";
-              document.getElementById("productFormTitle").textContent = "Thêm sản phẩm mới";
-              document.getElementById("submitButtonText").textContent = "Lưu sản phẩm";
+              document.getElementById("productFormTitle").textContent =
+                "Thêm sản phẩm mới";
+              document.getElementById("submitButtonText").textContent =
+                "Lưu sản phẩm";
               // Hiển thị lại nút "Thêm biến thể"
               document.getElementById("addVariantBtn").style.display = "block";
               document.getElementById("variantsContainer").innerHTML = "";
@@ -1200,7 +1261,11 @@
               addVariantRow();
               await loadProducts();
             } else {
-              const msg = data?.msg || data?.message || data?.error || "Không thể cập nhật sản phẩm.";
+              const msg =
+                data?.msg ||
+                data?.message ||
+                data?.error ||
+                "Không thể cập nhật sản phẩm.";
               productFormMessage.textContent = msg;
               productFormMessage.className = "block text-xs mt-1 text-rose-400";
             }
@@ -1217,7 +1282,8 @@
 
             if (res.ok && data.data) {
               productFormMessage.textContent = "Đã thêm sản phẩm thành công!";
-              productFormMessage.className = "block text-xs mt-1 text-emerald-400";
+              productFormMessage.className =
+                "block text-xs mt-1 text-emerald-400";
               productForm.reset();
               // Reset variants
               document.getElementById("variantsContainer").innerHTML = "";
@@ -1228,7 +1294,11 @@
                 await loadProducts();
               }, 500);
             } else {
-              const msg = data?.msg || data?.message || data?.error || "Không thể thêm sản phẩm. Vui lòng kiểm tra lại thông tin.";
+              const msg =
+                data?.msg ||
+                data?.message ||
+                data?.error ||
+                "Không thể thêm sản phẩm. Vui lòng kiểm tra lại thông tin.";
               productFormMessage.textContent = msg;
               productFormMessage.className = "block text-xs mt-1 text-rose-400";
               console.error("Add product error:", data);
@@ -1236,7 +1306,8 @@
           }
         } catch (err) {
           console.error(err);
-          productFormMessage.textContent = "Lỗi kết nối server. Vui lòng thử lại.";
+          productFormMessage.textContent =
+            "Lỗi kết nối server. Vui lòng thử lại.";
           productFormMessage.className = "block text-xs mt-1 text-rose-400";
         }
       });

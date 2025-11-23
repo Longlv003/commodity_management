@@ -69,7 +69,7 @@
           </a>
 
           <a
-            href="/admin"
+            href="/admin/products"
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-slate-800 hover:text-white"
           >
             <span class="material-symbols-outlined text-xl"> inventory_2 </span>
@@ -143,13 +143,6 @@
           </div>
 
           <div class="flex items-center gap-4">
-            <button
-              id="addCustomerBtn"
-              class="hidden sm:flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500"
-            >
-              <span class="material-symbols-outlined text-base">person_add</span>
-              <span>Thêm khách hàng</span>
-            </button>
             <div class="hidden sm:flex flex-col items-end">
               <p class="text-sm font-medium" id="currentUserName">Admin</p>
               <p class="text-xs text-slate-500" id="currentUserEmail"></p>
@@ -180,17 +173,14 @@
                 class="bg-transparent text-sm flex-1 outline-none placeholder:text-slate-500"
               />
             </div>
-            <button
-              id="addCustomerBtnMobile"
-              class="sm:hidden flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500"
-            >
-              <span class="material-symbols-outlined text-base">person_add</span>
-              <span>Thêm khách hàng</span>
-            </button>
           </section>
 
-          <!-- Customers Table -->
-          <section class="rounded-xl border border-slate-800 bg-slate-900/60 shadow-xl overflow-hidden">
+          <!-- Main grid -->
+          <section
+            class="grid grid-cols-1 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-6"
+          >
+            <!-- Customers Table -->
+            <div class="rounded-xl border border-slate-800 bg-slate-900/60 shadow-xl overflow-hidden flex flex-col">
             <div
               class="flex items-center justify-between px-4 md:px-6 py-3 border-b border-slate-800"
             >
@@ -204,54 +194,48 @@
               </p>
             </div>
 
-            <div class="overflow-auto scrollbar-thin">
-              <table class="min-w-full text-sm">
-                <thead class="bg-slate-900/80 sticky top-0 z-10">
-                  <tr class="text-left text-xs text-slate-400 uppercase">
-                    <th class="px-4 py-3 font-medium">Khách hàng</th>
-                    <th class="px-4 py-3 font-medium">Email</th>
-                    <th class="px-4 py-3 font-medium">Số điện thoại</th>
-                    <th class="px-4 py-3 font-medium">Tổng đơn hàng</th>
-                    <th class="px-4 py-3 font-medium">Tổng chi tiêu</th>
-                    <th class="px-4 py-3 font-medium">Trạng thái</th>
-                    <th class="px-4 py-3 font-medium text-right">
-                      Hành động
-                    </th>
-                  </tr>
-                </thead>
-                <tbody id="customerTableBody" class="divide-y divide-slate-800">
-                  <!-- JS render rows -->
-                </tbody>
-              </table>
+              <div class="overflow-auto scrollbar-thin flex-1">
+                <table class="min-w-full text-sm">
+                  <thead class="bg-slate-900/80 sticky top-0 z-10">
+                    <tr class="text-left text-xs text-slate-400 uppercase">
+                      <th class="px-4 py-3 font-medium">Khách hàng</th>
+                      <th class="px-4 py-3 font-medium">Email</th>
+                      <th class="px-4 py-3 font-medium">Số điện thoại</th>
+                      <th class="px-4 py-3 font-medium">Vai trò</th>
+                      <th class="px-4 py-3 font-medium">Tổng đơn hàng</th>
+                      <th class="px-4 py-3 font-medium">Tổng chi tiêu</th>
+                      <th class="px-4 py-3 font-medium">Trạng thái</th>
+                      <th class="px-4 py-3 font-medium text-right">
+                        Hành động
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="customerTableBody" class="divide-y divide-slate-800">
+                    <!-- JS render rows -->
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </section>
-        </div>
-      </main>
 
-      <!-- Add/Edit Customer Modal -->
-      <div
-        id="customerModal"
-        class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
-      >
-        <div
-          class="bg-slate-900 rounded-xl border border-slate-800 shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
-        >
-          <!-- Modal Header -->
-          <div
-            class="flex items-center justify-between px-6 py-4 border-b border-slate-800"
-          >
-            <h2 class="text-lg font-semibold" id="modalTitle">Thêm khách hàng mới</h2>
-            <button
-              id="closeModalBtn"
-              class="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white"
-            >
-              <span class="material-symbols-outlined text-xl">close</span>
-            </button>
-          </div>
+            <!-- Right column: add/edit customer form -->
+            <div class="flex flex-col gap-6">
+              <!-- Add/Edit Customer Form -->
+              <div
+                class="rounded-xl border border-slate-800 bg-slate-900/60 shadow-xl"
+              >
+                <div
+                  class="flex items-center justify-between px-4 md:px-6 py-3 border-b border-slate-800"
+                >
+                  <p class="text-sm font-semibold" id="customerFormTitle">
+                    Thêm khách hàng mới
+                  </p>
+                </div>
 
-          <!-- Modal Content -->
-          <div class="overflow-auto scrollbar-thin flex-1 px-6 py-4">
-            <form id="customerForm" enctype="multipart/form-data" class="space-y-4">
+                <form
+                  id="customerForm"
+                  enctype="multipart/form-data"
+                  class="px-4 md:px-6 py-4 flex flex-col gap-4"
+                >
               <input type="hidden" id="customerId" name="id" />
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -310,6 +294,7 @@
                   >
                     <option value="user">Khách hàng</option>
                     <option value="admin">Quản trị viên</option>
+                    <option value="engineer">Kỹ sư</option>
                   </select>
                 </div>
 
@@ -351,33 +336,33 @@
                 </div>
               </div>
 
-              <p
-                id="customerFormMessage"
-                class="hidden text-xs mt-2"
-              ></p>
-            </form>
-          </div>
+                  <p
+                    id="customerFormMessage"
+                    class="hidden text-xs mt-1"
+                  ></p>
 
-          <!-- Modal Footer -->
-          <div class="flex justify-end gap-2 px-6 py-4 border-t border-slate-800">
-            <button
-              type="button"
-              id="cancelBtn"
-              class="h-9 rounded-lg border border-slate-700 px-4 text-xs font-medium text-slate-200 hover:bg-slate-800"
-            >
-              Huỷ
-            </button>
-            <button
-              type="submit"
-              form="customerForm"
-              id="submitCustomerBtn"
-              class="h-9 rounded-lg bg-blue-600 px-4 text-xs font-semibold text-white hover:bg-blue-500"
-            >
-              Lưu
-            </button>
-          </div>
+                  <div class="flex justify-end gap-2 pt-2">
+                    <button
+                      type="button"
+                      id="resetCustomerForm"
+                      class="h-9 rounded-lg border border-slate-700 px-3 text-xs font-medium text-slate-200 hover:bg-slate-800 transition-colors"
+                    >
+                      Huỷ
+                    </button>
+                    <button
+                      type="submit"
+                      id="submitCustomerBtn"
+                      class="h-9 rounded-lg bg-blue-600 px-4 text-xs font-semibold text-white hover:bg-blue-500 transition-colors"
+                    >
+                      <span id="submitButtonText">Lưu khách hàng</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </section>
         </div>
-      </div>
+      </main>
 
       <!-- Customer Detail Modal -->
       <div
@@ -438,17 +423,14 @@
       const customerTableBody = document.getElementById("customerTableBody");
       const customerCount = document.getElementById("customerCount");
       const searchInput = document.getElementById("searchInput");
-      const addCustomerBtn = document.getElementById("addCustomerBtn");
-      const addCustomerBtnMobile = document.getElementById("addCustomerBtnMobile");
-      const customerModal = document.getElementById("customerModal");
       const customerDetailModal = document.getElementById("customerDetailModal");
       const customerForm = document.getElementById("customerForm");
       const customerFormMessage = document.getElementById("customerFormMessage");
-      const closeModalBtn = document.getElementById("closeModalBtn");
       const closeDetailModalBtn = document.getElementById("closeDetailModalBtn");
-      const cancelBtn = document.getElementById("cancelBtn");
+      const resetCustomerFormBtn = document.getElementById("resetCustomerForm");
       const submitCustomerBtn = document.getElementById("submitCustomerBtn");
-      const modalTitle = document.getElementById("modalTitle");
+      const customerFormTitle = document.getElementById("customerFormTitle");
+      const submitButtonText = document.getElementById("submitButtonText");
       const passwordRequired = document.getElementById("passwordRequired");
       const logoutBtn = document.getElementById("logoutBtn");
       const mobileMenuBtn = document.getElementById("mobileMenuBtn");
@@ -538,7 +520,7 @@
 
         if (!filtered.length) {
           customerTableBody.innerHTML =
-            '<tr><td colspan="7" class="px-4 py-8 text-center text-xs text-slate-500">Không có khách hàng nào.</td></tr>';
+            '<tr><td colspan="8" class="px-4 py-8 text-center text-xs text-slate-500">Không có khách hàng nào.</td></tr>';
           customerCount.textContent = "0";
           return;
         }
@@ -557,6 +539,13 @@
             ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/40"
             : "bg-rose-500/10 text-rose-400 border-rose-500/40";
 
+          const roleLabel = customer.role === "admin" ? "Quản trị viên" : customer.role === "engineer" ? "Kỹ sư" : "Khách hàng";
+          const roleColor = customer.role === "admin" 
+            ? "bg-blue-500/10 text-blue-400 border-blue-500/40"
+            : customer.role === "engineer"
+            ? "bg-purple-500/10 text-purple-400 border-purple-500/40"
+            : "bg-slate-500/10 text-slate-400 border-slate-500/40";
+
           row.innerHTML = `
             <td class="px-4 py-3">
               <div class="flex items-center gap-3">
@@ -569,7 +558,6 @@
                 </div>
                 <div class="flex flex-col">
                   <span class="text-xs font-medium text-slate-100">${customer.name || "-"}</span>
-                  <span class="text-[10px] text-slate-500">${customer.role === "admin" ? "Quản trị viên" : "Khách hàng"}</span>
                 </div>
               </div>
             </td>
@@ -578,6 +566,11 @@
             </td>
             <td class="px-4 py-3 text-xs text-slate-300">
               ${customer.phone || "-"}
+            </td>
+            <td class="px-4 py-3">
+              <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${roleColor}">
+                ${roleLabel}
+              </span>
             </td>
             <td class="px-4 py-3 text-xs text-slate-100">
               ${stats.total_orders || 0}
@@ -602,14 +595,16 @@
                 <button
                   onclick="editCustomer('${customer._id}')"
                   class="inline-flex items-center justify-center rounded-md border border-slate-700 bg-slate-900/60 px-2 py-1 text-[10px] text-slate-200 hover:bg-slate-800"
-                  title="Sửa"
+                  title="${customer.role === "admin" ? "Không thể sửa tài khoản admin" : "Sửa"}"
+                  ${customer.role === "admin" ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ""}
                 >
                   <span class="material-symbols-outlined text-sm">edit</span>
                 </button>
                 <button
                   onclick="deleteCustomer('${customer._id}', '${(customer.name || "").replace(/'/g, "\\'")}')"
                   class="inline-flex items-center justify-center rounded-md border border-rose-700 bg-rose-900/60 px-2 py-1 text-[10px] text-rose-200 hover:bg-rose-800"
-                  title="Xóa"
+                  title="${customer.role === "admin" ? "Không thể xóa tài khoản admin" : "Xóa"}"
+                  ${customer.role === "admin" ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ""}
                 >
                   <span class="material-symbols-outlined text-sm">delete</span>
                 </button>
@@ -642,15 +637,23 @@
         }
       }
 
-      function openAddModal() {
+      function resetForm() {
         isEditMode = false;
-        modalTitle.textContent = "Thêm khách hàng mới";
+        customerFormTitle.textContent = "Thêm khách hàng mới";
+        submitButtonText.textContent = "Lưu khách hàng";
         passwordRequired.style.display = "inline";
         customerForm.reset();
         document.getElementById("customerId").value = "";
         document.getElementById("customerImagePreview").classList.add("hidden");
         customerFormMessage.classList.add("hidden");
-        customerModal.classList.remove("hidden");
+        const passwordInput = document.getElementById("customerPassword");
+        passwordInput.disabled = false;
+        passwordInput.placeholder = "Để trống nếu không đổi";
+        passwordInput.required = true;
+        // Enable lại dropdown role
+        const roleSelect = document.getElementById("customerRole");
+        roleSelect.disabled = false;
+        roleSelect.title = "";
       }
 
       async function editCustomer(customerId) {
@@ -660,8 +663,15 @@
           return;
         }
 
+        // Không cho phép sửa account admin
+        if (customer.role === "admin") {
+          alert("Không thể chỉnh sửa tài khoản admin");
+          return;
+        }
+
         isEditMode = true;
-        modalTitle.textContent = "Sửa thông tin khách hàng";
+        customerFormTitle.textContent = "Sửa thông tin khách hàng";
+        submitButtonText.textContent = "Cập nhật khách hàng";
         passwordRequired.style.display = "none";
         document.getElementById("customerId").value = customer._id;
         document.getElementById("customerName").value = customer.name || "";
@@ -669,9 +679,21 @@
         document.getElementById("customerPhone").value = customer.phone || "";
         document.getElementById("customerAddress").value = customer.address || "";
         document.getElementById("customerRole").value = customer.role || "user";
+        // Disable dropdown role nếu là admin
+        const roleSelect = document.getElementById("customerRole");
+        if (customer.role === "admin") {
+          roleSelect.disabled = true;
+          roleSelect.title = "Không thể thay đổi role của tài khoản admin";
+        } else {
+          roleSelect.disabled = false;
+          roleSelect.title = "";
+        }
         document.getElementById("customerStatus").value = customer.is_active ? "true" : "false";
-        document.getElementById("customerPassword").value = "";
-        document.getElementById("customerPassword").required = false;
+        const passwordInput = document.getElementById("customerPassword");
+        passwordInput.value = "";
+        passwordInput.required = false;
+        passwordInput.disabled = true;
+        passwordInput.placeholder = "Không thể thay đổi mật khẩu khi sửa";
 
         if (customer.image) {
           const previewImg = document.getElementById("previewImg");
@@ -682,7 +704,11 @@
         }
 
         customerFormMessage.classList.add("hidden");
-        customerModal.classList.remove("hidden");
+
+        // Scroll đến form
+        document
+          .getElementById("customerForm")
+          .scrollIntoView({ behavior: "smooth", block: "start" });
       }
 
       async function viewCustomerDetail(customerId) {
@@ -816,6 +842,14 @@
       }
 
       async function deleteCustomer(customerId, customerName) {
+        const customer = allCustomers.find((c) => c._id === customerId);
+        
+        // Không cho phép xóa account admin
+        if (customer && customer.role === "admin") {
+          alert("Không thể xóa tài khoản admin");
+          return;
+        }
+
         if (!confirm(`Bạn có chắc muốn xóa khách hàng "${customerName}"?`)) {
           return;
         }
@@ -841,29 +875,16 @@
         }
       }
 
-      function closeModal() {
-        customerModal.classList.add("hidden");
-        customerForm.reset();
-        customerFormMessage.classList.add("hidden");
-      }
-
       function closeDetailModal() {
         customerDetailModal.classList.add("hidden");
       }
 
       // Event listeners
-      addCustomerBtn.addEventListener("click", openAddModal);
-      addCustomerBtnMobile.addEventListener("click", openAddModal);
-      closeModalBtn.addEventListener("click", closeModal);
-      closeDetailModalBtn.addEventListener("click", closeDetailModal);
-      cancelBtn.addEventListener("click", closeModal);
-      searchInput.addEventListener("input", () => renderCustomers());
-
-      customerModal.addEventListener("click", (e) => {
-        if (e.target === customerModal) {
-          closeModal();
-        }
+      resetCustomerFormBtn.addEventListener("click", () => {
+        resetForm();
       });
+      closeDetailModalBtn.addEventListener("click", closeDetailModal);
+      searchInput.addEventListener("input", () => renderCustomers());
 
       customerDetailModal.addEventListener("click", (e) => {
         if (e.target === customerDetailModal) {
@@ -873,12 +894,23 @@
 
       customerForm.addEventListener("submit", async (e) => {
         e.preventDefault();
+        
+        const customerId = document.getElementById("customerId").value;
+        
+        // Kiểm tra nếu đang sửa account admin
+        if (isEditMode && customerId) {
+          const customer = allCustomers.find((c) => c._id === customerId);
+          if (customer && customer.role === "admin") {
+            alert("Không thể chỉnh sửa tài khoản admin");
+            return;
+          }
+        }
+
         customerFormMessage.classList.remove("hidden");
         customerFormMessage.textContent = isEditMode ? "Đang cập nhật..." : "Đang thêm khách hàng...";
-        customerFormMessage.className = "block text-xs mt-2 text-amber-400";
+        customerFormMessage.className = "block text-xs mt-1 text-amber-400";
 
         const formData = new FormData(customerForm);
-        const customerId = document.getElementById("customerId").value;
 
         try {
           let res;
@@ -904,11 +936,10 @@
 
           if (res.ok) {
             customerFormMessage.textContent = data.msg || "Thành công!";
-            customerFormMessage.className = "block text-xs mt-2 text-emerald-400";
-            customerForm.reset();
+            customerFormMessage.className = "block text-xs mt-1 text-emerald-400";
             await loadCustomers();
             setTimeout(() => {
-              closeModal();
+              resetForm();
             }, 1000);
           } else {
             customerFormMessage.textContent = data.msg || "Có lỗi xảy ra";
@@ -946,6 +977,7 @@
       });
 
       // Khởi chạy
+      resetForm();
       loadCustomers();
     </script>
   </body>

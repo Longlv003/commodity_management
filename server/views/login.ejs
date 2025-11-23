@@ -17,7 +17,6 @@
       .material-symbols-outlined {
         font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
       }
-      
     </style>
   </head>
 
@@ -97,24 +96,26 @@
                   placeholder="Nhập mật khẩu của bạn"
                 />
               </div>
-                
+
               <div class="flex items-center justify-between mt-2">
-                  <label class="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm select-none cursor-pointer">
-                  <input 
-                   id="rememberMe" 
-                   type="checkbox" 
-                   class="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary"
-              />
-                <span>Ghi nhớ đăng nhập</span>
+                <label
+                  class="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm select-none cursor-pointer"
+                >
+                  <input
+                    id="rememberMe"
+                    type="checkbox"
+                    class="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary"
+                  />
+                  <span>Ghi nhớ đăng nhập</span>
                 </label>
 
-              <a 
-                id="forgotPassLink"
-                href="#"
-                class="text-sm font-medium text-primary hover:underline"
-              >
-               Quên mật khẩu?
-              </a>
+                <a
+                  id="forgotPassLink"
+                  href="#"
+                  class="text-sm font-medium text-primary hover:underline"
+                >
+                  Quên mật khẩu?
+                </a>
               </div>
             </label>
 
@@ -127,48 +128,56 @@
             </p>
 
             <button
-            type="submit"
+              type="submit"
               id="submitBtn"
               class="flex w-full items-center justify-center rounded-lg h-14 px-6 text-base font-bold leading-normal text-white bg-blue-600 hover:bg-blue-700 mt-4"
             >
               Đăng nhập
-</button>
-
+            </button>
           </form>
         </div>
 
         <!-- POPUP QUÊN MẬT KHẨU -->
-<div
-  id="forgotPopup"
-  class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50"
->
-  <div class="bg-white dark:bg-gray-900 p-6 rounded-xl w-full max-w-md shadow-xl">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold text-gray-900 dark:text-white">Quên mật khẩu</h2>
-      <button id="forgotClose" class="text-gray-500 hover:text-gray-800">✖</button>
-    </div>
+        <div
+          id="forgotPopup"
+          class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50"
+        >
+          <div
+            class="bg-white dark:bg-gray-900 p-6 rounded-xl w-full max-w-md shadow-xl"
+          >
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+                Quên mật khẩu
+              </h2>
+              <button
+                id="forgotClose"
+                class="text-gray-500 hover:text-gray-800"
+              >
+                ✖
+              </button>
+            </div>
 
-    <p class="text-gray-600 dark:text-gray-300 mb-3">
-      Nhập email để nhận liên kết đặt lại mật khẩu.
-    </p>
+            <p class="text-gray-600 dark:text-gray-300 mb-3">
+              Nhập email để nhận liên kết đặt lại mật khẩu.
+            </p>
 
-    <input
-      id="forgotEmail"
-      type="email"
-      class="w-full h-12 px-4 rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white"
-      placeholder="Nhập email của bạn"
-    />
+            <input
+              id="forgotEmail"
+              type="email"
+              class="w-full h-12 px-4 rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white"
+              placeholder="Nhập email của bạn"
+            />
 
-    <p id="forgotMsg" class="text-sm mt-3"></p>
+            <p id="forgotMsg" class="text-sm mt-3"></p>
 
-    <button
-      id="forgotSubmit"
-      class="mt-4 w-full h-12 bg-primary text-white font-bold rounded-lg hover:bg-primary/90"
-    >
-      Gửi yêu cầu
-    </button>
-  </div>
-</div>
+            <button
+              id="forgotSubmit"
+              class="mt-4 w-full h-12 bg-primary text-white font-bold rounded-lg hover:bg-primary/90"
+            >
+              Gửi yêu cầu
+            </button>
+          </div>
+        </div>
 
         <!-- Right Side - Image -->
         <div
@@ -191,14 +200,14 @@
       const submitBtn = document.getElementById("submitBtn");
 
       window.addEventListener("load", () => {
-    const savedEmail = localStorage.getItem("savedEmail");
-    const remember = localStorage.getItem("rememberMe");
+        const savedEmail = localStorage.getItem("savedEmail");
+        const remember = localStorage.getItem("rememberMe");
 
-    if (savedEmail && remember === "true") {
-      document.getElementById("email").value = savedEmail;
-      document.getElementById("rememberMe").checked = true;
-    }
-  });
+        if (savedEmail && remember === "true") {
+          document.getElementById("email").value = savedEmail;
+          document.getElementById("rememberMe").checked = true;
+        }
+      });
 
       loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -211,16 +220,16 @@
         const remember = document.getElementById("rememberMe").checked;
 
         // Lưu hoặc xoá email theo checkbox
-    if (remember) {
-      localStorage.setItem("savedEmail", email);
-      localStorage.setItem("rememberMe", "true");
-    } else {
-      localStorage.removeItem("savedEmail");
-      localStorage.removeItem("rememberMe");
-    }
+        if (remember) {
+          localStorage.setItem("savedEmail", email);
+          localStorage.setItem("rememberMe", "true");
+        } else {
+          localStorage.removeItem("savedEmail");
+          localStorage.removeItem("rememberMe");
+        }
 
         try {
-          const res = await fetch("/api/account/login", {
+          const res = await fetch("/api/account/login/web", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -240,7 +249,7 @@
               localStorage.setItem("auth_user", JSON.stringify(user));
 
               // chuyển trang vào dashboard (bạn có thể đổi URL sang /admin hoặc khác)
-              window.location.href = "/admin"; // chỉnh theo route dashboard bên bạn
+              window.location.href = "/admin/dashboard"; // chỉnh theo route dashboard bên bạn
               return;
             } else {
               errorText.textContent = "Không nhận được token từ server.";
@@ -262,65 +271,64 @@
         }
       });
 
-       // ================================
-  // 3) QUÊN MẬT KHẨU — POPUP + API
-  // ================================
-  const forgotLink = document.getElementById("forgotPassLink");
-  const forgotPopup = document.getElementById("forgotPopup");
-  const forgotClose = document.getElementById("forgotClose");
-  const forgotSubmit = document.getElementById("forgotSubmit");
+      // ================================
+      // 3) QUÊN MẬT KHẨU — POPUP + API
+      // ================================
+      const forgotLink = document.getElementById("forgotPassLink");
+      const forgotPopup = document.getElementById("forgotPopup");
+      const forgotClose = document.getElementById("forgotClose");
+      const forgotSubmit = document.getElementById("forgotSubmit");
 
-  // Hiện popup
-  forgotLink.addEventListener("click", () => {
-    forgotPopup.classList.remove("hidden");
-  });
-
-  // Tắt popup
-  forgotClose.addEventListener("click", () => {
-    forgotPopup.classList.add("hidden");
-  });
-
-  // Gửi yêu cầu reset mật khẩu
-  forgotSubmit.addEventListener("click", async () => {
-    const forgotEmail = document.getElementById("forgotEmail").value.trim();
-    const forgotMsg = document.getElementById("forgotMsg");
-
-    if (!forgotEmail) {
-      forgotMsg.textContent = "Vui lòng nhập email.";
-      forgotMsg.classList.remove("text-green-500");
-      forgotMsg.classList.add("text-red-500");
-      return;
-    }
-
-    forgotMsg.textContent = "Đang gửi yêu cầu...";
-    forgotMsg.classList.remove("text-red-500");
-    forgotMsg.classList.add("text-yellow-500");
-
-    try {
-      const res = await fetch("/api/account/forgot", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: forgotEmail }),
+      // Hiện popup
+      forgotLink.addEventListener("click", () => {
+        forgotPopup.classList.remove("hidden");
       });
 
-      const data = await res.json().catch(() => ({}));
+      // Tắt popup
+      forgotClose.addEventListener("click", () => {
+        forgotPopup.classList.add("hidden");
+      });
 
-      if (res.ok) {
-        forgotMsg.textContent = "✔ Email reset mật khẩu đã được gửi!";
+      // Gửi yêu cầu reset mật khẩu
+      forgotSubmit.addEventListener("click", async () => {
+        const forgotEmail = document.getElementById("forgotEmail").value.trim();
+        const forgotMsg = document.getElementById("forgotMsg");
+
+        if (!forgotEmail) {
+          forgotMsg.textContent = "Vui lòng nhập email.";
+          forgotMsg.classList.remove("text-green-500");
+          forgotMsg.classList.add("text-red-500");
+          return;
+        }
+
+        forgotMsg.textContent = "Đang gửi yêu cầu...";
         forgotMsg.classList.remove("text-red-500");
-        forgotMsg.classList.add("text-green-500");
-      } else {
-        forgotMsg.textContent = data?.message || "Không thể gửi yêu cầu!";
-        forgotMsg.classList.remove("text-green-500");
-        forgotMsg.classList.add("text-red-500");
-      }
-    } catch (err) {
-      forgotMsg.textContent = "Lỗi server. Vui lòng thử lại.";
-      forgotMsg.classList.remove("text-green-500");
-      forgotMsg.classList.add("text-red-500");
-    }
-  });
-      
+        forgotMsg.classList.add("text-yellow-500");
+
+        try {
+          const res = await fetch("/api/account/forgot", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: forgotEmail }),
+          });
+
+          const data = await res.json().catch(() => ({}));
+
+          if (res.ok) {
+            forgotMsg.textContent = "✔ Email reset mật khẩu đã được gửi!";
+            forgotMsg.classList.remove("text-red-500");
+            forgotMsg.classList.add("text-green-500");
+          } else {
+            forgotMsg.textContent = data?.message || "Không thể gửi yêu cầu!";
+            forgotMsg.classList.remove("text-green-500");
+            forgotMsg.classList.add("text-red-500");
+          }
+        } catch (err) {
+          forgotMsg.textContent = "Lỗi server. Vui lòng thử lại.";
+          forgotMsg.classList.remove("text-green-500");
+          forgotMsg.classList.add("text-red-500");
+        }
+      });
     </script>
   </body>
 </html>

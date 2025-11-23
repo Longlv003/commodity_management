@@ -71,12 +71,14 @@
             href="/admin/dashboard"
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm bg-slate-800 text-white"
           >
-            <span class="material-symbols-outlined text-xl">space_dashboard</span>
+            <span class="material-symbols-outlined text-xl"
+              >space_dashboard</span
+            >
             <span>Dashboard</span>
           </a>
 
           <a
-            href="/admin"
+            href="/admin/products"
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-slate-800 hover:text-white"
           >
             <span class="material-symbols-outlined text-xl"> inventory_2 </span>
@@ -87,7 +89,9 @@
             href="/admin/orders"
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-slate-800 hover:text-white"
           >
-            <span class="material-symbols-outlined text-xl"> receipt_long </span>
+            <span class="material-symbols-outlined text-xl">
+              receipt_long
+            </span>
             <span>Đơn hàng</span>
           </a>
 
@@ -164,15 +168,26 @@
 
         <div class="px-4 md:px-8 py-6">
           <!-- Quick Stats -->
-          <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <section
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+          >
             <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-xs text-slate-500 mb-1">Tổng sản phẩm</p>
-                  <p class="text-2xl font-semibold text-blue-400" id="totalProducts">0</p>
+                  <p
+                    class="text-2xl font-semibold text-blue-400"
+                    id="totalProducts"
+                  >
+                    0
+                  </p>
                 </div>
-                <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-500/10">
-                  <span class="material-symbols-outlined text-blue-400 text-2xl">inventory_2</span>
+                <div
+                  class="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-500/10"
+                >
+                  <span class="material-symbols-outlined text-blue-400 text-2xl"
+                    >inventory_2</span
+                  >
                 </div>
               </div>
             </div>
@@ -181,10 +196,20 @@
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-xs text-slate-500 mb-1">Tổng đơn hàng</p>
-                  <p class="text-2xl font-semibold text-emerald-400" id="totalOrders">0</p>
+                  <p
+                    class="text-2xl font-semibold text-emerald-400"
+                    id="totalOrders"
+                  >
+                    0
+                  </p>
                 </div>
-                <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-500/10">
-                  <span class="material-symbols-outlined text-emerald-400 text-2xl">receipt_long</span>
+                <div
+                  class="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-500/10"
+                >
+                  <span
+                    class="material-symbols-outlined text-emerald-400 text-2xl"
+                    >receipt_long</span
+                  >
                 </div>
               </div>
             </div>
@@ -193,10 +218,20 @@
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-xs text-slate-500 mb-1">Tổng khách hàng</p>
-                  <p class="text-2xl font-semibold text-amber-400" id="totalCustomers">0</p>
+                  <p
+                    class="text-2xl font-semibold text-amber-400"
+                    id="totalCustomers"
+                  >
+                    0
+                  </p>
                 </div>
-                <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-amber-500/10">
-                  <span class="material-symbols-outlined text-amber-400 text-2xl">group</span>
+                <div
+                  class="flex h-12 w-12 items-center justify-center rounded-lg bg-amber-500/10"
+                >
+                  <span
+                    class="material-symbols-outlined text-amber-400 text-2xl"
+                    >group</span
+                  >
                 </div>
               </div>
             </div>
@@ -205,10 +240,20 @@
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-xs text-slate-500 mb-1">Tổng doanh thu</p>
-                  <p class="text-2xl font-semibold text-purple-400" id="totalRevenue">0 đ</p>
+                  <p
+                    class="text-2xl font-semibold text-purple-400"
+                    id="totalRevenue"
+                  >
+                    0 đ
+                  </p>
                 </div>
-                <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-500/10">
-                  <span class="material-symbols-outlined text-purple-400 text-2xl">payments</span>
+                <div
+                  class="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-500/10"
+                >
+                  <span
+                    class="material-symbols-outlined text-purple-400 text-2xl"
+                    >payments</span
+                  >
                 </div>
               </div>
             </div>
@@ -216,7 +261,9 @@
 
           <!-- Management Cards -->
           <section>
-            <h2 class="text-sm font-semibold text-slate-300 mb-4">Quản lý hệ thống</h2>
+            <h2 class="text-sm font-semibold text-slate-300 mb-4">
+              Quản lý hệ thống
+            </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <!-- Quản lý sản phẩm -->
               <a
@@ -224,16 +271,27 @@
                 class="dashboard-card rounded-xl border border-slate-800 bg-slate-900/60 p-6 cursor-pointer group"
               >
                 <div class="flex flex-col items-center text-center">
-                  <div class="flex h-16 w-16 items-center justify-center rounded-xl bg-blue-500/10 mb-4 group-hover:bg-blue-500/20 transition-colors">
-                    <span class="material-symbols-outlined text-blue-400 text-4xl">inventory_2</span>
+                  <div
+                    class="flex h-16 w-16 items-center justify-center rounded-xl bg-blue-500/10 mb-4 group-hover:bg-blue-500/20 transition-colors"
+                  >
+                    <span
+                      class="material-symbols-outlined text-blue-400 text-4xl"
+                      >inventory_2</span
+                    >
                   </div>
-                  <h3 class="text-base font-semibold text-slate-100 mb-2">Quản lý sản phẩm</h3>
+                  <h3 class="text-base font-semibold text-slate-100 mb-2">
+                    Quản lý sản phẩm
+                  </h3>
                   <p class="text-xs text-slate-500 mb-4">
                     Thêm, sửa, xóa và quản lý sản phẩm trong hệ thống
                   </p>
-                  <div class="flex items-center gap-2 text-blue-400 text-sm font-medium">
+                  <div
+                    class="flex items-center gap-2 text-blue-400 text-sm font-medium"
+                  >
                     <span>Xem chi tiết</span>
-                    <span class="material-symbols-outlined text-base">arrow_forward</span>
+                    <span class="material-symbols-outlined text-base"
+                      >arrow_forward</span
+                    >
                   </div>
                 </div>
               </a>
@@ -244,16 +302,27 @@
                 class="dashboard-card rounded-xl border border-slate-800 bg-slate-900/60 p-6 cursor-pointer group"
               >
                 <div class="flex flex-col items-center text-center">
-                  <div class="flex h-16 w-16 items-center justify-center rounded-xl bg-emerald-500/10 mb-4 group-hover:bg-emerald-500/20 transition-colors">
-                    <span class="material-symbols-outlined text-emerald-400 text-4xl">receipt_long</span>
+                  <div
+                    class="flex h-16 w-16 items-center justify-center rounded-xl bg-emerald-500/10 mb-4 group-hover:bg-emerald-500/20 transition-colors"
+                  >
+                    <span
+                      class="material-symbols-outlined text-emerald-400 text-4xl"
+                      >receipt_long</span
+                    >
                   </div>
-                  <h3 class="text-base font-semibold text-slate-100 mb-2">Quản lý đơn hàng</h3>
+                  <h3 class="text-base font-semibold text-slate-100 mb-2">
+                    Quản lý đơn hàng
+                  </h3>
                   <p class="text-xs text-slate-500 mb-4">
                     Xem danh sách hóa đơn và chi tiết từng giao dịch
                   </p>
-                  <div class="flex items-center gap-2 text-emerald-400 text-sm font-medium">
+                  <div
+                    class="flex items-center gap-2 text-emerald-400 text-sm font-medium"
+                  >
                     <span>Xem chi tiết</span>
-                    <span class="material-symbols-outlined text-base">arrow_forward</span>
+                    <span class="material-symbols-outlined text-base"
+                      >arrow_forward</span
+                    >
                   </div>
                 </div>
               </a>
@@ -264,16 +333,27 @@
                 class="dashboard-card rounded-xl border border-slate-800 bg-slate-900/60 p-6 cursor-pointer group"
               >
                 <div class="flex flex-col items-center text-center">
-                  <div class="flex h-16 w-16 items-center justify-center rounded-xl bg-amber-500/10 mb-4 group-hover:bg-amber-500/20 transition-colors">
-                    <span class="material-symbols-outlined text-amber-400 text-4xl">group</span>
+                  <div
+                    class="flex h-16 w-16 items-center justify-center rounded-xl bg-amber-500/10 mb-4 group-hover:bg-amber-500/20 transition-colors"
+                  >
+                    <span
+                      class="material-symbols-outlined text-amber-400 text-4xl"
+                      >group</span
+                    >
                   </div>
-                  <h3 class="text-base font-semibold text-slate-100 mb-2">Quản lý khách hàng</h3>
+                  <h3 class="text-base font-semibold text-slate-100 mb-2">
+                    Quản lý khách hàng
+                  </h3>
                   <p class="text-xs text-slate-500 mb-4">
                     Thêm, sửa, xóa và quản lý thông tin khách hàng
                   </p>
-                  <div class="flex items-center gap-2 text-amber-400 text-sm font-medium">
+                  <div
+                    class="flex items-center gap-2 text-amber-400 text-sm font-medium"
+                  >
                     <span>Xem chi tiết</span>
-                    <span class="material-symbols-outlined text-base">arrow_forward</span>
+                    <span class="material-symbols-outlined text-base"
+                      >arrow_forward</span
+                    >
                   </div>
                 </div>
               </a>
@@ -284,16 +364,27 @@
                 class="dashboard-card rounded-xl border border-slate-800 bg-slate-900/60 p-6 cursor-pointer group"
               >
                 <div class="flex flex-col items-center text-center">
-                  <div class="flex h-16 w-16 items-center justify-center rounded-xl bg-purple-500/10 mb-4 group-hover:bg-purple-500/20 transition-colors">
-                    <span class="material-symbols-outlined text-purple-400 text-4xl">insights</span>
+                  <div
+                    class="flex h-16 w-16 items-center justify-center rounded-xl bg-purple-500/10 mb-4 group-hover:bg-purple-500/20 transition-colors"
+                  >
+                    <span
+                      class="material-symbols-outlined text-purple-400 text-4xl"
+                      >insights</span
+                    >
                   </div>
-                  <h3 class="text-base font-semibold text-slate-100 mb-2">Thống kê báo cáo</h3>
+                  <h3 class="text-base font-semibold text-slate-100 mb-2">
+                    Thống kê báo cáo
+                  </h3>
                   <p class="text-xs text-slate-500 mb-4">
                     Xem doanh thu và top sản phẩm bán chạy
                   </p>
-                  <div class="flex items-center gap-2 text-purple-400 text-sm font-medium">
+                  <div
+                    class="flex items-center gap-2 text-purple-400 text-sm font-medium"
+                  >
                     <span>Xem chi tiết</span>
-                    <span class="material-symbols-outlined text-base">arrow_forward</span>
+                    <span class="material-symbols-outlined text-base"
+                      >arrow_forward</span
+                    >
                   </div>
                 </div>
               </a>
@@ -304,16 +395,27 @@
                 class="dashboard-card rounded-xl border border-slate-800 bg-slate-900/60 p-6 cursor-pointer group"
               >
                 <div class="flex flex-col items-center text-center">
-                  <div class="flex h-16 w-16 items-center justify-center rounded-xl bg-pink-500/10 mb-4 group-hover:bg-pink-500/20 transition-colors">
-                    <span class="material-symbols-outlined text-pink-400 text-4xl">image</span>
+                  <div
+                    class="flex h-16 w-16 items-center justify-center rounded-xl bg-pink-500/10 mb-4 group-hover:bg-pink-500/20 transition-colors"
+                  >
+                    <span
+                      class="material-symbols-outlined text-pink-400 text-4xl"
+                      >image</span
+                    >
                   </div>
-                  <h3 class="text-base font-semibold text-slate-100 mb-2">Quản lý banner</h3>
+                  <h3 class="text-base font-semibold text-slate-100 mb-2">
+                    Quản lý banner
+                  </h3>
                   <p class="text-xs text-slate-500 mb-4">
                     Thêm, sửa, xóa và quản lý banner khuyến mãi
                   </p>
-                  <div class="flex items-center gap-2 text-pink-400 text-sm font-medium">
+                  <div
+                    class="flex items-center gap-2 text-pink-400 text-sm font-medium"
+                  >
                     <span>Xem chi tiết</span>
-                    <span class="material-symbols-outlined text-base">arrow_forward</span>
+                    <span class="material-symbols-outlined text-base"
+                      >arrow_forward</span
+                    >
                   </div>
                 </div>
               </a>
@@ -415,7 +517,8 @@
             });
             const productsData = await productsRes.json();
             if (Array.isArray(productsData.data)) {
-              totalProductsEl.textContent = productsData.data.length.toLocaleString("vi-VN");
+              totalProductsEl.textContent =
+                productsData.data.length.toLocaleString("vi-VN");
             }
           } catch (err) {
             console.error("Load products error", err);
@@ -430,7 +533,8 @@
             });
             const ordersData = await ordersRes.json();
             if (Array.isArray(ordersData.data)) {
-              totalOrdersEl.textContent = ordersData.data.length.toLocaleString("vi-VN");
+              totalOrdersEl.textContent =
+                ordersData.data.length.toLocaleString("vi-VN");
               const totalRevenue = ordersData.data.reduce(
                 (sum, order) => sum + (order.total_amount || 0),
                 0
@@ -450,7 +554,8 @@
             });
             const customersData = await customersRes.json();
             if (Array.isArray(customersData.data)) {
-              totalCustomersEl.textContent = customersData.data.length.toLocaleString("vi-VN");
+              totalCustomersEl.textContent =
+                customersData.data.length.toLocaleString("vi-VN");
             }
           } catch (err) {
             console.error("Load customers error", err);

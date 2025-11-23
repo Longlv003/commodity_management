@@ -3,28 +3,44 @@ const { billDetailModel } = require("../models/billDetail.model");
 const { pVariantModel } = require("../models/product.variants.model");
 const { pModel } = require("../models/product.model");
 
-// API thống kê doanh thu theo ngày/tháng/năm
+// API thống kê doanh thu theo khoảng ngày
 exports.GetRevenueStatistics = async (req, res, next) => {
   let dataRes = { msg: "OK", data: null };
 
   try {
-    const { period } = req.query; // 'day', 'month', 'year'
+    const { start_date, end_date } = req.query;
 
-    if (!period || !['day', 'month', 'year'].includes(period)) {
-      throw new Error("Period phải là 'day', 'month' hoặc 'year'");
+    // Kiểm tra tham số
+    if (!start_date || !end_date) {
+      throw new Error("Vui lòng cung cấp start_date và end_date (định dạng: YYYY-MM-DD)");
     }
 
-    let matchStage = {};
+    // Chuyển đổi string thành Date object
+    const startDate = new Date(start_date);
+    const endDate = new Date(end_date);
+    
+    // Đặt thời gian cho endDate là cuối ngày (23:59:59)
+    endDate.setHours(23, 59, 59, 999);
+
+    // Kiểm tra tính hợp lệ của ngày
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      throw new Error("Định dạng ngày không hợp lệ. Vui lòng sử dụng định dạng YYYY-MM-DD");
+    }
+
+    // Kiểm tra start_date phải nhỏ hơn hoặc bằng end_date
+    if (startDate > endDate) {
+      throw new Error("Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc");
+    }
+
+    // Tính số ngày trong khoảng để quyết định group theo ngày hay tháng
+    const daysDiff = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+    
     let groupStage = {};
 
-    // Xác định match và group theo period
-    if (period === 'day') {
-      // Thống kê theo ngày (30 ngày gần nhất)
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      matchStage = {
-        created_date: { $gte: thirtyDaysAgo }
-      };
+    // Nếu khoảng thời gian <= 90 ngày, group theo ngày
+    // Nếu > 90 ngày và <= 730 ngày (2 năm), group theo tháng
+    // Nếu > 730 ngày, group theo năm
+    if (daysDiff <= 90) {
       groupStage = {
         _id: {
           year: { $year: "$created_date" },
@@ -35,13 +51,7 @@ exports.GetRevenueStatistics = async (req, res, next) => {
         total_revenue: { $sum: "$total_amount" },
         order_count: { $sum: 1 }
       };
-    } else if (period === 'month') {
-      // Thống kê theo tháng (12 tháng gần nhất)
-      const twelveMonthsAgo = new Date();
-      twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
-      matchStage = {
-        created_date: { $gte: twelveMonthsAgo }
-      };
+    } else if (daysDiff <= 730) {
       groupStage = {
         _id: {
           year: { $year: "$created_date" },
@@ -51,13 +61,7 @@ exports.GetRevenueStatistics = async (req, res, next) => {
         total_revenue: { $sum: "$total_amount" },
         order_count: { $sum: 1 }
       };
-    } else if (period === 'year') {
-      // Thống kê theo năm (5 năm gần nhất)
-      const fiveYearsAgo = new Date();
-      fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
-      matchStage = {
-        created_date: { $gte: fiveYearsAgo }
-      };
+    } else {
       groupStage = {
         _id: {
           year: { $year: "$created_date" }
@@ -68,11 +72,25 @@ exports.GetRevenueStatistics = async (req, res, next) => {
       };
     }
 
+    // Match stage để lọc theo khoảng ngày
+    const matchStage = {
+      created_date: {
+        $gte: startDate,
+        $lte: endDate
+      }
+    };
+
     // Aggregate để tính toán
     const statistics = await billModel.aggregate([
       { $match: matchStage },
       { $group: groupStage },
-      { $sort: { "_id.year": 1, "_id.month": period === 'day' ? 1 : undefined, "_id.day": period === 'day' ? 1 : undefined } }
+      { 
+        $sort: { 
+          "_id.year": 1, 
+          "_id.month": daysDiff <= 90 ? 1 : undefined, 
+          "_id.day": daysDiff <= 90 ? 1 : undefined 
+        } 
+      }
     ]);
 
     // Tính tổng doanh thu và số đơn hàng
@@ -80,7 +98,8 @@ exports.GetRevenueStatistics = async (req, res, next) => {
     const totalOrders = statistics.reduce((sum, item) => sum + item.order_count, 0);
 
     dataRes.data = {
-      period: period,
+      start_date: start_date,
+      end_date: end_date,
       statistics: statistics,
       summary: {
         total_revenue: totalRevenue,

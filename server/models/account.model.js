@@ -11,7 +11,7 @@ const accSchema = new db.mongoose.Schema(
     pass: { type: String, required: true, unique: true },
     role: {
       type: String,
-      enum: ["user", "admin"],
+      enum: ["user", "admin", "engineer"],
       default: "user",
     },
     is_active: { type: Boolean, default: true },

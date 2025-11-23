@@ -132,7 +132,7 @@ exports.AddCustomer = async (req, res, next) => {
   let dataRes = { msg: "OK", data: null };
 
   try {
-    const { name, email, phone, address, pass, role = "user" } = req.body;
+    const { name, email, phone, address, pass, role = "user", is_active } = req.body;
 
     if (!email || !pass) {
       throw new Error("Email và mật khẩu là bắt buộc");
@@ -147,6 +147,16 @@ exports.AddCustomer = async (req, res, next) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPass = await bcrypt.hash(pass, salt);
 
+    // Xử lý is_active: có thể là boolean hoặc string "true"/"false"
+    let isActiveValue = true; // Mặc định là true
+    if (is_active !== undefined && is_active !== null) {
+      if (typeof is_active === "boolean") {
+        isActiveValue = is_active;
+      } else if (typeof is_active === "string") {
+        isActiveValue = is_active === "true";
+      }
+    }
+
     const newCustomer = new userModel({
       name,
       email,
@@ -154,7 +164,7 @@ exports.AddCustomer = async (req, res, next) => {
       address,
       pass: hashedPass,
       role,
-      is_active: true,
+      is_active: isActiveValue,
     });
 
     if (req.file) {
@@ -192,13 +202,26 @@ exports.UpdateCustomer = async (req, res, next) => {
       throw new Error("Không tìm thấy khách hàng");
     }
 
+    // Không cho phép sửa account có role admin
+    if (customer.role === "admin") {
+      throw new Error("Không thể chỉnh sửa tài khoản admin");
+    }
+
     let updateData = {};
 
     if (name) updateData.name = name;
     if (phone) updateData.phone = phone;
     if (address) updateData.address = address;
     if (role) updateData.role = role;
-    if (typeof is_active === "boolean") updateData.is_active = is_active;
+    
+    // Xử lý is_active: có thể là boolean hoặc string "true"/"false"
+    if (is_active !== undefined && is_active !== null) {
+      if (typeof is_active === "boolean") {
+        updateData.is_active = is_active;
+      } else if (typeof is_active === "string") {
+        updateData.is_active = is_active === "true";
+      }
+    }
 
     if (email && email !== customer.email) {
       const existingUser = await userModel.findOne({ email });

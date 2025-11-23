@@ -33,6 +33,44 @@ exports.doLogin = async (req, res, next) => {
   }
 };
 
+// Login cho web admin (chỉ admin và engineer)
+exports.doLoginWeb = async (req, res, next) => {
+  try {
+    const { email, pass } = req.body;
+
+    if (!email || !pass) {
+      return res.status(400).json({ error: "Missing email or password" });
+    }
+
+    const user = await userModel.findByEmailPasswd(email, pass);
+    if (!user) {
+      return res.status(401).json({ error: "Incorrect login credentials" });
+    }
+
+    if (!user.is_active) {
+      return res
+        .status(403)
+        .json({ error: "Account is locked. Please contact admin" });
+    }
+
+    // Chỉ cho phép admin và engineer đăng nhập vào web admin
+    if (user.role !== "admin" && user.role !== "engineer") {
+      return res
+        .status(403)
+        .json({ error: "Bạn không có quyền đăng nhập vào hệ thống quản trị" });
+    }
+
+    const token = await userModel.makeAuthToken(user);
+    return res.status(200).json({
+      message: "Login successful",
+      data: { user, token },
+    });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(400).send(error);
+  }
+};
+
 exports.doReg = async (req, res, next) => {
   try {
     const salt = await bcrypt.genSalt(10);
