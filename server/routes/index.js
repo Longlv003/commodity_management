@@ -36,4 +36,9 @@ router.get("/admin/customers", (req, res) => {
   res.render("admin_customers");
 });
 
+// Trang quản lý banner
+router.get("/admin/banners", (req, res) => {
+  res.render("admin_banners");
+});
+
 module.exports = router;

@@ -14,6 +14,7 @@ var walletCtrl = require("../controllers/wallet.controller");
 var userFavoriteCtrl = require("../controllers/userFavorite.controller");
 var statisticsCtrl = require("../controllers/statistics.controller");
 var customerCtrl = require("../controllers/customer.controller");
+var pVariantCtrl = require("../controllers/product.variant.controller");
 
 // User
 router.post("/account/register", upload.single("image"), accountCtrl.doReg);
@@ -51,6 +52,9 @@ router.post(
   bannerCtrl.AddBanner
 );
 router.get("/banner/sale/list", bannerCtrl.GetAllBanner);
+router.get("/banner/sale/list/admin", mdw.api_auth, mdw.checkRole(["admin"]), bannerCtrl.GetAllBannersAdmin);
+router.put("/banner/sale/update/:_id", mdw.api_auth, mdw.checkRole(["admin"]), upload.single("image"), bannerCtrl.UpdateBanner);
+router.delete("/banner/sale/delete/:_id", mdw.api_auth, mdw.checkRole(["admin"]), bannerCtrl.DeleteBanner);
 
 // Category
 router.post(
@@ -78,7 +82,7 @@ router.get("/categories/top4", catCtrl.GetTopCategories);
 router.post(
   "/product/add",
   mdw.api_auth,
-  upload.single("image"),
+  upload.any(),
   pCtrl.AddProduct
 );
 router.put(
@@ -99,6 +103,10 @@ router.put(
 );
 router.get("/product/list/favorite", mdw.api_auth, pCtrl.GetFavoriteProducts);
 router.get("/product/:_id", pCtrl.GetProductDetail);
+
+// Product Variant
+router.put("/variant/edit/:_id", mdw.api_auth, mdw.checkRole(["admin"]), upload.single("image"), pVariantCtrl.EditVariant);
+router.delete("/variant/delete/:_id", mdw.api_auth, mdw.checkRole(["admin"]), pVariantCtrl.DeleteVariant);
 
 // User Favorite
 // user_id bắt buộc phải truyền qua query (?user_id=xxx)
