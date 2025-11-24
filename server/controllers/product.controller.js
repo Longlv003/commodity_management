@@ -3,6 +3,7 @@ const { uploadSingleFile } = require("../helpers/upload.helper");
 const mongoose = require("mongoose");
 const { pVariantModel } = require("../models/product.variants.model");
 const { userFavoriteModel } = require("../models/userFavorite.model");
+const { variantSalesModel } = require("../models/variant.sales.model");
 
 exports.CheckProductAndSKU = async (req, res, next) => {
   let dataRes = { msg: "OK" };
@@ -313,51 +314,6 @@ exports.EditProduct = async (req, res, next) => {
   res.json(dataRes);
 };
 
-exports.DeleteProduct = async (req, res, next) => {
-  let dataRes = { msg: "OK" };
-
-  try {
-    const { _id } = req.params;
-
-    if (!_id) {
-      throw new Error("Missing product ID");
-    }
-
-    // Tìm sản phẩm
-    const product = await pModel.findById(_id);
-    if (!product) {
-      throw new Error("Product not found");
-    }
-
-    // Nếu đã bị xóa rồi thì báo luôn
-    if (product.is_deleted) {
-      dataRes.msg = "This product has already been deleted";
-      dataRes.data = product;
-      return res.json(dataRes);
-    }
-
-    // Đánh dấu xóa mềm
-    product.is_deleted = true;
-    product.deleted_at = new Date();
-
-    await product.save();
-
-    // Nếu bạn muốn xóa mềm luôn cả variants đi kèm:
-    await pVariantModel.updateMany(
-      { product_id: _id },
-      { $set: { is_deleted: true, deleted_at: new Date() } }
-    );
-
-    dataRes.msg = "Product soft-deleted successfully";
-    dataRes.data = product;
-  } catch (error) {
-    console.error("DeleteProduct Error:", error);
-    dataRes.msg = error.message;
-  }
-
-  res.json(dataRes);
-};
-
 exports.UploadImage = async (req, res, next) => {
   let dataRes = { msg: "OK" };
   try {
@@ -580,41 +536,103 @@ exports.GetTopSellingProducts = async (req, res, next) => {
     // Lấy user_id từ query (optional)
     const user_id = req.query.user_id;
 
-    // Gom nhóm theo product_id để tính tổng quantity, total_sold, min/max price
-    const variantStats = await pVariantModel.aggregate([
-      { $match: { is_deleted: { $ne: true } } }, // Bỏ qua variant bị xóa mềm
+    // ========== LIST A: Top sản phẩm bán chạy trong 30 ngày gần nhất ==========
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    thirtyDaysAgo.setHours(0, 0, 0, 0);
+    const now = new Date();
+    now.setHours(23, 59, 59, 999);
+
+    const salesStats30Days = await variantSalesModel.aggregate([
+      {
+        $match: {
+          sale_date: {
+            $gte: thirtyDaysAgo,
+            $lte: now,
+          },
+        },
+      },
       {
         $group: {
           _id: "$product_id",
-          totalQty: { $sum: "$quantity" },
-          totalSold: { $sum: "$total_sold" },
-          min_price: { $min: "$price" },
-          max_price: { $max: "$price" },
+          totalSold: { $sum: "$quantity_sold" },
         },
       },
-      { $sort: { totalSold: -1 } }, // Sắp xếp giảm dần theo sản phẩm bán chạy
-      { $limit: 10 }, // Lấy top 10
+      { $sort: { totalSold: -1 } },
+      { $limit: 10 }, // Lấy top 10 trong 30 ngày
     ]);
 
-    // Nếu không có dữ liệu
-    if (!variantStats || variantStats.length === 0) {
+    let listAProductIds = [];
+    let listASalesMap = {};
+    
+    if (salesStats30Days && salesStats30Days.length > 0) {
+      listAProductIds = salesStats30Days.map((s) => s._id);
+      salesStats30Days.forEach((s) => {
+        listASalesMap[s._id.toString()] = s.totalSold;
+      });
+    }
+
+    // ========== LIST B: Top 10 sản phẩm bán chạy dựa vào total_sold từ đầu đến cuối ==========
+    let listBProductIds = [];
+    let listBSalesMap = {};
+    
+    // Chỉ lấy listB nếu listA rỗng (length === 0)
+    if (listAProductIds.length === 0) {
+      const allTimeSalesStats = await variantSalesModel.aggregate([
+        {
+          $group: {
+            _id: "$product_id",
+            totalSold: { $sum: "$quantity_sold" },
+          },
+        },
+        { $sort: { totalSold: -1 } },
+        { $limit: 10 }, // Lấy top 10
+      ]);
+
+      if (allTimeSalesStats && allTimeSalesStats.length > 0) {
+        listBProductIds = allTimeSalesStats.map((s) => s._id);
+        allTimeSalesStats.forEach((s) => {
+          listBSalesMap[s._id.toString()] = s.totalSold;
+        });
+      }
+    }
+
+    const combinedProductIds = listAProductIds.length > 0 ? listAProductIds : listBProductIds;
+    const combinedSalesMap = listAProductIds.length > 0 ? listASalesMap : listBSalesMap;
+
+    if (combinedProductIds.length === 0) {
       dataRes.data = [];
       dataRes.msg = "No selling data found";
       return res.json(dataRes);
     }
 
-    // Danh sách product_id
-    const productIds = variantStats.map((v) => v._id);
+    // Gom nhóm theo product_id để tính tổng quantity, min/max price từ variant
+    const variantStats = await pVariantModel.aggregate([
+      { 
+        $match: { 
+          product_id: { $in: combinedProductIds },
+          is_deleted: { $ne: true } 
+        } 
+      },
+      {
+        $group: {
+          _id: "$product_id",
+          totalQty: { $sum: "$quantity" },
+          min_price: { $min: "$price" },
+          max_price: { $max: "$price" },
+        },
+      },
+    ]);
 
     // Lấy thông tin chi tiết sản phẩm
     const products = await pModel.find({
-      _id: { $in: productIds },
+      _id: { $in: combinedProductIds },
       is_deleted: { $ne: true },
     });
 
     // Lấy variant đầu tiên của mỗi product để lấy image
     const firstVariants = await pVariantModel.find({
-      product_id: { $in: productIds },
+      product_id: { $in: combinedProductIds },
       is_deleted: { $ne: true },
     }).sort({ _id: 1 });
 
@@ -636,20 +654,33 @@ exports.GetTopSellingProducts = async (req, res, next) => {
       });
     }
 
-    // Map để tra nhanh
+    // Map để tra nhanh - kết hợp dữ liệu từ variantStats và combinedSalesMap
     const statMap = {};
     variantStats.forEach((v) => {
       statMap[v._id.toString()] = {
         quantity: v.totalQty,
-        total_sold: v.totalSold,
+        total_sold: combinedSalesMap[v._id.toString()] || 0, // Lấy từ combinedSalesMap
         min_price: v.min_price,
         max_price: v.max_price,
       };
     });
+    
+    // Nếu không có variantStats cho một số product, thêm vào với giá trị mặc định
+    combinedProductIds.forEach((pid) => {
+      const pidStr = pid.toString();
+      if (!statMap[pidStr]) {
+        statMap[pidStr] = {
+          quantity: 0,
+          total_sold: combinedSalesMap[pidStr] || 0,
+          min_price: 0,
+          max_price: 0,
+        };
+      }
+    });
 
     // Gắn dữ liệu thống kê + image + is_favorite vào từng sản phẩm
     // Filter bỏ các sản phẩm hết hàng (quantity = 0)
-    const result = products
+    let result = products
       .map((p) => {
         const variant = variantMap[p._id.toString()];
         return {
@@ -664,144 +695,13 @@ exports.GetTopSellingProducts = async (req, res, next) => {
       })
       .filter((p) => p.quantity > 0); // Chỉ lấy sản phẩm còn hàng
 
+    // Sắp xếp theo total_sold giảm dần
+    result.sort((a, b) => b.total_sold - a.total_sold);
+
     dataRes.data = result;
     dataRes.msg = "Top-selling products retrieved successfully";
   } catch (error) {
     console.error("Error fetching top-selling products:", error);
-    dataRes.data = null;
-    dataRes.msg = "Server error: " + error.message;
-  }
-
-  res.json(dataRes);
-};
-
-exports.UpdateFavorite = async (req, res, next) => {
-  let dataRes = { msg: "OK" };
-
-  try {
-    const { _id, is_favorite } = req.params;
-
-    // Kiểm tra id có tồn tại không
-    if (!_id) {
-      throw new Error("Thiếu thông tin sản phẩm");
-    }
-
-    // Kiểm tra is_favorite có hợp lệ không
-    if (is_favorite !== "true" && is_favorite !== "false") {
-      throw new Error("Trạng thái favorite không hợp lệ");
-    }
-
-    // Chuyển is_favorite từ string sang boolean
-    const isFavorite = is_favorite === "true";
-
-    // Kiểm tra sản phẩm
-    const product = await pModel.findById(_id);
-    if (!product) {
-      throw new Error("Sản phẩm không tồn tại");
-    }
-
-    // Update favorite
-    const updatedProduct = await pModel.findByIdAndUpdate(
-      _id,
-      {
-        $set: {
-          is_favorite: isFavorite,
-        },
-      },
-      { new: true }
-    );
-
-    dataRes.data = updatedProduct;
-    dataRes.msg = isFavorite
-      ? "Đã thêm vào yêu thích"
-      : "Đã xóa khỏi yêu thích";
-  } catch (error) {
-    console.error("UpdateFavorite Error:", error);
-    dataRes.data = null;
-    dataRes.msg = error.message;
-  }
-
-  res.json(dataRes);
-};
-
-exports.GetFavoriteProducts = async (req, res, next) => {
-  let dataRes = { msg: "OK" };
-
-  try {
-    // Lấy danh sách sản phẩm yêu thích
-    const products = await pModel
-      .find({ is_favorite: true, is_deleted: { $ne: true } })
-      .exec();
-
-    if (!products || products.length === 0) {
-      dataRes.data = [];
-      dataRes.msg = "No favorite products found";
-      return res.json(dataRes);
-    }
-
-    // Lấy tổng quantity + min/max price từ variants
-    const variantStats = await pVariantModel.aggregate([
-      {
-        $match: {
-          product_id: { $in: products.map((p) => p._id) },
-          is_deleted: { $ne: true },
-        },
-      },
-      {
-        $group: {
-          _id: "$product_id",
-          totalQty: { $sum: "$quantity" },
-          minPrice: { $min: "$price" },
-          maxPrice: { $max: "$price" },
-        },
-      },
-    ]);
-
-    // Lấy variant đầu tiên của mỗi product để lấy image
-    const productIds = products.map((p) => p._id);
-    const firstVariants = await pVariantModel.find({
-      product_id: { $in: productIds },
-      is_deleted: { $ne: true },
-    }).sort({ _id: 1 });
-
-    // Tạo map để lấy variant đầu tiên của mỗi product
-    const variantMap = {};
-    firstVariants.forEach((v) => {
-      const pid = v.product_id.toString();
-      if (!variantMap[pid]) {
-        variantMap[pid] = v;
-      }
-    });
-
-    // Tạo map để tra nhanh theo product_id
-    const statMap = {};
-    variantStats.forEach((v) => {
-      statMap[v._id.toString()] = {
-        quantity: v.totalQty,
-        min_price: v.minPrice,
-        max_price: v.maxPrice,
-      };
-    });
-
-    // Gắn quantity + min/max price + image vào từng sản phẩm
-    // Filter bỏ các sản phẩm hết hàng (quantity = 0)
-    const result = products
-      .map((p) => {
-        const variant = variantMap[p._id.toString()];
-        return {
-          ...p.toObject(),
-          quantity: statMap[p._id.toString()]?.quantity || 0,
-          min_price: statMap[p._id.toString()]?.min_price || 0,
-          max_price: statMap[p._id.toString()]?.max_price || 0,
-          image: variant && variant.image ? variant.image : [],
-        };
-      })
-      .filter((p) => p.quantity > 0); // Chỉ lấy sản phẩm còn hàng
-
-    dataRes.data = result;
-    dataRes.msg = "Favorite products retrieved successfully";
-  } catch (error) {
-    console.error("Error fetching favorite products:", error);
     dataRes.data = null;
     dataRes.msg = "Server error: " + error.message;
   }

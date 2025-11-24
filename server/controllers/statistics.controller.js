@@ -2,6 +2,7 @@ const { billModel } = require("../models/bill.model");
 const { billDetailModel } = require("../models/billDetail.model");
 const { pVariantModel } = require("../models/product.variants.model");
 const { pModel } = require("../models/product.model");
+const { variantSalesModel } = require("../models/variant.sales.model");
 
 // API thống kê doanh thu theo khoảng ngày
 exports.GetRevenueStatistics = async (req, res, next) => {
@@ -19,6 +20,8 @@ exports.GetRevenueStatistics = async (req, res, next) => {
     const startDate = new Date(start_date);
     const endDate = new Date(end_date);
     
+    // Đặt thời gian cho startDate là đầu ngày (00:00:00)
+    startDate.setHours(0, 0, 0, 0);
     // Đặt thời gian cho endDate là cuối ngày (23:59:59)
     endDate.setHours(23, 59, 59, 999);
 
@@ -37,9 +40,6 @@ exports.GetRevenueStatistics = async (req, res, next) => {
     
     let groupStage = {};
 
-    // Nếu khoảng thời gian <= 90 ngày, group theo ngày
-    // Nếu > 90 ngày và <= 730 ngày (2 năm), group theo tháng
-    // Nếu > 730 ngày, group theo năm
     if (daysDiff <= 90) {
       groupStage = {
         _id: {
@@ -80,17 +80,23 @@ exports.GetRevenueStatistics = async (req, res, next) => {
       }
     };
 
+    // Tạo sort stage động dựa trên daysDiff
+    let sortStage = { "_id.year": 1 };
+    if (daysDiff <= 90) {
+      // Nếu <= 90 ngày, sort theo year, month, day
+      sortStage["_id.month"] = 1;
+      sortStage["_id.day"] = 1;
+    } else if (daysDiff <= 730) {
+      // Nếu <= 730 ngày, sort theo year, month
+      sortStage["_id.month"] = 1;
+    }
+    // Nếu > 730 ngày, chỉ sort theo year (đã có ở trên)
+
     // Aggregate để tính toán
     const statistics = await billModel.aggregate([
       { $match: matchStage },
       { $group: groupStage },
-      { 
-        $sort: { 
-          "_id.year": 1, 
-          "_id.month": daysDiff <= 90 ? 1 : undefined, 
-          "_id.day": daysDiff <= 90 ? 1 : undefined 
-        } 
-      }
+      { $sort: sortStage }
     ]);
 
     // Tính tổng doanh thu và số đơn hàng
@@ -121,30 +127,70 @@ exports.GetTopSellingProductsStats = async (req, res, next) => {
   let dataRes = { msg: "OK", data: null };
 
   try {
-    const { limit = 10 } = req.query;
+    const { limit = 10, start_date, end_date } = req.query;
 
-    // Gom nhóm theo product_id để tính tổng quantity, total_sold, min/max price
-    const variantStats = await pVariantModel.aggregate([
-      { $match: { is_deleted: { $ne: true } } },
+    // Tạo match stage - nếu có start_date và end_date thì filter theo ngày
+    let matchStage = {};
+    if (start_date && end_date) {
+      const startDate = new Date(start_date);
+      const endDate = new Date(end_date);
+      endDate.setHours(23, 59, 59, 999);
+      
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        throw new Error("Invalid date format. Use YYYY-MM-DD or ISO date string");
+      }
+
+      if (startDate > endDate) {
+        throw new Error("start_date must be before end_date");
+      }
+
+      matchStage = {
+        sale_date: {
+          $gte: startDate,
+          $lte: endDate,
+        },
+      };
+    }
+
+    // Tính total_sold từ variantSalesModel (thay vì từ variant model)
+    const aggregatePipeline = [
+      ...(Object.keys(matchStage).length > 0 ? [{ $match: matchStage }] : []),
       {
         $group: {
           _id: "$product_id",
-          totalQty: { $sum: "$quantity" },
-          totalSold: { $sum: "$total_sold" },
-          min_price: { $min: "$price" },
-          max_price: { $max: "$price" },
+          totalSold: { $sum: "$quantity_sold" },
         },
       },
       { $sort: { totalSold: -1 } },
       { $limit: parseInt(limit) },
-    ]);
+    ];
 
-    if (!variantStats || variantStats.length === 0) {
+    const salesStats = await variantSalesModel.aggregate(aggregatePipeline);
+
+    if (!salesStats || salesStats.length === 0) {
       dataRes.data = [];
       return res.json(dataRes);
     }
 
-    const productIds = variantStats.map((v) => v._id);
+    const productIds = salesStats.map((s) => s._id);
+
+    // Gom nhóm theo product_id để tính tổng quantity, min/max price từ variant
+    const variantStats = await pVariantModel.aggregate([
+      { 
+        $match: { 
+          product_id: { $in: productIds },
+          is_deleted: { $ne: true } 
+        } 
+      },
+      {
+        $group: {
+          _id: "$product_id",
+          totalQty: { $sum: "$quantity" },
+          min_price: { $min: "$price" },
+          max_price: { $max: "$price" },
+        },
+      },
+    ]);
     const products = await pModel.find({
       _id: { $in: productIds },
       is_deleted: { $ne: true },
@@ -163,11 +209,18 @@ exports.GetTopSellingProductsStats = async (req, res, next) => {
       }
     });
 
+    // Tạo map từ salesStats để lấy total_sold
+    const salesMap = {};
+    salesStats.forEach((s) => {
+      salesMap[s._id.toString()] = s.totalSold;
+    });
+
+    // Map để tra nhanh - kết hợp dữ liệu từ variantStats và salesStats
     const statMap = {};
     variantStats.forEach((v) => {
       statMap[v._id.toString()] = {
         quantity: v.totalQty,
-        total_sold: v.totalSold,
+        total_sold: salesMap[v._id.toString()] || 0, // Lấy từ salesStats
         min_price: v.min_price,
         max_price: v.max_price,
       };

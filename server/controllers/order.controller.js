@@ -5,6 +5,7 @@ const { pModel } = require("../models/product.model");
 const { pVariantModel } = require("../models/product.variants.model");
 const { walletModel } = require("../models/wallet.model");
 const { transactionModel } = require("../models/transaction.model");
+const { variantSalesModel } = require("../models/variant.sales.model");
 
 exports.PlaceOrder = async (req, res, next) => {
   let dataRes = { msg: "OK" };
@@ -206,13 +207,27 @@ exports.PlaceOrder = async (req, res, next) => {
       });
       await newBillDetails.save();
 
+      // Tạo sales record để lưu lịch sử bán hàng theo thời gian
+      const newSalesRecord = new variantSalesModel({
+        variant_id: item.id_variant._id,
+        product_id: item.id_product._id,
+        quantity_sold: item.quantity,
+        sale_date: savedBill.created_date || new Date(),
+        bill_id: savedBill._id,
+        bill_detail_id: newBillDetails._id,
+        price: price,
+        size: variant.size || "",
+        color: variant.color || "",
+      });
+      await newSalesRecord.save();
+
       // Update số lượng variant (không phải product)
+      // total_sold đã được tách ra model variantSalesModel riêng
       await pVariantModel.updateOne(
         { _id: item.id_variant._id },
         {
           $inc: {
             quantity: -item.quantity,
-            total_sold: item.quantity,
           },
         }
       );

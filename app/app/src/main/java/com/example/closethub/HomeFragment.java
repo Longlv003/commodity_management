@@ -174,8 +174,17 @@ public class HomeFragment extends Fragment {
             public void onResponse(Call<ApiResponse<List<Product>>> call, Response<ApiResponse<List<Product>>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     productArrayList.clear();
-                    productArrayList.addAll(response.body().getData());
-                    productAdapter.notifyDataSetChanged();
+                    List<Product> products = response.body().getData();
+                    if (products != null) {
+                        productArrayList.addAll(products);
+                        // Log số lượng sản phẩm bán chạy
+                        Log.d("HomeFragment", "Số lượng sản phẩm bán chạy: " + productArrayList.size());
+                        productAdapter.notifyDataSetChanged();
+                    } else {
+                        Log.d("HomeFragment", "Số lượng sản phẩm bán chạy: 0 (products is null)");
+                    }
+                } else {
+                    Log.d("HomeFragment", "Số lượng sản phẩm bán chạy: 0 (response not successful)");
                 }
             }
 
@@ -183,6 +192,7 @@ public class HomeFragment extends Fragment {
             public void onFailure(Call<ApiResponse<List<Product>>> call, Throwable throwable) {
                 Toast.makeText(getContext(), "Error: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e("Error", "ProductList Error", throwable);
+                Log.d("HomeFragment", "Số lượng sản phẩm bán chạy: 0 (request failed)");
             }
         });
     }

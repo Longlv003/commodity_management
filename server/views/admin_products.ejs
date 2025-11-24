@@ -806,7 +806,7 @@
 
       async function loadCategories() {
         try {
-          const res = await fetch("/api/category/list");
+          const res = await fetch("/api/category/list/all");
           const data = await res.json();
           if (Array.isArray(data.data)) {
             allCategories = data.data;

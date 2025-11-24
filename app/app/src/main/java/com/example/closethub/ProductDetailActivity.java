@@ -37,8 +37,10 @@ import com.example.closethub.networks.ApiService;
 import com.example.closethub.networks.RetrofitClient;
 import com.google.gson.Gson;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -318,8 +320,9 @@ public class ProductDetailActivity extends AppCompatActivity {
         for (Variant v : product.getVariants()) {
             if (v.getSize().equals(selectedSize) &&
                     v.getColor().equals(selectedColor)) {
-
-                txtPrice.setText(v.getPrice() + "đ");
+                NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
+                String formattedAmount = formatter.format(v.getPrice()) + " ₫";
+                txtPrice.setText(formattedAmount);
                 break;
             }
         }

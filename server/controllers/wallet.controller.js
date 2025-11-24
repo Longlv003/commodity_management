@@ -174,34 +174,6 @@ exports.GetWalletInfo = async (req, res) => {
   }
 };
 
-// ==================== KIỂM TRA SỐ DƯ ====================
-exports.CheckBalance = async (req, res) => {
-  let dataRes = { msg: "OK", data: null };
-
-  try {
-    const userId = req.user._id;
-
-    const wallet = await walletModel
-      .findOne({ id_user: userId })
-      .select("balance wallet_number");
-
-    if (!wallet) {
-      return res.status(404).json({ msg: "Không tìm thấy ví", data: null });
-    }
-
-    dataRes.data = {
-      wallet_number: wallet.wallet_number,
-      balance: wallet.balance,
-    };
-
-    return res.json(dataRes);
-  } catch (error) {
-    console.error("CheckBalance Error:", error);
-    dataRes.msg = error.message || "Lỗi kiểm tra số dư";
-    return res.status(500).json(dataRes);
-  }
-};
-
 // ==================== NẠP TIỀN ====================
 exports.Deposit = async (req, res) => {
   let dataRes = { msg: "OK", data: null };

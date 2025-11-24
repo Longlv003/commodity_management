@@ -125,7 +125,7 @@
             android:layout_marginTop="8dp"
             android:gravity="center"
             android:orientation="horizontal"
-            android:background="@drawable/custom_edt">
+            android:background="@drawable/custom_btn">
 
 <!--            <ImageView-->
 <!--                android:id="@+id/btnAddCart"-->
@@ -142,8 +142,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Add to cart"
+                android:textStyle="bold"
                 android:gravity="center_horizontal"
-
                 android:clickable="true"/>
 
         </LinearLayout>

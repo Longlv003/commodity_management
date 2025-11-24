@@ -76,34 +76,6 @@ public interface ApiService {
     @GET("/api/product/list-by-cat")
     Call<ApiResponse<List<Product>>> getListProductByCat(@Query("catID") String catID, @Query("user_id") String userId);
 
-    // Old favorite API (deprecated - using userFavorite API instead)
-    @PUT("/api/product/{id}/edit/favorite/{favorite}")
-    Call<ApiResponse<Product>> toggleFavorite(
-            @Header("Authorization") String token,
-            @Path("id") String id,
-            @Path("favorite") boolean favorite
-    );
-
-    @GET("/api/product/list/favorite")
-    Call<ApiResponse<List<Product>>> getFavoriteProducts(
-            @Header("Authorization") String token
-    );
-
-    // New User Favorite APIs
-    @POST("/api/favorite/add")
-    Call<ApiResponse<Object>> addFavorite(
-            @Header("Authorization") String token,
-            @Query("user_id") String userId,
-            @Body FavoriteRequest request
-    );
-
-    @DELETE("/api/favorite/remove/{product_id}")
-    Call<ApiResponse<Object>> removeFavorite(
-            @Header("Authorization") String token,
-            @Path("product_id") String productId,
-            @Query("user_id") String userId
-    );
-
     @POST("/api/favorite/toggle")
     Call<ApiResponse<FavoriteResponse>> toggleFavoriteNew(
             @Header("Authorization") String token,

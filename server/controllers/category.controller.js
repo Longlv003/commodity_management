@@ -1,5 +1,6 @@
 const {catModel} = require('../models/category.model');
 const {pModel} = require('../models/product.model');
+const {variantSalesModel} = require('../models/variant.sales.model');
 
 exports.addCat = async (req, res, next) => {
     let dataRes = { msg: 'OK' };
@@ -24,21 +25,6 @@ exports.addCat = async (req, res, next) => {
 
     res.json(dataRes);
 };
-
-exports.updateCat = async (req, res, next) => {
-    let dataRes = {msg: 'OK'};
-    try {
-        const { _id } = req.params;
-        const { name } = req.body;
-
-        const data = await catModel.findByIdAndUpdate(_id, { name }, { new: true });
-        dataRes.data = data;
-    } catch (error) {
-        console.log(error.message);
-        dataRes.msg = error.message;
-    }
-    res.json(dataRes);
-}
 
 exports.deleteCat = async (req, res, next) => {
     let dataRes = { msg: 'OK' };
@@ -70,6 +56,43 @@ exports.deleteCat = async (req, res, next) => {
 exports.getListCat = async (req, res, next) => {
     let dataRes = {msg: 'OK'};
     try {
+        // Lấy danh sách các catID có sản phẩm (chưa bị xóa)
+        const categoriesWithProducts = await pModel.aggregate([
+            {
+                $match: {
+                    is_deleted: { $ne: true }
+                }
+            },
+            {
+                $group: {
+                    _id: "$catID"
+                }
+            }
+        ]);
+
+        // Lấy danh sách catID
+        const categoryIds = categoriesWithProducts.map(item => item._id).filter(id => id != null);
+
+        // Chỉ lấy các category có sản phẩm
+        let list = [];
+        if (categoryIds.length > 0) {
+            list = await catModel.find({
+                _id: { $in: categoryIds }
+            });
+        }
+        
+        dataRes.data = list;
+    } catch (error) {
+        console.log(error.message);
+        dataRes.msg = error.message;
+    }
+    res.json(dataRes);
+};
+
+exports.getAllCategories = async (req, res, next) => {
+    let dataRes = {msg: 'OK'};
+    try {
+        // Lấy tất cả danh mục (kể cả danh mục không có sản phẩm)
         let list = await catModel.find();
         dataRes.data = list;
     } catch (error) {
@@ -83,39 +106,75 @@ exports.GetTopCategories = async (req, res, next) => {
     let dataRes = { msg: 'OK' };
     
     try {
-        // Đếm số sản phẩm theo từng category
-        const categoryCounts = await pModel.aggregate([
+        // Tính tổng số lượng sản phẩm bán chạy (total_sold) theo từng category
+        // Bước 1: Aggregate từ variantSalesModel để lấy product_id và quantity_sold
+        // Bước 2: Join với product để lấy catID
+        // Bước 3: Group theo catID và tính tổng quantity_sold
+        const categorySalesStats = await variantSalesModel.aggregate([
             {
-                $group: {
-                    _id: "$catID",
-                    productCount: { $sum: 1 }
+                $lookup: {
+                    from: "products",
+                    localField: "product_id",
+                    foreignField: "_id",
+                    as: "product"
                 }
             },
             {
-                $sort: { productCount: -1 }
+                $unwind: "$product"
+            },
+            {
+                $match: {
+                    "product.is_deleted": { $ne: true },
+                    "product.catID": { $ne: null } // Đảm bảo catID không null
+                }
+            },
+            {
+                $group: {
+                    _id: "$product.catID",
+                    totalSold: { $sum: "$quantity_sold" }
+                }
+            },
+            {
+                $sort: { totalSold: -1 }
             },
             {
                 $limit: 4
             }
         ]);
 
+        // Chỉ lấy top 4 category có số lượng bán chạy nhất (không có fallback)
+        let categoryIds = [];
+        
+        if (categorySalesStats && categorySalesStats.length > 0) {
+            categoryIds = categorySalesStats.map(item => item._id).filter(id => id != null);
+        }
+
+        // Nếu không có dữ liệu bán hàng, trả về mảng rỗng
+        if (categoryIds.length === 0) {
+            dataRes.data = [];
+            dataRes.total = 0;
+            dataRes.msg = "Không có dữ liệu bán hàng";
+            return res.json(dataRes);
+        }
+
         // Lấy thông tin chi tiết của các category
-        const categoryIds = categoryCounts.map(item => item._id);
         const categories = await catModel.find({
             _id: { $in: categoryIds }
         });
 
-        // Kết hợp thông tin
+        // Kết hợp thông tin với totalSold từ sales stats
         const result = categories.map(category => {
-            const countInfo = categoryCounts.find(item => item._id.toString() === category._id.toString());
+            const salesInfo = categorySalesStats.find(item => 
+                item._id && item._id.toString() === category._id.toString()
+            );
             return {
                 _id: category._id,
                 name: category.name,
-                productCount: countInfo ? countInfo.productCount : 0
+                productCount: salesInfo ? salesInfo.totalSold : 0 // Dùng totalSold (số lượng bán chạy)
             };
         });
 
-        // Sắp xếp lại theo số lượng sản phẩm giảm dần
+        // Sắp xếp lại theo số lượng bán chạy giảm dần
         result.sort((a, b) => b.productCount - a.productCount);
 
         dataRes.data = result;
